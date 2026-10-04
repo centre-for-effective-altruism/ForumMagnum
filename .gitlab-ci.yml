@@ -68,12 +68,18 @@ playwright-tests:
     - apt-get install -y postgresql-client
     - corepack enable
     - yarn install --frozen-lockfile
+    - yarn playwright install chromium --with-deps
     - timeout 60 bash -c 'until pg_isready -h postgres -p 5432 -U postgres -t 2; do sleep 1; done'
-  script:
     - psql postgres://postgres:password@postgres:5432/postgres -f schema/accepted_schema.sql
     - psql postgres://postgres:password@postgres:5432/postgres -f playwright/fixtures.sql
-    - yarn playwright install chromium --with-deps
+  script:
     - yarn playwright test --project chromium
+  artifacts:
+    when: on_failure
+    paths:
+      - playwright-report/
+      - test-results/
+    expire_in: 1 week
 
 crosspost-tests:
   stage: checks
@@ -98,12 +104,18 @@ crosspost-tests:
     - apt-get install -y postgresql-client
     - corepack enable
     - yarn install --frozen-lockfile
+    - yarn playwright install chromium --with-deps
     - timeout 60 bash -c 'until pg_isready -h postgres-local -p 5432 -U postgres -t 2; do sleep 1; done'
     - timeout 60 bash -c 'until pg_isready -h postgres-foreign -p 5432 -U postgres -t 2; do sleep 1; done'
-  script:
     - psql postgres://postgres:password@postgres-local:5432/postgres -f schema/accepted_schema.sql
     - psql postgres://postgres:password@postgres-local:5432/postgres -f playwright/fixtures.sql
     - psql postgres://postgres:password@postgres-foreign:5432/postgres -f schema/accepted_schema.sql
     - psql postgres://postgres:password@postgres-foreign:5432/postgres -f playwright/fixtures.sql
-    - yarn playwright install chromium --with-deps
+  script:
     - yarn playwright-test-crosspost
+  artifacts:
+    when: on_failure
+    paths:
+      - playwright-report/
+      - test-results/
+    expire_in: 1 week
