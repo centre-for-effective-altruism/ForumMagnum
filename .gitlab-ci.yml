@@ -1,16 +1,32 @@
 image: node:22
 
 stages:
-  - lint
+  - checks
 
 variables:
   BROWSERSLIST_IGNORE_OLD_DATA: "1"
   NODE_OPTIONS: "--max-old-space-size=4096"
 
-runLint:
-  stage: lint
+lint:
+  stage: checks
   before_script:
     - corepack enable
     - yarn install --frozen-lockfile
   script:
     - yarn run eslint
+
+typecheck:
+  stage: checks
+  before_script:
+    - corepack enable
+    - yarn install --frozen-lockfile
+  script:
+    - yarn run tsc
+
+unit-tests:
+  stage: checks
+  before_script:
+    - corepack enable
+    - yarn install --frozen-lockfile
+  script:
+    - yarn run unit-ci
