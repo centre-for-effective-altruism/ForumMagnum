@@ -68,6 +68,7 @@ playwright-tests:
     - apt-get install -y postgresql-client
     - corepack enable
     - yarn install --frozen-lockfile
+    - timeout 60 bash -c 'until pg_isready -h postgres -p 5432 -U postgres -t 2; do sleep 1; done'
   script:
     - psql postgres://postgres:password@postgres:5432/postgres -f schema/accepted_schema.sql
     - psql postgres://postgres:password@postgres:5432/postgres -f playwright/fixtures.sql
@@ -97,6 +98,8 @@ crosspost-tests:
     - apt-get install -y postgresql-client
     - corepack enable
     - yarn install --frozen-lockfile
+    - timeout 60 bash -c 'until pg_isready -h postgres-local -p 5432 -U postgres -t 2; do sleep 1; done'
+    - timeout 60 bash -c 'until pg_isready -h postgres-foreign -p 5432 -U postgres -t 2; do sleep 1; done'
   script:
     - psql postgres://postgres:password@postgres-local:5432/postgres -f schema/accepted_schema.sql
     - psql postgres://postgres:password@postgres-local:5432/postgres -f playwright/fixtures.sql
