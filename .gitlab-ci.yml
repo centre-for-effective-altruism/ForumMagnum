@@ -51,3 +51,31 @@ integration-tests:
   script:
     - yarn create-integration-db-ci
     - yarn run integration-ci
+
+crosspost-tests:
+  stage: checks
+  services:
+    - name: ankane/pgvector
+      alias: postgres-local
+      variables:
+        POSTGRES_DB: postgres
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+    - name: ankane/pgvector
+      alias: postgres-foreign
+      variables:
+        POSTGRES_DB: postgres
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+  before_script:
+    - apt-get update
+    - apt-get install -y postgresql-client
+    - corepack enable
+    - yarn install --frozen-lockfile
+  script:
+    - psql postgres://postgres:password@postgres-local:5432/postgres -f schema/accepted_schema.sql
+    - psql postgres://postgres:password@postgres-local:5432/postgres -f playwright/fixtures.sql
+    - psql postgres://postgres:password@postgres-foreign:5432/postgres -f schema/accepted_schema.sql
+    - psql postgres://postgres:password@postgres-foreign:5432/postgres -f playwright/fixtures.sql
+    - yarn playwright install chromium --with-deps
+    - yarn playwright-test-crosspost
