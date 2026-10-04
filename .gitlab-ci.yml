@@ -30,3 +30,24 @@ unit-tests:
     - yarn install --frozen-lockfile
   script:
     - yarn run unit-ci
+
+integration-tests:
+  stage: checks
+  image: node:22
+  services:
+    - name: ankane/pgvector
+      alias: postgres
+      variables:
+        POSTGRES_DB: unittest_jest_template
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+  variables:
+    PG_URL: postgres://postgres:postgres@postgres:5432/postgres
+    NODE_OPTIONS: "--max_old_space_size=4096"
+    SLOW_QUERY_REPORT_CUTOFF_MS: "-1"
+  before_script:
+    - corepack enable
+    - yarn install --frozen-lockfile
+  script:
+    - yarn create-integration-db-ci
+    - yarn run integration-ci
