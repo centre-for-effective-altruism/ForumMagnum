@@ -22,7 +22,7 @@ const getWebServers = () => {
     command: "yarn start-playwright",
     url: "http://localhost:3456",
     reuseExistingServer: true,
-    stdout: "ignore",
+    stdout: "pipe",
     stderr: "pipe",
   });
 
@@ -41,7 +41,7 @@ const getWebServers = () => {
       command: "yarn start-playwright-crosspost",
       url: "http://localhost:3467",
       reuseExistingServer: true,
-      stdout: "ignore",
+      stdout: "pipe",
       stderr: "pipe",
     });
   }
