@@ -6,6 +6,7 @@ stages:
 variables:
   BROWSERSLIST_IGNORE_OLD_DATA: "1"
   NODE_OPTIONS: "--max-old-space-size=4096"
+  SLOW_QUERY_REPORT_CUTOFF_MS: "-1"
 
 lint:
   stage: checks
@@ -33,7 +34,6 @@ unit-tests:
 
 integration-tests:
   stage: checks
-  image: node:22
   services:
     - name: ankane/pgvector
       alias: postgres
@@ -43,9 +43,9 @@ integration-tests:
         POSTGRES_PASSWORD: postgres
   variables:
     PG_URL: postgres://postgres:postgres@postgres:5432/postgres
-    NODE_OPTIONS: "--max_old_space_size=4096"
-    SLOW_QUERY_REPORT_CUTOFF_MS: "-1"
   before_script:
+    - apt-get update
+    - apt-get install -y postgresql-client
     - corepack enable
     - yarn install --frozen-lockfile
   script:
