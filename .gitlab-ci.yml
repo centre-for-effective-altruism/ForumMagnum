@@ -1,0 +1,15 @@
+image: node:22
+
+stages:
+  - lint
+
+variables:
+  BROWSERSLIST_IGNORE_OLD_DATA: "1"
+
+runLint:
+  stage: lint
+  before_script:
+    - corepack enable
+    - yarn install --frozen-lockfile
+  script:
+    - yarn run eslint
