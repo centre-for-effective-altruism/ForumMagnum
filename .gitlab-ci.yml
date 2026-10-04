@@ -52,7 +52,7 @@ integration-tests:
     - yarn create-integration-db-ci
     - yarn run integration-ci
 
-playwright:
+playwright-tests:
   stage: checks
   services:
     - name: ankane/pgvector
@@ -89,6 +89,9 @@ crosspost-tests:
         POSTGRES_DB: postgres
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: password
+  variables:
+    PG_URL: postgres://postgres:password@postgres-local:5432/postgres
+    PG_CROSSPOST_URL: postgres://postgres:password@postgres-foreign:5432/postgres
   before_script:
     - apt-get update
     - apt-get install -y postgresql-client
