@@ -5,6 +5,7 @@ stages:
 
 variables:
   BROWSERSLIST_IGNORE_OLD_DATA: "1"
+  NODE_OPTIONS: "--max-old-space-size=4096"
 
 runLint:
   stage: lint
