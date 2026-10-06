@@ -93,7 +93,7 @@ async function getUserCountryCode({ signal }: { signal?: AbortSignal } = {}): Pr
 
   inFlightRequest = (async () => {
     try {
-      const response = await fetch("api/country", { signal });
+      const response = await fetch("/api/country", { signal });
 
       if (!response.ok) {
         throw new Error(`Error fetching user country: ${response.statusText}`);
