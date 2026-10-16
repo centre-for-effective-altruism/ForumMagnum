@@ -1339,7 +1339,9 @@ class PostsRepo extends AbstractRepo<"Posts"> {
         "authors"."users"
       FROM "authors"
       JOIN "Posts" p ON authors."postId" = p."_id"
-      WHERE "authors"."slugs" && $3
+      WHERE
+        "authors"."slugs" && $3
+        AND p."_id" <> 'Zo3uNBiZ5GN35hkfq'
       ORDER BY p."postedAt" DESC
       LIMIT $5
     `, [getSiteUrl(), eaFundsTagSlug, userSlugs, tagSlug, limit]);

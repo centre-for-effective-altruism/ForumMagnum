@@ -1,8 +1,6 @@
 import { isServer } from "../../../lib/executionEnvironment";
-import { DatabasePublicSetting, hasCookieConsentSetting } from "../../../lib/publicSettings";
+import { hasCookieConsentSetting } from "../../../lib/publicSettings";
 import { getBrowserLocalStorage } from "../../editor/localStorageHandlers";
-
-const ipApiKeySetting = new DatabasePublicSetting<string | null>('ipapi.apiKey', null);
 
 const GDPR_COUNTRY_CODES: string[] = [
   "AT", // Austria
@@ -93,12 +91,9 @@ async function getUserCountryCode({ signal }: { signal?: AbortSignal } = {}): Pr
     return countryCode;
   }
 
-  const apiKey = ipApiKeySetting.get();
-  const ipapiUrl = apiKey ? `https://ipapi.co/json/?key=${apiKey}` : 'https://ipapi.co/json/';
-
   inFlightRequest = (async () => {
     try {
-      const response = await fetch(ipapiUrl, { signal });
+      const response = await fetch("/api/country", { signal });
 
       if (!response.ok) {
         throw new Error(`Error fetching user country: ${response.statusText}`);
