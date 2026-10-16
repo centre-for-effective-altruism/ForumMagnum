@@ -85,13 +85,14 @@ class MockAuth0Client extends IAuth0BackendClient {
   }
 }
 
+const settings = new DatabaseServerSetting<Auth0Settings|null>("oAuth.auth0", null);
+
 /**
  * Auth0 Management API Client
  * For this to work, we must authorize the forum application in Auth0:
  * Applications -> APIs -> Auth0 Management API -> Machine to Machine Applications
  */
-class Auth0Client extends IAuth0BackendClient {
-  private settings = new DatabaseServerSetting<Auth0Settings|null>("oAuth.auth0", null);
+export class Auth0Client extends IAuth0BackendClient {
   private managementClient?: ManagementClient;
   private authClient?: AuthenticationClient;
 
@@ -100,14 +101,14 @@ class Auth0Client extends IAuth0BackendClient {
       appId: clientId,
       secret: clientSecret,
       originalDomain: domain,
-    } = this.settings?.get() ?? {};
+    } = settings?.get() ?? {};
     if (!clientId || !clientSecret || !domain) {
       throw new Error("Missing auth0 environment settings");
     }
     return {clientId, clientSecret, domain};
   }
 
-  private getManagementClient() {
+  getManagementClient() {
     if (!this.managementClient) {
       this.managementClient = new ManagementClient({
         ...this.getSettings(),
