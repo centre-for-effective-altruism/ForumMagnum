@@ -32,7 +32,7 @@ type RawEvent = {
 export const writeEventsToPosthog = (events: RawEvent[]) => {
   for (const { type, timestamp, props } of events) {
     getPosthog()?.capture({
-      distinctId: (props.userId || props.clientId || "anonymous") as string,
+      distinctId: (props.userId || props.clientId) as string,
       event: type,
       timestamp,
       properties: props,
