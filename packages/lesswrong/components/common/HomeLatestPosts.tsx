@@ -3,7 +3,7 @@ import { registerComponent } from '../../lib/vulcan-lib/components';
 import { useCurrentUser } from '../common/withUser';
 import { Link } from '../../lib/reactRouterWrapper';
 import { useLocation } from '../../lib/routeUtil';
-import { AnalyticsContext, useOnMountTracking } from '../../lib/analyticsEvents';
+import { AnalyticsContext } from '../../lib/analyticsEvents';
 import { FilterSettings, useFilterSettings } from '../../lib/filterSettings';
 import moment from '../../lib/moment-timezone';
 import { useCurrentTime } from '../../lib/utils/timeUtil';
@@ -121,15 +121,6 @@ const HomeLatestPosts = ({classes}: {classes: ClassesType<typeof styles>}) => {
   // (except that on the EA Forum/FriendlyUI it always starts out hidden)
   const [filterSettingsVisibleDesktop, setFilterSettingsVisibleDesktop] = useState(isFriendlyUI ? false : !currentUser?.hideFrontpageFilterSettingsDesktop);
   const [filterSettingsVisibleMobile, setFilterSettingsVisibleMobile] = useState(false);
-  const { captureEvent } = useOnMountTracking({
-    eventType:"frontpageFilterSettings",
-    eventProps: {
-      filterSettings,
-      filterSettingsVisible: filterSettingsVisibleDesktop,
-      pageSectionContext: "latestPosts"
-    },
-    captureOnMount: true,
-  })
   const { query } = location;
   const limit = parseInt(query.limit) || defaultLimit;
 
@@ -150,11 +141,6 @@ const HomeLatestPosts = ({classes}: {classes: ClassesType<typeof styles>}) => {
     if (isLWorAF) {
       void updateCurrentUser({hideFrontpageFilterSettingsDesktop: filterSettingsVisibleDesktop})
     }
-    
-    captureEvent("filterSettingsClicked", {
-      settingsVisible: !filterSettingsVisibleDesktop,
-      settings: filterSettings,
-    })
   }
 
   const showCurated = isFriendlyUI || (isLW && reviewIsActive())
@@ -187,11 +173,6 @@ const HomeLatestPosts = ({classes}: {classes: ClassesType<typeof styles>}) => {
                 showIcon={false}
                 onClick={() => {
                   setFilterSettingsVisibleMobile(!filterSettingsVisibleMobile)
-                  captureEvent("filterSettingsClicked", {
-                    settingsVisible: !filterSettingsVisibleMobile,
-                    settings: filterSettings,
-                    pageSectionContext: "latestPosts"
-                  })
                 }} />
             </LWTooltip>
             {isFriendlyUI && <PostsListViewToggle />}

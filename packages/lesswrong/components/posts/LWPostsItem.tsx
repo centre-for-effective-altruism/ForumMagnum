@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import { NEW_COMMENT_MARGIN_BOTTOM } from '../comments/constants';
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { cloudinaryCloudNameSetting } from '../../lib/publicSettings';
-import { getReviewPhase, postEligibleForReview, postPassedNomination, REVIEW_YEAR, reviewIsActive } from '../../lib/reviewUtils';
+import { getReviewPhase, postEligibleForReview, postPassedNomination, REVIEW_YEAR } from '../../lib/reviewUtils';
 import { PostsItemConfig, usePostsItem } from './usePostsItem';
 import PostsItemTrailingButtons, { MENU_WIDTH, DismissButton } from './PostsItemTrailingButtons';
 import DebateIcon from '@/lib/vendor/@material-ui/icons/src/Forum';
@@ -501,7 +501,6 @@ const LWPostsItem = ({classes, ...props}: PostsList2Props) => {
                 <AnalyticsTracker
                     eventType={"postItem"}
                     eventProps={{mountedPostId: post._id, mountedPostScore: post.score, mountedPostBaseScore: post.baseScore}}
-                    captureOnMount={(eventData) => eventData.capturePostItemOnMount}
                     captureOnClick={false}
                 >
                   <PostsTitle

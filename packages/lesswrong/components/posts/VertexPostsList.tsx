@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { NetworkStatus, gql, useQuery } from '@apollo/client';
-import { VertexConfiguration } from '../../lib/collections/users/recommendationSettings';
-import { useOnMountTracking } from '../../lib/analyticsEvents';
 import { isServer } from '../../lib/executionEnvironment';
 import { registerComponent } from "../../lib/vulcan-lib/components";
 import { fragmentTextForQuery } from "../../lib/vulcan-lib/fragments";
@@ -15,12 +13,6 @@ interface VertexRecommendedPost {
   post: PostsListWithVotes,
   attributionId?: string,
 }
-
-const styles = (theme: ThemeType) => ({
-  root: {
-
-  }
-});
 
 const DEFAULT_RESOLVER_NAME = 'GoogleVertexPosts';
 
@@ -40,26 +32,14 @@ const getVertexPostsQuery = (resolverName: VertexResolver) => gql`
   ${fragmentTextForQuery('PostsListWithVotes')}
 `;
 
-const getLoadMoreSettings = (resolverName: VertexResolver, results: VertexRecommendedPost[]): VertexConfiguration['loadMore'] => {
-  switch (resolverName) {
-    case DEFAULT_RESOLVER_NAME:
-      const prevAttributionId = results.find(result => result.attributionId)?.attributionId;
-      if (!prevAttributionId) {
-        return undefined;
-      }
-      return { prevAttributionId };  
-  }
-}
-
 export const stickiedPostTerms: PostsViewTerms = {
   view: 'stickied',
   limit: 4, // seriously, shouldn't have more than 4 stickied posts
   forum: true
 };
 
-export const VertexPostsList = ({ limit = 100, classes }: {
+export const VertexPostsList = ({ limit = 100 }: {
   limit?: number,
-  classes: ClassesType<typeof styles>,
 }) => {
   const [displayCount, setDisplayCount] = useState(15);
 
@@ -76,14 +56,6 @@ export const VertexPostsList = ({ limit = 100, classes }: {
   });
 
   const results: VertexRecommendedPost[] | undefined = data?.[resolverName]?.results;
-  const postIds = results?.map(({post}) => post._id) ?? [];
-
-  useOnMountTracking({
-    eventType: "postList",
-    eventProps: { postIds },
-    captureOnMount: (eventProps) => eventProps.postIds.length > 0,
-    skip: !postIds.length || loading,
-  });
 
   if (loading && !results) {
     return <PostsLoading placeholderCount={limit} />;
@@ -94,7 +66,7 @@ export const VertexPostsList = ({ limit = 100, classes }: {
   }
 
   return <div>
-    <div className={classes.root}>
+    <div>
       {results.slice(0, displayCount).map(({ post, attributionId }) => <PostsItem 
         key={post._id} 
         post={post} 
@@ -116,6 +88,4 @@ export const VertexPostsList = ({ limit = 100, classes }: {
   </div>;
 }
 
-export default registerComponent('VertexPostsList', VertexPostsList, {styles});
-
-
+export default registerComponent('VertexPostsList', VertexPostsList);

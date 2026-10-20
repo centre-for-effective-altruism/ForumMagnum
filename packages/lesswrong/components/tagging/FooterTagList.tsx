@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMulti } from '../../lib/crud/withMulti';
 import { useMutation, gql } from '@apollo/client';
 import { useCurrentUser } from '../common/withUser';
-import { useTracking, useOnMountTracking } from "../../lib/analyticsEvents";
+import { useTracking } from "../../lib/analyticsEvents";
 import { contentTypes } from '../posts/PostsPage/ContentType';
 import FooterTag, { tagStyle, smallTagTextStyle } from './FooterTag';
 import classNames from 'classnames';
@@ -178,7 +178,7 @@ const FooterTagList = ({
   // - (somewhat speculative) It allows the mutation to be handled more seamlessly
   // (incrementing the score and reordering the tags) by updating the result of
   // this query
-  const { results, loading, loadingInitial, refetch } = useMulti({
+  const { results, loadingInitial, refetch } = useMulti({
     terms: {
       view: "tagsOnPost",
       postId: post._id,
@@ -223,14 +223,6 @@ const FooterTagList = ({
   const tagIds = (results ? results.map((tagRel) => tagRel.tag?._id) : post.tags.map((tag) => tag._id)).filter(
     Boolean
   ) as string[];
-
-  useOnMountTracking({
-    eventType: "tagList",
-    eventProps: {tagIds},
-    captureOnMount: eventProps => eventProps.tagIds.length > 0,
-    // LW doesn't get a lot of use out of `tagListMounted` events and there are a lot of them
-    skip: isLWorAF || !tagIds.length || loading
-  });
 
   const [mutate] = useMutation(gql`
     mutation addOrUpvoteTag($tagId: String, $postId: String) {

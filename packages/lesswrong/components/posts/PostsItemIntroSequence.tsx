@@ -183,7 +183,6 @@ const PostsItemIntroSequence = ({
           <span className={classes.title}>
             <AnalyticsTracker
               eventType={"postItem"}
-              captureOnMount={(eventData) => eventData.capturePostItemOnMount}
               captureOnClick={false}
             >
               <PostsTitle
