@@ -130,7 +130,6 @@ import './server/fmCrosspost/resolvers';
 import './server/exportUserData';
 import './server/deleteUserContent';
 
-import './server/userJobAdCron';
 import './server/inactiveUserSurveyCron';
 
 import "./server/languageModels/autoTagCallbacks";
