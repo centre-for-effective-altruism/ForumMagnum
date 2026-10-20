@@ -166,43 +166,6 @@ function closeRenderRequestPerfMetric(rendered: RenderResult & { cached?: boolea
   closeRequestPerfMetric();
 }
 
-function recordSsrAnalytics(
-  params: AttemptCachedRenderParams | AttemptNonCachedRenderParams,
-  rendered: Exclude<RenderResult, { aborted: true }> & { cached?: boolean }
-) {
-  const { req, startTime, userAgent, url, tabId, ip } = params;
-
-  if (!shouldRecordSsrAnalytics(userAgent)) return;
-
-  const clientId = getCookieFromReq(req, "clientId");
-
-  const userId = params.cacheAttempt
-    ? null
-    : params.user?._id;
-
-  const timings = params.cacheAttempt
-    ? { totalTime: new Date().valueOf() - startTime.valueOf() }
-    : rendered.timings;
-
-  const cached = params.cacheAttempt
-    ? rendered.cached
-    : false;
-
-  const abTestGroups = rendered.allAbTestGroups;
-
-  captureEvent("ssr", {
-    url,
-    tabId,
-    clientId,
-    ip,
-    userAgent,
-    userId,
-    timings,
-    abTestGroups,
-    cached,
-  });
-}
-
 function getRequestMetadata(req: Request) {
   const ip = getIpFromRequest(req)
   const userAgent = req.headers["user-agent"];
@@ -294,7 +257,6 @@ export const renderWithCache = async (req: Request, res: Response, user: DbUser|
   }
 
   logRequestToConsole(req, user, tabId, rendered);
-  recordSsrAnalytics(renderParams, rendered);
 
   return {
     ...rendered,
@@ -397,24 +359,6 @@ function logRenderQueueState() {
 function isExcludedFromPageCache(path: string): boolean {
   if (path.startsWith("/collaborateOnPost") || path.startsWith("/editPost")) return true;
   return false
-}
-
-const userAgentExclusions = [
-  'health',
-  'bot',
-  'spider',
-  'crawler',
-  'curl',
-  'node',
-  'python'
-];
-
-function shouldRecordSsrAnalytics(userAgent?: string) {
-  if (!userAgent) {
-    return true;
-  }
-
-  return !userAgentExclusions.some(excludedAgent => userAgent.toLowerCase().includes(excludedAgent));
 }
 
 export const getThemeOptionsFromReq = (req: Request, user: DbUser|null): AbstractThemeOptions => {
