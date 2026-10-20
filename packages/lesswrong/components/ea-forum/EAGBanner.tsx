@@ -11,7 +11,6 @@ import { distance } from "../community/modules/LocalGroups";
 import { getCachedUserCountryCode } from "../common/CookieBanner/geolocation";
 import { lightbulbIcon } from "../icons/lightbulbIcon";
 import DeferRender from "../common/DeferRender";
-import AnalyticsInViewTracker from "../common/AnalyticsInViewTracker";
 import SingleColumnSection from "../common/SingleColumnSection";
 import LWTooltip from "../common/LWTooltip";
 import HoverPreviewLink from "../linkPreview/HoverPreviewLink";
@@ -140,53 +139,47 @@ const EAGBanner = ({classes}: {classes: ClassesType<typeof styles>}) => {
   ) {
     return null;
   }
-  const inViewEventProps = {
-    inViewType: `${eagName}Banner`,
-    reason: userLocationNearby && userInCountry ? 'both' : userLocationNearby ? 'nearby' : 'country'
-  }
 
   return (
     <DeferRender ssr={!!currentUser}>
       <AnalyticsContext pageElementContext="EAGBanner">
-        <AnalyticsInViewTracker eventProps={inViewEventProps}>
-          <SingleColumnSection className={classes.root}>
-            <div className={classes.lightbulb}>{lightbulbIcon}</div>
-            <div className={classes.content}>
-              <div className={classes.topRow}>
-                Upcoming conference near you
-                <LWTooltip title={
-                    <>
-                      You're seeing this recommendation because of your location.{" "}
-                      {userLocationNearby && <>
-                        You can update your account location via your{" "}
-                        <Link to="/account?highlightField=googleLocation" className={classes.link}>
-                          account settings
-                        </Link>.
-                      </>}
-                    </>
-                  }
-                  clickable={userLocationNearby}
-                >
-                  <ForumIcon icon="QuestionMarkCircle" className={classes.infoIcon} />
-                </LWTooltip>
-              </div>
-              <div>
-                <HoverPreviewLink href={eagPostLink}>
-                  <span className={classes.bold}>{eagName}</span>
-                </HoverPreviewLink>{" "}
-                applications close on {applicationDeadline.format('ddd MMMM D')}.{" "}
-                <Link to={eagLink} className={classes.applyLink}>
-                  Apply now
-                </Link>
-              </div>
+        <SingleColumnSection className={classes.root}>
+          <div className={classes.lightbulb}>{lightbulbIcon}</div>
+          <div className={classes.content}>
+            <div className={classes.topRow}>
+              Upcoming conference near you
+              <LWTooltip title={
+                  <>
+                    You're seeing this recommendation because of your location.{" "}
+                    {userLocationNearby && <>
+                      You can update your account location via your{" "}
+                      <Link to="/account?highlightField=googleLocation" className={classes.link}>
+                        account settings
+                      </Link>.
+                    </>}
+                  </>
+                }
+                clickable={userLocationNearby}
+              >
+                <ForumIcon icon="QuestionMarkCircle" className={classes.infoIcon} />
+              </LWTooltip>
             </div>
-            <ForumIcon
-              icon="Close"
-              onClick={onDismissBanner}
-              className={classes.close}
-            />
-          </SingleColumnSection>
-        </AnalyticsInViewTracker>
+            <div>
+              <HoverPreviewLink href={eagPostLink}>
+                <span className={classes.bold}>{eagName}</span>
+              </HoverPreviewLink>{" "}
+              applications close on {applicationDeadline.format('ddd MMMM D')}.{" "}
+              <Link to={eagLink} className={classes.applyLink}>
+                Apply now
+              </Link>
+            </div>
+          </div>
+          <ForumIcon
+            icon="Close"
+            onClick={onDismissBanner}
+            className={classes.close}
+          />
+        </SingleColumnSection>
       </AnalyticsContext>
     </DeferRender>
   );
@@ -197,5 +190,3 @@ export default registerComponent(
   EAGBanner,
   {styles},
 );
-
-

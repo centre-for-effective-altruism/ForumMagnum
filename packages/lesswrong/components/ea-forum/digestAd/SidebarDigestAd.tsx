@@ -6,7 +6,6 @@ import { eaForumDigestSubscribeURL } from '../../recentDiscussion/RecentDiscussi
 import { Link } from '../../../lib/reactRouterWrapper';
 import classNames from 'classnames';
 import { useDigestAd } from './useDigestAd';
-import AnalyticsInViewTracker from "../../common/AnalyticsInViewTracker";
 import ForumIcon from "../../common/ForumIcon";
 import EAButton from "../EAButton";
 
@@ -139,18 +138,16 @@ const SidebarDigestAd = ({className, classes}: {
   }
   
   return <AnalyticsContext pageSubSectionContext="digestAd">
-    <AnalyticsInViewTracker eventProps={{inViewType: "sidebarDigestAd"}}>
-      <div className={classNames(classes.root, className)}>
-        <div className={classes.headingRow}>
-          <h2 className={classes.heading}>{DIGEST_AD_HEADLINE_TEXT}</h2>
-          <ForumIcon icon="Close" className={classes.close} onClick={handleClose} />
-        </div>
-        <div className={classes.body}>
-          {DIGEST_AD_BODY_TEXT}
-        </div>
-        {formNode}
+    <div className={classNames(classes.root, className)}>
+      <div className={classes.headingRow}>
+        <h2 className={classes.heading}>{DIGEST_AD_HEADLINE_TEXT}</h2>
+        <ForumIcon icon="Close" className={classes.close} onClick={handleClose} />
       </div>
-    </AnalyticsInViewTracker>
+      <div className={classes.body}>
+        {DIGEST_AD_BODY_TEXT}
+      </div>
+      {formNode}
+    </div>
   </AnalyticsContext>
 }
 

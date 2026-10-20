@@ -12,7 +12,6 @@ import EARecentDiscussionTagRevision from "./EARecentDiscussionTagRevision";
 import SingleColumnSection from "../common/SingleColumnSection";
 import SectionTitle from "../common/SectionTitle";
 import MixedTypeFeed from "../common/MixedTypeFeed";
-import AnalyticsInViewTracker from "../common/AnalyticsInViewTracker";
 import EARecentDiscussionNewQuickTake from './EARecentDiscussionNewQuickTake';
 import EARecentDiscussionQuickTakeCommented from './EARecentDiscussionQuickTakeCommented';
 
@@ -46,92 +45,90 @@ const RecentDiscussionFeed = ({
 
   return (
     <AnalyticsContext pageSectionContext="recentDiscussion">
-      <AnalyticsInViewTracker eventProps={{inViewType: "recentDiscussion"}}>
-        <SingleColumnSection>
-          <SectionTitle title={title} large />
-          <MixedTypeFeed
-            firstPageSize={10}
-            pageSize={20}
-            refetchRef={refetchRef}
-            resolverName="RecentDiscussionFeed"
-            sortKeyType="Date"
-            resolverArgs={{ af: 'Boolean' }}
-            resolverArgsValues={{ af }}
-            fragmentArgs={{
-              commentsLimit: 'Int',
-              maxAgeHours: 'Int',
-              tagCommentsLimit: 'Int',
-            }}
-            fragmentArgsValues={{
-              commentsLimit, maxAgeHours,
-              tagCommentsLimit: commentsLimit,
-            }}
-            renderers={{
-              postCommented: {
-                fragmentName: "PostsRecentDiscussion",
-                render: (post: PostsRecentDiscussion) => (
-                  <EARecentDiscussionThread
-                    post={post}
-                    refetch={refetch}
-                    comments={post.recentComments}
-                    expandAllThreads={expandAll}
+      <SingleColumnSection>
+        <SectionTitle title={title} large />
+        <MixedTypeFeed
+          firstPageSize={10}
+          pageSize={20}
+          refetchRef={refetchRef}
+          resolverName="RecentDiscussionFeed"
+          sortKeyType="Date"
+          resolverArgs={{ af: 'Boolean' }}
+          resolverArgsValues={{ af }}
+          fragmentArgs={{
+            commentsLimit: 'Int',
+            maxAgeHours: 'Int',
+            tagCommentsLimit: 'Int',
+          }}
+          fragmentArgsValues={{
+            commentsLimit, maxAgeHours,
+            tagCommentsLimit: commentsLimit,
+          }}
+          renderers={{
+            postCommented: {
+              fragmentName: "PostsRecentDiscussion",
+              render: (post: PostsRecentDiscussion) => (
+                <EARecentDiscussionThread
+                  post={post}
+                  refetch={refetch}
+                  comments={post.recentComments}
+                  expandAllThreads={expandAll}
+                />
+              )
+            },
+            newQuickTake: {
+              fragmentName: "QuickTakesRecentDiscussion",
+              render: (quickTake: QuickTakesRecentDiscussion) => (
+                <EARecentDiscussionNewQuickTake
+                  quickTake={quickTake}
+                  refetch={refetch}
+                />
+              ),
+            },
+            quickTakeCommented: {
+              fragmentName: "PostQuickTakesRecentDiscussion",
+              render: (post: PostQuickTakesRecentDiscussion) => (
+                <EARecentDiscussionQuickTakeCommented
+                  post={post}
+                  comments={post.recentQuickTakeComments}
+                  expandAllThreads={expandAll}
+                  refetch={refetch}
+                />
+              )
+            },
+            tagDiscussed: {
+              fragmentName: "TagRecentDiscussion",
+              render: (tag: TagRecentDiscussion) => (
+                <EARecentDiscussionTagCommented
+                  tag={tag}
+                  refetch={refetch}
+                  comments={tag.recentComments}
+                  expandAllThreads={expandAll}
+                />
+              )
+            },
+            tagRevised: {
+              fragmentName: "RecentDiscussionRevisionTagFragment",
+              render: (revision: RecentDiscussionRevisionTagFragment) => <div>
+                {revision.tag && revision.documentId &&
+                  <EARecentDiscussionTagRevision
+                    tag={revision.tag}
+                    revision={revision}
+                    headingStyle="full"
+                    documentId={revision.documentId}
                   />
-                )
+                }
+              </div>,
+            },
+            ...(showSubscribeReminderInFeed.get() ? {
+              subscribeReminder: {
+                fragmentName: null,
+                render: () => <RecentDiscussionSubscribeReminder />,
               },
-              newQuickTake: {
-                fragmentName: "QuickTakesRecentDiscussion",
-                render: (quickTake: QuickTakesRecentDiscussion) => (
-                  <EARecentDiscussionNewQuickTake
-                    quickTake={quickTake}
-                    refetch={refetch}
-                  />
-                ),
-              },
-              quickTakeCommented: {
-                fragmentName: "PostQuickTakesRecentDiscussion",
-                render: (post: PostQuickTakesRecentDiscussion) => (
-                  <EARecentDiscussionQuickTakeCommented
-                    post={post}
-                    comments={post.recentQuickTakeComments}
-                    expandAllThreads={expandAll}
-                    refetch={refetch}
-                  />
-                )
-              },
-              tagDiscussed: {
-                fragmentName: "TagRecentDiscussion",
-                render: (tag: TagRecentDiscussion) => (
-                  <EARecentDiscussionTagCommented
-                    tag={tag}
-                    refetch={refetch}
-                    comments={tag.recentComments}
-                    expandAllThreads={expandAll}
-                  />
-                )
-              },
-              tagRevised: {
-                fragmentName: "RecentDiscussionRevisionTagFragment",
-                render: (revision: RecentDiscussionRevisionTagFragment) => <div>
-                  {revision.tag && revision.documentId &&
-                    <EARecentDiscussionTagRevision
-                      tag={revision.tag}
-                      revision={revision}
-                      headingStyle="full"
-                      documentId={revision.documentId}
-                    />
-                  }
-                </div>,
-              },
-              ...(showSubscribeReminderInFeed.get() ? {
-                subscribeReminder: {
-                  fragmentName: null,
-                  render: () => <RecentDiscussionSubscribeReminder />,
-                },
-              } : {}),
-            }}
-          />
-        </SingleColumnSection>
-      </AnalyticsInViewTracker>
+            } : {}),
+          }}
+        />
+      </SingleColumnSection>
     </AnalyticsContext>
   )
 }

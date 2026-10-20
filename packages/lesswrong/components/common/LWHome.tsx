@@ -10,7 +10,6 @@ import { isLW, isAF } from '@/lib/instanceSettings';
 import { combineUrls, getSiteUrl } from "../../lib/vulcan-lib/utils";
 import { registerComponent } from "../../lib/vulcan-lib/components";
 import RecentDiscussionFeed from "../recentDiscussion/RecentDiscussionFeed";
-import AnalyticsInViewTracker from "./AnalyticsInViewTracker";
 import FrontpageReviewWidget from "../review/FrontpageReviewWidget";
 import SingleColumnSection from "./SingleColumnSection";
 import EAPopularCommentsSection from "../ea-forum/EAPopularCommentsSection";
@@ -62,23 +61,18 @@ const LWHome = () => {
           </>}
           {(!reviewIsActive() || getReviewPhase() === "RESULTS" || !showReviewOnFrontPageIfActive.get()) && !lightconeFundraiserActive.get() && <SingleColumnSection>
           </SingleColumnSection>}
-          <AnalyticsInViewTracker
-            eventProps={{inViewType: "homePosts"}}
-            observerProps={{threshold:[0, 0.5, 1]}}
-          >
-            <LWHomePosts>
-              <QuickTakesSection />
-              <EAPopularCommentsSection />
-              <UltraFeed onShowingChange={setIsUltraFeedShowing} />
-              {!isUltraFeedShowing && (
-                <RecentDiscussionFeed
-                  af={false}
-                  commentsLimit={4}
-                  maxAgeHours={18}
-                />
-              )}
-            </LWHomePosts>
-          </AnalyticsInViewTracker>
+          <LWHomePosts>
+            <QuickTakesSection />
+            <EAPopularCommentsSection />
+            <UltraFeed onShowingChange={setIsUltraFeedShowing} />
+            {!isUltraFeedShowing && (
+              <RecentDiscussionFeed
+                af={false}
+                commentsLimit={4}
+                maxAgeHours={18}
+              />
+            )}
+          </LWHomePosts>
         </React.Fragment>
       </AnalyticsContext>
   )
