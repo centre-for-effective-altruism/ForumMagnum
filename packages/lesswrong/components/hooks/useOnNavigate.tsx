@@ -3,7 +3,6 @@ import { registerComponent } from '../../lib/vulcan-lib/components';
 import type { RouterLocation } from '../../lib/vulcan-lib/routes';
 import { useSubscribedLocation } from '../../lib/routeUtil';
 import { isClient } from '../../lib/executionEnvironment';
-import { captureEvent } from '../../lib/analyticsEvents';
 import * as _ from 'underscore';
 
 let lastLocation: RouterLocation|null = null;
@@ -20,10 +19,6 @@ const NavigationEventSender = () => {
       if (location.pathname !== lastLocation?.pathname) {
         // Don't send the callback on the initial pageload, only on post-load navigations
         if (lastLocation) {
-          captureEvent("navigate", {
-            from: lastLocation.pathname,
-            to: location.pathname,
-          });
           let change: LocationChange = {oldLocation: lastLocation, newLocation: location};
           for(let cb of [...onNavigateFunctions]) {
             cb(change);
