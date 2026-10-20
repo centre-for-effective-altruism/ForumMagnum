@@ -1,13 +1,8 @@
 import * as Sentry from '@sentry/browser';
 import * as SentryIntegrations from '@sentry/integrations';
-import { captureEvent } from '../lib/analyticsEvents';
-import { browserProperties } from '../lib/utils/browserProperties';
 import { sentryUrlSetting, sentryReleaseSetting, sentryEnvironmentSetting } from '../lib/instanceSettings';
 import { getUserEmail } from "../lib/collections/users/helpers";
-import { devicePrefersDarkMode } from "../components/themes/usePrefersDarkMode";
 import { configureDatadogRum } from './datadogRum';
-import type { UtmParam } from '@/server/analytics/utm-tracking';
-import { CamelCaseify } from '@/lib/vulcan-lib/utils';
 
 const sentryUrl = sentryUrlSetting.get()
 const sentryEnvironment = sentryEnvironmentSetting.get()
@@ -62,27 +57,3 @@ export function onUserChanged(user: UsersCurrent) {
   addUserIdToGoogleAnalytics(user);
   configureDatadogRum(user);
 }
-
-window.addEventListener('load', ev => {
-  const urlParams = new URLSearchParams(document.location?.search)
-
-  const eventPayload: Record<CamelCaseify<UtmParam, '_'>, string | null> & Record<string, AnyBecauseIsInput> = {
-    url: document.location?.href,
-    referrer: document.referrer,
-    utmSource: urlParams.get('utm_source'),
-    utmMedium: urlParams.get('utm_medium'),
-    utmCampaign: urlParams.get('utm_campaign'),
-    utmContent: urlParams.get('utm_content'),
-    utmTerm: urlParams.get('utm_term'),
-    utmUserId: urlParams.get('utm_user_id'),
-    browserProps: browserProperties(),
-    prefersDarkMode: devicePrefersDarkMode(),
-    performance: {
-      memory: (window as any).performance?.memory?.usedJSHeapSize,
-      timeOrigin: window.performance?.timeOrigin,
-      timing: window.performance?.timing?.toJSON?.(),
-    },
-  }
-
-  captureEvent("pageLoadFinished", eventPayload);
-});
