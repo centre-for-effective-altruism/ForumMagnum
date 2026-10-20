@@ -1,5 +1,6 @@
 import { PostHog } from 'posthog-node'
 import { DatabaseServerSetting } from '../databaseSettings';
+import { isProduction } from '@/lib/executionEnvironment';
 
 export const posthogSettings = new DatabaseServerSetting<{
   host: string,
@@ -14,11 +15,17 @@ export const getPosthog = (): PostHog | null => {
   if (!client) {
     const settings = posthogSettings.get();
     if (!settings) {
+      // eslint-disable-next-line no-console
+      console.warn("Posthog not configured");
       return null;
     }
     client = new PostHog(settings.projectToken, {
       host: settings.host,
     });
+    if (!client) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to create posthog client");
+    }
   }
   return client;
 }
@@ -35,7 +42,11 @@ export const writeEventsToPosthog = (events: RawEvent[]) => {
       distinctId: (props.userId || props.clientId) as string,
       event: type,
       timestamp,
-      properties: props,
+      properties: {
+        environment: isProduction ? "prod" : "dev",
+        repo: "forum-magnum",
+        ...props,
+      },
     });
   }
 }
