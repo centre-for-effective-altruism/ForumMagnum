@@ -3,7 +3,6 @@ import { useMulti } from "../../lib/crud/withMulti";
 import { useCurrentUser } from "../common/withUser";
 import { sortBy } from 'underscore';
 import { postGetLastCommentedAt } from "../../lib/collections/posts/helpers";
-import { useOnMountTracking } from "../../lib/analyticsEvents";
 import type { Placement as PopperPlacementType } from "popper.js"
 import { isFriendlyUI } from "../../themes/forumTheme";
 import { PostsItemConfig } from "./usePostsItem";
@@ -83,7 +82,7 @@ const defaultTooltipPlacement = isFriendlyUI
   ? "bottom-start"
   : "bottom-end";
 
-export const usePostsList = <TagId extends string | undefined = undefined>({
+export const usePostsList = ({
   children,
   terms,
   dimWhenLoading = false,
@@ -207,29 +206,10 @@ export const usePostsList = <TagId extends string | undefined = undefined>({
     })
   }
 
-  const postIds = (orderedResults || []).map((post) => post._id);
-
-  const postIdsWithScores = (orderedResults || []).map((post) => {
-      return {postId: post._id, score: post.score, baseScore: post.baseScore}
-    });
-
   const {view: contextViewType} = usePostsListView();
   const viewType: PostsListViewType = configuredViewType === "fromContext"
     ? contextViewType
     : configuredViewType;
-
-  // Analytics Tracking
-  useOnMountTracking({
-    eventType: "postList",
-    eventProps: {
-      postIds,
-      postVisibility: hiddenPosts,
-      postMountData: postIdsWithScores,
-      viewType,
-    },
-    captureOnMount: (eventProps) => eventProps.postIds.length > 0,
-    skip: !postIds.length || loading,
-  });
 
   const hasResults = orderedResults && orderedResults.length > 1;
 

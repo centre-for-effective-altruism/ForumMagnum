@@ -1,16 +1,15 @@
 import { registerComponent } from '../../lib/vulcan-lib/components';
 import React, { useCallback } from 'react';
-import { useOnMountTracking } from "../../lib/analyticsEvents";
+import { useTracking } from "../../lib/analyticsEvents";
 
-const AnalyticsTracker = ({eventType, eventProps, children, captureOnClick=true, captureOnMount, skip}: {
+const AnalyticsTracker = ({eventType, eventProps, children, captureOnClick=true, skip}: {
   eventType: string,
   eventProps?: Record<string,any>,
   children?: React.ReactNode,
   captureOnClick?: boolean,
-  captureOnMount?: ((eventData: Record<string,any>) => boolean)|boolean,
   skip?: boolean,
 }) => {
-  const { captureEvent } = useOnMountTracking({eventType, eventProps, captureOnMount})
+  const { captureEvent } = useTracking({eventType, eventProps})
   const handleClick = useCallback((e: React.MouseEvent) => {
     !skip && captureOnClick && captureEvent(`${eventType}Clicked`,
         {...eventProps, buttonPressed: e.button})

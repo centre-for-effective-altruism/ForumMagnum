@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { NetworkStatus, gql, useQuery } from '@apollo/client';
 import { HybridRecombeeConfiguration, RecombeeConfiguration } from '../../lib/collections/users/recommendationSettings';
-import { useOnMountTracking } from '../../lib/analyticsEvents';
 import uniq from 'lodash/uniq';
 import { filterNonnull } from '../../lib/utils/typeGuardUtils';
 import moment from 'moment';
 import { useCurrentUser } from '../common/withUser';
-import { aboutPostIdSetting } from '@/lib/instanceSettings';
 import { IsRecommendationContext } from '../dropdowns/posts/PostActions';
 import { registerComponent } from "../../lib/vulcan-lib/components";
 import { fragmentTextForQuery } from "../../lib/vulcan-lib/fragments";
@@ -44,12 +42,6 @@ type LoadMoreSettings = {
   loadMore: (RecombeeConfiguration | HybridRecombeeConfiguration)['loadMore'];
   excludedPostIds?: never
 } | undefined;
-
-const styles = (theme: ThemeType) => ({
-  root: {
-
-  }
-});
 
 const DEFAULT_RESOLVER_NAME = 'RecombeeLatestPosts';
 const HYBRID_RESOLVER_NAME = 'RecombeeHybridPosts';
@@ -123,11 +115,10 @@ export const stickiedPostTerms: PostsViewTerms = {
   forum: true
 };
 
-export const RecombeePostsList = ({ algorithm, settings, limit = 15, classes }: {
+export const RecombeePostsList = ({ algorithm, settings, limit = 15 }: {
   algorithm: string,
   settings: RecombeeConfiguration,
   limit?: number,
-  classes: ClassesType<typeof styles>,
 }) => {
   const [loadMoreCount, setLoadMoreCount] = useState(1);
   const currentUser = useCurrentUser();
@@ -155,38 +146,6 @@ export const RecombeePostsList = ({ algorithm, settings, limit = 15, classes }: 
   //exclude posts with hiddenPostIds
   const filteredResults = results?.filter(({ post }) => !hiddenPostIds.includes(post._id));
 
-  const postIds = filteredResults?.map(({post}) => post._id) ?? [];
-  const postIdsWithScenario = filteredResults?.map(({ post, scenario, curated, stickied, generatedAt }, idx) => {
-    let loggedScenario = scenario;
-    if (!loggedScenario) {
-      if (post._id === aboutPostIdSetting.get() && idx === 0) {
-        loggedScenario = 'welcome-post';
-      } else if (curated) {
-        loggedScenario = 'curated';
-      } else if (stickied) {
-        loggedScenario = 'stickied';
-      } else {
-        loggedScenario = 'hacker-news';
-      }
-    }
-
-    const data = { postId: post._id, scenario: loggedScenario };
-
-    if (generatedAt) {
-      return {...data, generatedAt: new Date(generatedAt).toISOString()};
-    }
-
-    return data;
-  }) ?? [];
-
-  useOnMountTracking({
-    eventType: "postList",
-    // TODO: Remove postIds which is redundant once analytics dashboard written to use postIdsWithScenario
-    eventProps: { postIds, postIdsWithScenario, algorithm },
-    captureOnMount: (eventProps) => eventProps.postIds.length > 0,
-    skip: !postIds.length || loading,
-  });
-
   if (loading && !filteredResults) {
     return <PostsLoading placeholderCount={limit} />;
   }
@@ -196,7 +155,7 @@ export const RecombeePostsList = ({ algorithm, settings, limit = 15, classes }: 
   }
 
   return <div>
-    <div className={classes.root}>
+    <div>
       {filteredResults.map(({ post, recommId, curated, stickied }) => <IsRecommendationContext.Provider key={post._id} value={!!recommId}>
         <PostsItem 
           post={post} 
@@ -237,6 +196,4 @@ export const RecombeePostsList = ({ algorithm, settings, limit = 15, classes }: 
   </div>;
 }
 
-export default registerComponent('RecombeePostsList', RecombeePostsList, {styles});
-
-
+export default registerComponent('RecombeePostsList', RecombeePostsList);

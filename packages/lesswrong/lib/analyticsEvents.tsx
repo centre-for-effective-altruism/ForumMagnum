@@ -252,38 +252,6 @@ export function useTracking({eventType="unnamed", eventProps=emptyEventProps}: {
 
 export const withTracking = hookToHoc(useTracking)
 
-export function useOnMountTracking<T extends EventProps>({
-  eventType="unnamed",
-  eventProps,
-  captureOnMount,
-  skip=false,
-}: {
-  eventType?: string,
-  eventProps?: T,
-  captureOnMount?: boolean | ((eventProps: T) => boolean),
-  skip?: boolean
-}={}) {
-  const trackingContext = useContext(ReactTrackingContext)
-  useEffect(() => {
-    const eventData: AnyBecauseTodo = {...trackingContext, ...eventProps}
-    if (typeof captureOnMount === "function") {
-      !skip && captureOnMount(eventData) && captureEvent(`${eventType}Mounted`, eventData)
-    } else if (!!captureOnMount) {
-      !skip && captureEvent(`${eventType}Mounted`, eventData)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skip])
-
-  const track = useCallback((type?: string|undefined, trackingData?: Record<string,any>) => {
-    captureEvent(type || eventType, {
-      ...trackingContext,
-      ...eventProps,
-      ...trackingData
-    })
-  }, [trackingContext, eventProps, eventType])
-  return {captureEvent: track}
-}
-
 export function useIsInView<T extends HTMLElement>({rootMargin='0px', threshold=0}={}) {
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null)
   const [node, setNode] = useState<T | null>(null)
@@ -311,7 +279,6 @@ export function useIsInView<T extends HTMLElement>({rootMargin='0px', threshold=
 
   return { setNode, entry, node }
 }
-
 
 // Analytics events have two rate limits, one denominated in events per second,
 // the other denominated in uncompressed kilobytes per second. Each of these

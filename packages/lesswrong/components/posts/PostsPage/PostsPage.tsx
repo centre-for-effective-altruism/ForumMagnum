@@ -7,7 +7,7 @@ import withErrorBoundary from '../../common/withErrorBoundary'
 import { useRecordPostView } from '../../hooks/useRecordPostView';
 import { AnalyticsContext, useTracking } from "../../../lib/analyticsEvents";
 import {forumTitleSetting, isAF, isEAForum, isLWorAF} from '../../../lib/instanceSettings';
-import { cloudinaryCloudNameSetting, recombeeEnabledSetting, vertexEnabledSetting } from '../../../lib/publicSettings';
+import { cloudinaryCloudNameSetting } from '../../../lib/publicSettings';
 import classNames from 'classnames';
 import { hasPostRecommendations, commentsTableOfContentsEnabled, hasDigests, hasSidenotes } from '../../../lib/betas';
 import { useDialog } from '../../common/withDialog';
@@ -31,7 +31,6 @@ import { getMarketInfo, highlightMarket } from '../../../lib/collections/posts/a
 import isEqual from 'lodash/isEqual';
 import { usePostReadProgress } from '../usePostReadProgress';
 import { useDynamicTableOfContents } from '../../hooks/useDynamicTableOfContents';
-import { RecombeeRecommendationsContextWrapper } from '../../recommendations/RecombeeRecommendationsContextWrapper';
 import { getBrowserLocalStorage } from '../../editor/localStorageHandlers';
 import { useVote } from '@/components/votes/withVote';
 import { getVotingSystemByName } from '@/lib/voting/getVotingSystem';
@@ -69,13 +68,11 @@ import PostSideRecommendations from "../../recommendations/PostSideRecommendatio
 import PostBottomRecommendations from "../../recommendations/PostBottomRecommendations";
 import { NotifyMeDropdownItem } from "../../dropdowns/NotifyMeDropdownItem";
 import Row from "../../common/Row";
-import AnalyticsInViewTracker from "../../common/AnalyticsInViewTracker";
 import PostsPageQuestionContent from "../../questions/PostsPageQuestionContent";
 import AFUnreviewedCommentCount from "../../alignment-forum/AFUnreviewedCommentCount";
 import CommentsListSection from "../../comments/CommentsListSection";
 import CommentsTableOfContents from "../../comments/CommentsTableOfContents";
 import StickyDigestAd from "../../ea-forum/digestAd/StickyDigestAd";
-import AttributionInViewTracker from "../../common/AttributionInViewTracker";
 import ForumEventPostPagePollSection from "../../forumEvents/ForumEventPostPagePollSection";
 import NotifyMeButton from "../../notifications/NotifyMeButton";
 import LWTooltip from "../../common/LWTooltip";
@@ -84,7 +81,7 @@ import FundraisingThermometer from "../../common/FundraisingThermometer";
 import PostPageReviewButton from "./PostPageReviewButton";
 import HoveredReactionContextProvider from "../../votes/lwReactions/HoveredReactionContextProvider";
 import FixedPositionToCHeading from '../TableOfContents/PostFixedPositionToCHeading';
-import { CENTRAL_COLUMN_WIDTH, MAX_COLUMN_WIDTH, RECOMBEE_RECOMM_ID_QUERY_PARAM, RIGHT_COLUMN_WIDTH_WITH_SIDENOTES, RIGHT_COLUMN_WIDTH_WITHOUT_SIDENOTES, RIGHT_COLUMN_WIDTH_XS, SHARE_POPUP_QUERY_PARAM, sidenotesHiddenBreakpoint, VERTEX_ATTRIBUTION_ID_QUERY_PARAM } from './constants';
+import { CENTRAL_COLUMN_WIDTH, MAX_COLUMN_WIDTH, RIGHT_COLUMN_WIDTH_WITH_SIDENOTES, RIGHT_COLUMN_WIDTH_WITHOUT_SIDENOTES, RIGHT_COLUMN_WIDTH_XS, SHARE_POPUP_QUERY_PARAM, sidenotesHiddenBreakpoint } from './constants';
 
 const HIDE_TOC_WORDCOUNT_LIMIT = 300
 const MAX_ANSWERS_AND_REPLIES_QUERIED = 10000
@@ -475,8 +472,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
   const { captureEvent } = useTracking();
   const [cookies, setCookie] = useCookiesWithConsent([SHOW_PODCAST_PLAYER_COOKIE]);
   const { query, params } = location;
-  const [recommId, setRecommId] = useState<string | undefined>();
-  const [attributionId, setAttributionId] = useState<string | undefined>();
 
   const votingSystem = getVotingSystemByName(post.votingSystem || 'default');
   const voteProps = useVote(post, 'Posts', votingSystem);
@@ -618,34 +613,12 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
   });
 
   useEffect(() => {
-    const recommId = query[RECOMBEE_RECOMM_ID_QUERY_PARAM];
-    const attributionId = query[VERTEX_ATTRIBUTION_ID_QUERY_PARAM];
-
     void recordPostView({
       post: post,
       extraEventProperties: {
         sequenceId: getSequenceId()
       },
-      recommendationOptions: {
-        recombeeOptions: { recommId },
-        vertexOptions: { attributionId }
-      }
     });
-
-    if (!recombeeEnabledSetting.get() && !vertexEnabledSetting.get()) return;
-    setRecommId(recommId);
-    setAttributionId(attributionId);
-
-    // Remove recombee & vertex attribution ids from query once the they're stored to state and initial event fired off, to prevent accidentally
-    // sharing links with the query params still present
-    const currentQuery = isEmpty(query) ? {} : query;
-    const newQuery = {
-      ...currentQuery,
-      [RECOMBEE_RECOMM_ID_QUERY_PARAM]: undefined,
-      [VERTEX_ATTRIBUTION_ID_QUERY_PARAM]: undefined
-    };
-    navigate({...location.location, search: `?${qs.stringify(newQuery)}`}, { replace: true });  
-
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post._id]);
   
@@ -972,41 +945,39 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
     </div>
 
   const commentsSection =
-    <AnalyticsInViewTracker eventProps={{inViewType: "commentsSection"}}>
-      <AttributionInViewTracker eventProps={{ post, portion: 1, recommId, vertexAttributionId: attributionId }}>
-        {/* Answers Section */}
-        {post.question && <div className={classes.centralColumn}>
-          <div id="answers"/>
-          {fullPost && <AnalyticsContext pageSectionContext="answersSection">
-            <PostsPageQuestionContent post={fullPost} answersTree={answersTree ?? []} refetch={refetch}/>
-          </AnalyticsContext>}
-        </div>}
-        {/* Comments Section */}
-        <div className={classes.commentsSection}>
-          <AnalyticsContext pageSectionContext="commentsSection">
-            {fullPost && <CommentsListSection
-              comments={results ?? []}
-              loadMoreComments={loadMore}
-              totalComments={totalComments}
-              commentCount={displayedPublicCommentCount}
-              loadingMoreComments={loadingMore}
-              loading={loading}
-              post={fullPost}
-              newForm={!post.question && (!post.shortform || post.userId===currentUser?._id)}
-              highlightDate={highlightDate ?? undefined}
-              setHighlightDate={setHighlightDate}
-            />}
-            {isAF && <AFUnreviewedCommentCount post={post}/>}
-          </AnalyticsContext>
-          {isFriendlyUI && Math.max(post.commentCount, results?.length ?? 0) < 1 &&
-            <div className={classes.noCommentsPlaceholder}>
-              <div>No comments on this post yet.</div>
-              <div>Be the first to respond.</div>
-            </div>
-          }
-        </div>
-      </AttributionInViewTracker>
-    </AnalyticsInViewTracker>
+    <>
+      {/* Answers Section */}
+      {post.question && <div className={classes.centralColumn}>
+        <div id="answers"/>
+        {fullPost && <AnalyticsContext pageSectionContext="answersSection">
+          <PostsPageQuestionContent post={fullPost} answersTree={answersTree ?? []} refetch={refetch}/>
+        </AnalyticsContext>}
+      </div>}
+      {/* Comments Section */}
+      <div className={classes.commentsSection}>
+        <AnalyticsContext pageSectionContext="commentsSection">
+          {fullPost && <CommentsListSection
+            comments={results ?? []}
+            loadMoreComments={loadMore}
+            totalComments={totalComments}
+            commentCount={displayedPublicCommentCount}
+            loadingMoreComments={loadingMore}
+            loading={loading}
+            post={fullPost}
+            newForm={!post.question && (!post.shortform || post.userId===currentUser?._id)}
+            highlightDate={highlightDate ?? undefined}
+            setHighlightDate={setHighlightDate}
+          />}
+          {isAF && <AFUnreviewedCommentCount post={post}/>}
+        </AnalyticsContext>
+        {isFriendlyUI && Math.max(post.commentCount, results?.length ?? 0) < 1 &&
+          <div className={classes.noCommentsPlaceholder}>
+            <div>No comments on this post yet.</div>
+            <div>Be the first to respond.</div>
+          </div>
+        }
+      </div>
+    </>
 
   const commentsToC = fullPost
     ? <CommentsTableOfContents
@@ -1019,7 +990,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
 
   return <AnalyticsContext pageContext="postsPage" postId={post._id}>
     <PostsPageContext.Provider value={{fullPost: fullPost ?? null, postPreload: postPreload ?? null}}>
-    <RecombeeRecommendationsContextWrapper postId={post._id} recommId={recommId}>
     <SideItemsContainer>
     <ImageProvider>
     <SideItemVisibilityContextProvider post={fullPost}>
@@ -1060,16 +1030,15 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
     }
   
     {isEAForum && showDigestAd && <DeferRender ssr={false}><StickyDigestAd /></DeferRender>}
-    {hasPostRecommendations && fullPost && <AnalyticsInViewTracker eventProps={{inViewType: "postPageFooterRecommendations"}}>
+    {hasPostRecommendations && fullPost &&
       <PostBottomRecommendations
         post={post}
         hasTableOfContents={hasTableOfContents}
       />
-    </AnalyticsInViewTracker>}
+    }
     </SideItemVisibilityContextProvider>
     </ImageProvider>
     </SideItemsContainer>
-    </RecombeeRecommendationsContextWrapper>
     </PostsPageContext.Provider>
   </AnalyticsContext>
 }
@@ -1078,4 +1047,3 @@ export default registerComponent('PostsPage', PostsPage, {
   styles, hocs: [withErrorBoundary],
   areEqual: "auto",
 });
-

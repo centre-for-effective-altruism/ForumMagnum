@@ -8,7 +8,6 @@ import classNames from 'classnames';
 import { useDigestAd } from './useDigestAd';
 import { DIGEST_AD_BODY_TEXT, DIGEST_AD_HEADLINE_TEXT } from './SidebarDigestAd';
 import { getBrowserLocalStorage } from '../../editor/localStorageHandlers';
-import AnalyticsInViewTracker from "../../common/AnalyticsInViewTracker";
 import ForumIcon from "../../common/ForumIcon";
 import EAButton from "../EAButton";
 
@@ -190,20 +189,16 @@ const StickyDigestAd = ({className, classes}: {
   }
   
   return <AnalyticsContext pageSubSectionContext="digestAd">
-    <AnalyticsInViewTracker eventProps={{inViewType: "stickyDigestAd"}}>
-      <div className={classNames(classes.root, className)}>
-        <div className={classes.textCol}>
-          <h2 className={classes.heading}>{DIGEST_AD_HEADLINE_TEXT}</h2>
-          <div className={classNames(classes.body)}>
-            {DIGEST_AD_BODY_TEXT}
-          </div>
+    <div className={classNames(classes.root, className)}>
+      <div className={classes.textCol}>
+        <h2 className={classes.heading}>{DIGEST_AD_HEADLINE_TEXT}</h2>
+        <div className={classNames(classes.body)}>
+          {DIGEST_AD_BODY_TEXT}
         </div>
-        {formNode}
       </div>
-    </AnalyticsInViewTracker>
+      {formNode}
+    </div>
   </AnalyticsContext>
 }
 
 export default registerComponent("StickyDigestAd", StickyDigestAd, {styles, stylePriority: -1});
-
-

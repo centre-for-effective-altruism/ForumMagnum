@@ -5,18 +5,11 @@ import { isClient } from '../../lib/executionEnvironment';
 import { useEventListener } from '../hooks/useEventListener';
 
 function useBeforeUnloadTracking() {
-  const { captureEvent } = useTracking()
-  const trackBeforeUnload = useCallback(
-    () => {
-      captureEvent("beforeUnloadFired")
-      flushClientEvents(true)
-    },
-    [captureEvent]
-  );
-
+  const trackBeforeUnload = useCallback(() => {
+    flushClientEvents(true)
+  }, []);
   useEventListener('beforeunload', trackBeforeUnload)
 }
-
 
 function usePageVisibility() {
   const { captureEvent } = useTracking()

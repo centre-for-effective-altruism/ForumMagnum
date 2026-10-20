@@ -19,7 +19,6 @@ import { isFriendlyUI } from '../../themes/forumTheme';
 import LoginForm from "../users/LoginForm";
 import SignupSubscribeToCurated from "../users/SignupSubscribeToCurated";
 import Loading from "../vulcan-core/Loading";
-import AnalyticsInViewTracker from "../common/AnalyticsInViewTracker";
 
 // mailchimp link to sign up for the EA Forum's digest
 export const eaForumDigestSubscribeURL = "https://effectivealtruism.us8.list-manage.com/subscribe/post?u=52b028e7f799cca137ef74763&amp;id=7457c7ff3e&amp;f_id=0086c5e1f0"
@@ -222,11 +221,9 @@ const RecentDiscussionSubscribeReminder = ({classes}: {
   // eslint-disable-next-line react/no-unstable-nested-components
   const AnalyticsWrapper = ({children, branch}: {children: React.ReactNode, branch: string}) => {
     return <AnalyticsContext pageElementContext="subscribeReminder" branch={branch}>
-      <AnalyticsInViewTracker eventProps={{inViewType: "subscribeReminder"}}>
-        <div className={classes.root}>
-          {children}
-        </div>
-      </AnalyticsInViewTracker>
+      <div className={classes.root}>
+        {children}
+      </div>
     </AnalyticsContext>
   }
   
@@ -302,10 +299,10 @@ const RecentDiscussionSubscribeReminder = ({classes}: {
       </div>
       
       <Input placeholder="Email address" inputRef={emailAddressInput} className={classes.emailInput} />
-      <SignupSubscribeToCurated defaultValue={true} onChange={(checked: boolean) => setSubscribeChecked(true)}/>
+      <SignupSubscribeToCurated defaultValue={true} onChange={() => setSubscribeChecked(true)}/>
       
       <div className={classes.buttons}>
-        <Button className={classes.subscribeButton} onClick={async (ev) => {
+        <Button className={classes.subscribeButton} onClick={async () => {
           const emailAddress = emailAddressInput.current;
           if (emailAddress && SimpleSchema.RegEx.Email.test(emailAddress?.value)) {
             setLoading(true);
@@ -358,7 +355,7 @@ const RecentDiscussionSubscribeReminder = ({classes}: {
     );
     return <AnalyticsWrapper branch="previously-unsubscribed">
       {subscribeTextNode}
-      <Button className={classes.subscribeButton} onClick={async (ev) => {
+      <Button className={classes.subscribeButton} onClick={async () => {
         await updateAndMaybeVerifyEmail();
         captureEvent("subscribeReminderButtonClicked", {buttonType: "subscribeButton"});
       }}>Subscribe</Button>
@@ -380,7 +377,7 @@ const RecentDiscussionSubscribeReminder = ({classes}: {
     );
     return <AnalyticsWrapper branch="logged-in-not-subscribed">
       {subscribeTextNode}
-      <Button className={classes.subscribeButton} onClick={async (ev) => {
+      <Button className={classes.subscribeButton} onClick={async () => {
         await updateAndMaybeVerifyEmail();
         captureEvent("subscribeReminderButtonClicked", {buttonType: "subscribeButton"});
       }}>Subscribe</Button>
@@ -400,7 +397,7 @@ const RecentDiscussionSubscribeReminder = ({classes}: {
           Please verify your email address to activate your subscription to curated posts.
         </div>
         <div className={classes.buttons}>
-          <Button className={classes.subscribeButton} onClick={async (ev) => {
+          <Button className={classes.subscribeButton} onClick={async () => {
             setLoading(true);
             try {
               await updateCurrentUser({

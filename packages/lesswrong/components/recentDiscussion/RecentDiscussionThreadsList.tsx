@@ -4,14 +4,11 @@ import { useMulti } from '../../lib/crud/withMulti';
 import { useCurrentUser } from '../common/withUser';
 import AddBoxIcon from '@/lib/vendor/@material-ui/icons/src/AddBox';
 import { useGlobalKeydown } from '../common/withGlobalKeydown';
-import { isFriendlyUI } from '../../themes/forumTheme';
 import RecentDiscussionThread from "./RecentDiscussionThread";
 import SingleColumnSection from "../common/SingleColumnSection";
 import SectionTitle from "../common/SectionTitle";
 import SectionButton from "../common/SectionButton";
-import ShortformSubmitForm from "../shortform/ShortformSubmitForm";
 import Loading from "../vulcan-core/Loading";
-import AnalyticsInViewTracker from "../common/AnalyticsInViewTracker";
 import LoadMore from "../common/LoadMore";
 
 const RecentDiscussionThreadsList = ({
@@ -78,7 +75,7 @@ const RecentDiscussionThreadsList = ({
       </SectionTitle>
       <div>
         {results && <div>
-          {results.map((post, i) =>
+          {results.map((post) =>
             <RecentDiscussionThread
               key={post._id}
               post={post}
@@ -88,10 +85,8 @@ const RecentDiscussionThreadsList = ({
             />
           )}
         </div>}
-        <AnalyticsInViewTracker eventProps={{inViewType: "loadMoreButton"}}>
-            { loadMore && <LoadMore loadMore={loadMore}  /> }
-            { (loading || loadingMore) && <Loading />}
-        </AnalyticsInViewTracker>
+        { loadMore && <LoadMore loadMore={loadMore}  /> }
+        { (loading || loadingMore) && <Loading />}
       </div>
     </SingleColumnSection>
   )
