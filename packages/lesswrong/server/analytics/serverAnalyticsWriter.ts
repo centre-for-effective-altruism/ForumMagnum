@@ -5,6 +5,7 @@ import { addStaticRoute } from '@/server/vulcan-lib/staticRoutes';
 import { pgPromiseLib, getAnalyticsConnection } from './postgresConnection'
 import chunk from 'lodash/chunk';
 import gql from 'graphql-tag';
+import { writeEventsToPosthog } from './posthog';
 
 // Since different environments are connected to the same DB, this setting cannot be moved to the database
 export const environmentDescriptionSetting = new PublicInstanceSetting<string>("analytics.environment", "misconfigured", "warning")
@@ -39,7 +40,7 @@ addStaticRoute('/analyticsEvent', ({query}, req, res, next) => {
     res.end('analyticsEvent endpoint should be JSON with fields "events" and "now"');
     return;
   }
-  
+
   void handleAnalyticsEventWriteRequest(body.events, body.now);
   res.writeHead(200, {
     "Content-Type": "text/plain;charset=UTF-8"
@@ -79,6 +80,8 @@ const analyticsColumnSet = new pgPromiseLib.helpers.ColumnSet(['environment', 'e
 // use captureEvent.
 // Writes an event to the analytics database.
 async function writeEventsToAnalyticsDB(events: {type: string, timestamp: Date, props: AnyBecauseTodo}[]) {
+  writeEventsToPosthog(events);
+
   const connection = getAnalyticsConnection()
   
   if (connection) {

@@ -37,6 +37,7 @@ import DropdownDivider from "../dropdowns/DropdownDivider";
 import UsersProfileImage from "./UsersProfileImage";
 import ForumIcon from "../common/ForumIcon";
 import NewWikiTagMenu from "../tagging/NewWikiTagMenu";
+import { usePostHog } from '@posthog/react';
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -115,11 +116,16 @@ const UsersMenu = ({classes}: {
   const {disableNoKibitz, setDisableNoKibitz} = useContext(DisableNoKibitzContext );
   const {toggleOn, toggleOff} = useAdminToggle();
   const {preferNewSite, setPreferNewSite, showNewSiteToggle} = useEAForumV3();
+  const posthog = usePostHog();
 
   if (!currentUser) return null;
   if (currentUser.usernameUnset) {
     return <div className={classes.root}>
-      <Button href='/logout' classes={{root: classes.userButtonRoot}}>
+      <Button
+        href='/logout'
+        onClick={() => posthog.reset()}
+        classes={{root: classes.userButtonRoot}}
+      >
         <span className={classes.userButtonContents}>
           {isFriendlyUI ? "Log out" : "LOG OUT"}
         </span>
