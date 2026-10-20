@@ -1,10 +1,8 @@
 import React from 'react';
 import { registerComponent } from '../../lib/vulcan-lib/components';
 import { isFriendlyUI } from '../../themes/forumTheme';
-import { isEAForum } from '../../lib/instanceSettings';
 import SingleColumnSection from "../common/SingleColumnSection";
 import PostsList2 from "../posts/PostsList2";
-import TargetedJobAdSection from "./TargetedJobAdSection";
 
 const styles = (theme: ThemeType) => ({
   root: isFriendlyUI
@@ -34,7 +32,6 @@ const StickiedPosts = ({
       curatedIconLeft={false}
       placeholderCount={3}
     />
-    {/* {isEAForum && <TargetedJobAdSection />} */}
   </SingleColumnSection>
 }
 
