@@ -393,6 +393,18 @@ export function startWebserver() {
     }
   });
 
+  app.get('/api/bundle-hash', async (_request, response) => {
+    try {
+      const bundleHash = getClientBundle().resource.hash;
+      response.status(200);
+      response.setHeader("Content-Type", "application/json");
+      response.end(`{"js":"${bundleHash}"}`);
+    } catch (err) {
+      response.status(500);
+      response.end("");
+    }
+  });
+
   app.get('*', async (request, response) => {
     if(prefilterHandleRequest(request, response)) {
       return;
