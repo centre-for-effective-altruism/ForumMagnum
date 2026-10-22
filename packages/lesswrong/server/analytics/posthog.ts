@@ -1,6 +1,7 @@
 import { PostHog } from 'posthog-node'
 import { DatabaseServerSetting } from '../databaseSettings';
 import { isProduction } from '@/lib/executionEnvironment';
+import { isBotSiteSetting } from '@/lib/instanceSettings';
 
 export const posthogSettings = new DatabaseServerSetting<{
   host: string,
@@ -37,6 +38,9 @@ type RawEvent = {
 }
 
 export const writeEventsToPosthog = (events: RawEvent[]) => {
+  if (isBotSiteSetting.get()) {
+    return;
+  }
   for (const { type, timestamp, props } of events) {
     getPosthog()?.capture({
       distinctId: (props.userId || props.clientId) as string,
