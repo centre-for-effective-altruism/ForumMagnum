@@ -15,21 +15,29 @@ export const useEAForumV3 = (): {
   showNewSiteToggle: boolean;
 } => {
   const currentUser = useCurrentUser();
-  const [cookies, setCookie] = useCookiesWithConsent([PREFER_NEW_SITE_COOKIE]);
+  const [cookies, setCookie, removeCookie] = useCookiesWithConsent([PREFER_NEW_SITE_COOKIE]);
 
-  const preferNewSite = cookies[PREFER_NEW_SITE_COOKIE] === 'true';
+  const rawCookieValue = cookies[PREFER_NEW_SITE_COOKIE] as
+    | string
+    | boolean
+    | undefined;
+  const preferNewSite = rawCookieValue !== "false" && rawCookieValue !== false;
   const showNewSiteToggle = userIsMemberOf(currentUser, "realAdmins") ||
     userIsAdminOrMod(currentUser);
 
   const setPreferNewSite = useCallback((value: boolean) => {
-    const oneYearFromNow = new Date();
-    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-    setCookie(PREFER_NEW_SITE_COOKIE, value ? 'true' : 'false', {
-      path: '/',
-      expires: oneYearFromNow,
-    });
+    if (value) {
+      removeCookie(PREFER_NEW_SITE_COOKIE);
+    } else {
+      const oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+      setCookie(PREFER_NEW_SITE_COOKIE, value ? 'true' : 'false', {
+        path: '/',
+        expires: oneYearFromNow,
+      });
+    }
     window.location.reload();
-  }, [setCookie]);
+  }, [setCookie, removeCookie]);
 
   return {
     preferNewSite,
