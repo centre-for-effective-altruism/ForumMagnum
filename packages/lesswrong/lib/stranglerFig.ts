@@ -1,5 +1,4 @@
 import Cookies from 'universal-cookie';
-import { captureException } from '@sentry/core';
 import { isServer } from './executionEnvironment';
 
 // Strangler Fig Migration Utilities
@@ -8,40 +7,44 @@ import { isServer } from './executionEnvironment';
 // navigation based on cookies set by the new site's proxy.
 //
 // Cookie "prefer_ea_forum_v3": "true" if user has opted into new site
-// Cookie "ea_forum_v3_owned_routes": JSON blob with patterns for routes owned by new site
 
-interface OwnedRoutesPayload {
-  v: number;
-  patterns: string[];
-}
+const newSitePatterns = [
+  /^\/$/, // Home page
+  /^\/posts\/[^/]+\/[^/]+$/, // Post pages: /posts/[id]/[slug]
+  /^\/posts\/[^/]+$/, // Post pages without slug: /posts/[id]
+  /^\/s\/[A-Za-z0-9]+\/p\/[A-Za-z0-9]+$/, // Sequence posts
+  /^\/(users|user|u)\/[^/]+$/, // User profiles
+  /^\/auth\/auth0\/callback-v2$/, // Auth0 callback for new site
+  /^\/api\//, // All /api/* routes (unless matched above)
+  /^\/rpc\//, // All /rpc/* routes
+  /^\/ingest\//, // Posthog ingestion routes
+  /^\/monitoring$/, // Sentry ingestion
+  /^\/about$/, // About page
+  /^\/intro$/, // Intro page
+  /^\/moderation$/, // Moderation log page
+  /^\/contact$/, // Contact page
+  /^\/tags$/, // Topics redirect
+  /^\/topics$/, // Topics page
+  /^\/copyright$/, // Copyright page
+  /^\/cookie-policy$/, // Cookie policy
+  /^\/cookiePolicy$/, // Cookie policy (camelCase, redirect to kebab-case)
+  /^\/all-posts$/, // All posts page
+  /^\/allPosts$/, // All posts page (camelCase, redirect to kebab-case)
+  /^\/ban-notice$/, // Ban notice
+  /^\/banNotice$/, // Ban notice (camelCase, redirect to kebab-case)
+  /^\/best-of$/, // Best of
+  /^\/admin$/, // Admin
+  /^\/admin\/featured$/, // Admin featured queue
+  /^\/admin\/onboarding$/, // Admin onboarding test
+  /^\/admin\/org-updates-test$/, // Admin org-updates layout test
+  /^\/admin\/spotlights.*/, // Admin spotlights pages
+  /^\/admin\/swap-user-emails$/, // Admin swap user emails page
+  /^\/robots.txt$/, // robots.txt
+];
 
-export function isRouteOwnedByEAForumV3(href: string): boolean {
-  if (isServer) return false;
-
-  const cookies = new Cookies();
-
-  const preferNewSite = cookies.get('prefer_ea_forum_v3');
-  if (preferNewSite !== 'true') {
+export const isRouteOwnedByEAForumV3 = (href: string): boolean => {
+  if (isServer || new Cookies().get("prefer_ea_forum_v3") !== 'true') {
     return false;
   }
-
-  const ownedRoutesRaw = cookies.get('ea_forum_v3_owned_routes');
-  if (!ownedRoutesRaw) {
-    // User wants new site but we don't have route info yet => use SPA nav
-    return false;
-  }
-
-  let payload: OwnedRoutesPayload;
-  try {
-    payload = typeof ownedRoutesRaw === 'string'
-      ? JSON.parse(ownedRoutesRaw)
-      : ownedRoutesRaw;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error("Error parsing ea_forum_v3_owned_routes cookie:", e);
-    captureException(e);
-    return false;
-  }
-
-  return payload.patterns.some(p => new RegExp(p).test(href));
+  return newSitePatterns.some((regex) => regex.test(href));
 }
