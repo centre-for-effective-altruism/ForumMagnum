@@ -43,7 +43,7 @@ export const EmailAnnualForumUserSurvey = ({ user }: {
         We appreciate you taking the time to fill out the survey, and we read every response.
       </p>
       <p>
-        – Sarah (for the EA Forum Team)
+        – Toby (for the EA Forum Team)
       </p>
       <hr className={classes.hr}/>
     </div>

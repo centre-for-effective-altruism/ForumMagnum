@@ -40,7 +40,7 @@ export const EmailInactiveUserSurvey = ({ user }: {
         and <strong>all questions are optional</strong>. Any responses you share will likely help us improve the site for everyone.
       </p>
       <p>
-        – Sarah (for the EA Forum Team)
+        – Toby (for the EA Forum Team)
       </p>
       <hr className={classes.hr}/>
     </div>
