@@ -380,9 +380,3 @@ editing application code:
   collaboration, inspect both the app code and `ckEditor/`.
 - The production bundle uploads automatically on push to `ea-deploy` via
   `.github/actions/uploadCkEditorBundle`. No manual step needed.
-
-## PR Review Expectations
-
-- Every PR gets a random reviewer from `@ForumMagnum/cea-developers` via
-  `.github/CODEOWNERS`. Write PR descriptions assuming a reviewer who
-  doesn't have the context of the task as given.

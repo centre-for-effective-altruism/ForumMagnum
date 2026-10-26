@@ -469,6 +469,12 @@ export function addReferrerToPost(post: CreatePostDataInput, properties: CreateC
 
 /* NEW SYNC */
 export function checkTosAccepted<T extends CreatePostDataInput | UpdatePostDataInput>(currentUser: DbUser | null, post: T): T {
+  // Posts imported from RSS feeds are created on the user's behalf by the
+  // import cron, so the user won't necessarily have accepted the ToS. Only
+  // admins can set `feedId`.
+  if (post.feedId) {
+    return post;
+  }
   if (post.draft === false && !post.shortform && !currentUser?.acceptedTos) {
     throw new Error(TOS_NOT_ACCEPTED_ERROR);
   }

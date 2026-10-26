@@ -31,7 +31,7 @@ import { TooltipSpan } from '../common/FMTooltip';
 import MetaInfo from "../common/MetaInfo";
 import OmegaIcon from "../icons/OmegaIcon";
 import Error404 from "../common/Error404";
-import NewFeedButton from "../rss/NewFeedButton";
+import { NewFeedDialog } from "../rss/NewFeedButton";
 import NewDialogueDialog from "../posts/NewDialogueDialog";
 import SequencesGridWrapper from "../sequences/SequencesGridWrapper";
 import DraftsList from "../posts/DraftsList";
@@ -46,7 +46,6 @@ import SectionTitle from "../common/SectionTitle";
 import SequencesNewButton from "../sequences/SequencesNewButton";
 import NewConversationButton from "../messaging/NewConversationButton";
 import TagEditsByUser from "../tagging/TagEditsByUser";
-import DialogGroup from "../common/DialogGroup";
 import SettingsButton from "../icons/SettingsButton";
 import { ContentItemBody } from "../contents/ContentItemBody";
 import Loading from "../vulcan-core/Loading";
@@ -329,12 +328,12 @@ const UsersProfileFn = ({terms, slug, classes}: {
               }
               { currentUser?.isAdmin &&
                 <div>
-                  <DialogGroup
-                    actions={[]}
-                    trigger={<a>Register RSS</a>}
-                  >
-                    <div><NewFeedButton user={user} /></div>
-                  </DialogGroup>
+                  <a onClick={() => openDialog({
+                    name: "NewFeedDialog",
+                    contents: ({onClose}) => <NewFeedDialog user={user} onClose={onClose} />
+                  })}>
+                    Register RSS
+                  </a>
                 </div>
               }
               { currentUser && currentUser._id === user._id && <Link to="/manageSubscriptions">

@@ -1,8 +1,8 @@
 import { addCronJob } from '../cron/cronUtil';
 import RSSFeeds from '../../server/collections/rssfeeds/collection';
 import Users from '../../server/collections/users/collection';
+import Posts from '../../server/collections/posts/collection';
 import { asyncForeachSequential } from '../../lib/utils/asyncUtils';
-import feedparser from 'feedparser-promised';
 import { userIsAdminOrMod } from '../../lib/vulcan-users/permissions';
 import { accessFilterSingle } from '../../lib/utils/schemaUtils';
 import { diffHtml } from '../resolvers/htmlDiff';
@@ -14,6 +14,9 @@ import { createPost } from '../collections/posts/mutations';
 import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
 import { createAnonymousContext } from "@/server/vulcan-lib/createContexts";
 import { updateRSSFeed } from '../collections/rssfeeds/mutations';
+import { fetchFeedItems } from './fetchFeedItems';
+import { toRawFeedItem } from './callbacks';
+import uniqBy from 'lodash/uniqBy';
 
 export const runRSSImport = async () => {
   const feeds = await RSSFeeds.find({status: {$ne: 'inactive'}}).fetch()
@@ -29,27 +32,57 @@ export const runRSSImport = async () => {
   })
 }
 
+/**
+ * Immediately import new posts from a single feed, for testing. Run with:
+ *   yarn repl dev packages/lesswrong/server/rss-integration/cron.ts 'forceRSSImport("<feedId>")'
+ * Pass `{resetSeenPosts: true}` to forget which posts have been seen, so that
+ * every post currently in the feed is imported (except any that have already
+ * been imported).
+ */
+export const forceRSSImport = async (
+  feedId: string,
+  {resetSeenPosts = false}: {resetSeenPosts?: boolean} = {},
+) => {
+  const feed = await RSSFeeds.findOne({_id: feedId});
+  if (!feed) {
+    throw new Error(`No RSS feed with id ${feedId}`);
+  }
+  if (resetSeenPosts) {
+    feed.rawFeed = [];
+  }
+  await resyncFeed(feed);
+}
+
 async function resyncFeed(feed: DbRSSFeed): Promise<void> {
   // create array of all posts in current rawFeed object
   let previousPosts = feed.rawFeed || [];
 
   // check the feed for new posts
   const url = feed.url;
-  const currentPosts = await feedparser.parse(url);
+  const currentPosts = await fetchFeedItems(url, {
+    shouldFetchBody: ({guid}) => !previousPosts.some(
+      (prevPost: AnyBecauseTodo) => prevPost.guid === guid,
+    ),
+  });
   
+  // Feeds list their newest posts first, so reverse them to import the oldest
+  // first, so that they appear on the site in the right order
   let newPosts: Array<any> = currentPosts.filter(function (post: AnyBecauseTodo) {
     return !previousPosts.some((prevPost: AnyBecauseTodo) => {
       return post.guid === prevPost.guid
     })
-  })
+  }).reverse();
 
-  // update feed object with new feed data (mutation)
-  var set: any = {};
-  set.rawFeed = currentPosts;
-
-  await updateRSSFeed({ data: { ...set }, selector: { _id: feed._id } }, createAnonymousContext())
+  const failedGuids = new Set<string>();
 
   await asyncForeachSequential(newPosts, async newPost => {
+    // Guard against importing the same post twice, eg; if a previous run
+    // crashed before saving the seen posts
+    const existingPost = await Posts.findOne({feedId: feed._id, feedLink: newPost.link});
+    if (existingPost) {
+      return;
+    }
+
     const body = getRssPostContents(newPost);
 
     var post = {
@@ -72,10 +105,28 @@ async function resyncFeed(feed: DbRSSFeed): Promise<void> {
     // Create context with the lwUser as the currentUser
     const lwContext = await computeContextFromUser({ user: lwUser, isSSR: false });
 
-    await createPost({
-      data: post
-    }, lwContext);
+    try {
+      await createPost({
+        data: post
+      }, lwContext);
+    } catch (error) {
+      failedGuids.add(newPost.guid);
+      //eslint-disable-next-line no-console
+      console.error(`RSS error when importing post ${newPost.link} from feed ${feed.url}:`, error);
+    }
   })
+
+  // Posts that failed to import aren't marked as seen, so that they're retried
+  // on the next run rather than being silently dropped. Posts that we've seen
+  // before are kept even if they're no longer in the feed, so that they aren't
+  // imported if they reappear (eg; if the feed was temporarily empty).
+  var set: any = {};
+  set.rawFeed = uniqBy([
+    ...currentPosts.filter((post: AnyBecauseTodo) => !failedGuids.has(post.guid)),
+    ...previousPosts,
+  ].map(toRawFeedItem), "guid");
+
+  await updateRSSFeed({ data: { ...set }, selector: { _id: feed._id } }, createAnonymousContext())
 }
 
 function getRssPostContents(rssPost: AnyBecauseHard): string {
@@ -139,7 +190,12 @@ export const cronGraphQLQueries = {
     
     // Refresh the RSS feed
     const feedUrl = feed.url
-    const feedPosts = await feedparser.parse(feedUrl);
+    if (!feedUrl) {
+      throw new Error("RSS feed has no URL");
+    }
+    const feedPosts = await fetchFeedItems(feedUrl, {
+      shouldFetchBody: ({link}) => link === post.feedLink,
+    });
     
     // Find matching feed post
     let matchingPost = null;
