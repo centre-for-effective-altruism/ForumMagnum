@@ -83,4 +83,21 @@ describe("Polls in comments", () => {
     expect(polls).toHaveLength(1);
     expect(polls[0]._id).not.toBe(pollId);
   });
+
+  it("creates a new poll when a poll is duplicated within a comment", async () => {
+    const user = await createDummyUser();
+    const post = await createDummyPost(user);
+    const pollId = randomId();
+    const comment = await createPollComment(
+      user,
+      post._id,
+      `<p>Polls</p>${pollMarkup(pollId)}${pollMarkup(pollId)}`,
+    );
+
+    const savedComment = await Comments.findOne({ _id: comment._id });
+    const internalIds = getInternalIds(savedComment!.contents!.html!);
+    expect(new Set(internalIds).size).toBe(2);
+    const polls = await ForumEvents.find({ commentId: comment._id }).fetch();
+    expect(polls.map(({ _id }) => _id).sort()).toEqual([...internalIds].sort());
+  });
 });

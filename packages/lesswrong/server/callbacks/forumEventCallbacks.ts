@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { cheerioParse } from '@/server/utils/htmlUtil';
 import { createForumEvent, updateForumEvent } from '../collections/forumEvents/mutations';
 import { randomId, seededRandInt, ID_LENGTH } from '@/lib/random';
+import uniqBy from 'lodash/uniqBy';
 
 // Duplicate of ckEditor/src/ckeditor5-poll/constants.ts
 type PollProps = {
@@ -141,7 +142,8 @@ function pollBelongsTo(poll: Pick<DbForumEvent, "postId" | "commentId">, { colle
 /**
  * Pasting a poll into the editor keeps its internal id, which would otherwise
  * make the pasted copy edit the original poll. Give any poll whose id belongs
- * to a different post or comment a new id so it becomes a new poll instead.
+ * to a different post or comment, or that repeats an earlier poll in the same
+ * document, a new id so it becomes a new poll instead.
  *
  * The editor may keep submitting the original id (e.g. a post editor that
  * stays open after saving, or collaborative editing), so the new id is derived
@@ -165,16 +167,24 @@ export async function assignUniquePollIds(
   const pollIds = pollElements.map((el) => $(el).attr('data-internal-id')!);
   const existingPolls = await context.loaders.ForumEvents.loadMany(pollIds);
 
+  const occurrences = new Map<string, number>();
   let modified = false;
   pollElements.forEach((el, index) => {
     const pollId = pollIds[index];
+    const occurrence = occurrences.get(pollId) ?? 0;
+    occurrences.set(pollId, occurrence + 1);
     const existingPoll = existingPolls[index];
-    if (!existingPoll || existingPoll instanceof Error || pollBelongsTo(existingPoll, owner)) {
+    const belongsElsewhere = !!existingPoll && !(existingPoll instanceof Error) &&
+      !pollBelongsTo(existingPoll, owner);
+    if (occurrence === 0 && !belongsElsewhere) {
       return;
     }
 
+    const seed = occurrence === 0
+      ? `${owner.documentId}:${pollId}`
+      : `${owner.documentId}:${pollId}:${occurrence}`;
     const newId = owner.documentId
-      ? randomId(ID_LENGTH, seededRandInt(`${owner.documentId}:${pollId}`))
+      ? randomId(ID_LENGTH, seededRandInt(seed))
       : randomId();
     $(el).attr('data-internal-id', newId);
 
@@ -216,7 +226,7 @@ export async function upsertPolls({
   if (!(html && (collectionName === "Posts" || collectionName === "Comments") && !!documentId)) return;
 
   const $ = cheerioParse(html);
-  const pollData = getPollElements($)
+  const parsedPollData = getPollElements($)
     .map((_, element) => {
       const internalId = $(element).attr("data-internal-id");
       const props = $(element).attr("data-props");
@@ -242,6 +252,7 @@ export async function upsertPolls({
     })
     .get()
     .filter((item): item is ({ _id: string } & PollProps) => item !== null);
+  const pollData = uniqBy(parsedPollData, "_id");
 
   if (!pollData?.length) return;
 
