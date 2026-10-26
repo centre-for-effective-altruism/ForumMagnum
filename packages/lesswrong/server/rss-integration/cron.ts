@@ -2,7 +2,6 @@ import { addCronJob } from '../cron/cronUtil';
 import RSSFeeds from '../../server/collections/rssfeeds/collection';
 import Users from '../../server/collections/users/collection';
 import { asyncForeachSequential } from '../../lib/utils/asyncUtils';
-import feedparser from 'feedparser-promised';
 import { userIsAdminOrMod } from '../../lib/vulcan-users/permissions';
 import { accessFilterSingle } from '../../lib/utils/schemaUtils';
 import { diffHtml } from '../resolvers/htmlDiff';
@@ -14,6 +13,7 @@ import { createPost } from '../collections/posts/mutations';
 import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
 import { createAnonymousContext } from "@/server/vulcan-lib/createContexts";
 import { updateRSSFeed } from '../collections/rssfeeds/mutations';
+import { fetchFeedItems } from './fetchFeedItems';
 
 export const runRSSImport = async () => {
   const feeds = await RSSFeeds.find({status: {$ne: 'inactive'}}).fetch()
@@ -35,7 +35,11 @@ async function resyncFeed(feed: DbRSSFeed): Promise<void> {
 
   // check the feed for new posts
   const url = feed.url;
-  const currentPosts = await feedparser.parse(url);
+  const currentPosts = await fetchFeedItems(url, {
+    shouldFetchBody: ({guid}) => !previousPosts.some(
+      (prevPost: AnyBecauseTodo) => prevPost.guid === guid,
+    ),
+  });
   
   let newPosts: Array<any> = currentPosts.filter(function (post: AnyBecauseTodo) {
     return !previousPosts.some((prevPost: AnyBecauseTodo) => {
@@ -139,7 +143,12 @@ export const cronGraphQLQueries = {
     
     // Refresh the RSS feed
     const feedUrl = feed.url
-    const feedPosts = await feedparser.parse(feedUrl);
+    if (!feedUrl) {
+      throw new Error("RSS feed has no URL");
+    }
+    const feedPosts = await fetchFeedItems(feedUrl, {
+      shouldFetchBody: ({link}) => link === post.feedLink,
+    });
     
     // Find matching feed post
     let matchingPost = null;
