@@ -47,11 +47,7 @@ async function resyncFeed(feed: DbRSSFeed): Promise<void> {
     })
   })
 
-  // update feed object with new feed data (mutation)
-  var set: any = {};
-  set.rawFeed = currentPosts;
-
-  await updateRSSFeed({ data: { ...set }, selector: { _id: feed._id } }, createAnonymousContext())
+  const failedGuids = new Set<string>();
 
   await asyncForeachSequential(newPosts, async newPost => {
     const body = getRssPostContents(newPost);
@@ -76,10 +72,25 @@ async function resyncFeed(feed: DbRSSFeed): Promise<void> {
     // Create context with the lwUser as the currentUser
     const lwContext = await computeContextFromUser({ user: lwUser, isSSR: false });
 
-    await createPost({
-      data: post
-    }, lwContext);
+    try {
+      await createPost({
+        data: post
+      }, lwContext);
+    } catch (error) {
+      failedGuids.add(newPost.guid);
+      //eslint-disable-next-line no-console
+      console.error(`RSS error when importing post ${newPost.link} from feed ${feed.url}:`, error);
+    }
   })
+
+  // Posts that failed to import aren't marked as seen, so that they're retried
+  // on the next run rather than being silently dropped
+  var set: any = {};
+  set.rawFeed = currentPosts.filter(
+    (post: AnyBecauseTodo) => !failedGuids.has(post.guid),
+  );
+
+  await updateRSSFeed({ data: { ...set }, selector: { _id: feed._id } }, createAnonymousContext())
 }
 
 function getRssPostContents(rssPost: AnyBecauseHard): string {
