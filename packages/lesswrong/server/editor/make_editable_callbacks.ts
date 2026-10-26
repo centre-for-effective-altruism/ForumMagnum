@@ -13,6 +13,7 @@ import { createRevision } from '../collections/revisions/mutations'
 import { buildRevision } from './conversionUtils'
 import { updateDenormalizedHtmlAttributionsDueToRev, upvoteOwnTagRevision } from '../callbacks/revisionCallbacks'
 import { cheerioParse } from '../utils/htmlUtil'
+import { assignUniquePollIds } from '../callbacks/forumEventCallbacks'
 
 const ONE_MINUTE_MS = 60 * 1000;
 const ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
@@ -229,7 +230,12 @@ async function createInitialRevision<N extends CollectionNameString>(
     if (fieldName === 'contents' && (collectionName === 'Posts' || collectionName === 'Comments') &&
         originalContents.type === 'ckEditorMarkup') {
       const isDraft = !!(doc as AnyBecauseHard).draft;
-      const preprocessedData = await preprocessPollEndDates(originalContents.data, isDraft, context);
+      const uniquePollIdsData = await assignUniquePollIds(
+        originalContents.data,
+        { collectionName, documentId: (doc as AnyBecauseHard)._id },
+        context,
+      );
+      const preprocessedData = await preprocessPollEndDates(uniquePollIdsData, isDraft, context);
       originalContents = { ...originalContents, data: preprocessedData };
     }
 
@@ -320,7 +326,12 @@ async function createUpdateRevision<N extends CollectionNameString>(
     if (originalContents && fieldName === 'contents' && (collectionName === 'Posts' || collectionName === 'Comments') &&
         originalContents.type === 'ckEditorMarkup') {
       const isDraft = !!(newDocument as AnyBecauseHard).draft;
-      const preprocessedData = await preprocessPollEndDates(originalContents.data, isDraft, context);
+      const uniquePollIdsData = await assignUniquePollIds(
+        originalContents.data,
+        { collectionName, documentId: document._id },
+        context,
+      );
+      const preprocessedData = await preprocessPollEndDates(uniquePollIdsData, isDraft, context);
       originalContents = { type: originalContents.type, data: preprocessedData };
     }
 

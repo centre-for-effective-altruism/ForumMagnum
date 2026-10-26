@@ -2,6 +2,7 @@ import { hasPolls } from '@/lib/betas';
 import { z } from 'zod';
 import { cheerioParse } from '@/server/utils/htmlUtil';
 import { createForumEvent, updateForumEvent } from '../collections/forumEvents/mutations';
+import { randomId, seededRandInt, ID_LENGTH } from '@/lib/random';
 
 // Duplicate of ckEditor/src/ckeditor5-poll/constants.ts
 type PollProps = {
@@ -125,6 +126,74 @@ function getPollElements($: ReturnType<typeof cheerioParse>) {
   return $(".ck-poll[data-internal-id]");
 }
 
+type PollOwner = {
+  collectionName: CollectionNameString;
+  documentId?: string;
+};
+
+function pollBelongsTo(poll: Pick<DbForumEvent, "postId" | "commentId">, { collectionName, documentId }: PollOwner) {
+  if (!documentId) return false;
+  return collectionName === "Comments"
+    ? poll.commentId === documentId
+    : poll.postId === documentId && !poll.commentId;
+}
+
+/**
+ * Pasting a poll into the editor keeps its internal id, which would otherwise
+ * make the pasted copy edit the original poll. Give any poll whose id belongs
+ * to a different post or comment a new id so it becomes a new poll instead.
+ *
+ * The editor may keep submitting the original id (e.g. a post editor that
+ * stays open after saving, or collaborative editing), so the new id is derived
+ * from the document and original id to keep it stable across saves.
+ */
+export async function assignUniquePollIds(
+  originalContentsData: string,
+  owner: PollOwner,
+  context: ResolverContext,
+): Promise<string> {
+  if (!originalContentsData.includes('ck-poll')) {
+    return originalContentsData;
+  }
+
+  const $ = cheerioParse(originalContentsData);
+  const pollElements = getPollElements($).toArray();
+  if (!pollElements.length) {
+    return originalContentsData;
+  }
+
+  const pollIds = pollElements.map((el) => $(el).attr('data-internal-id')!);
+  const existingPolls = await context.loaders.ForumEvents.loadMany(pollIds);
+
+  let modified = false;
+  pollElements.forEach((el, index) => {
+    const pollId = pollIds[index];
+    const existingPoll = existingPolls[index];
+    if (!existingPoll || existingPoll instanceof Error || pollBelongsTo(existingPoll, owner)) {
+      return;
+    }
+
+    const newId = owner.documentId
+      ? randomId(ID_LENGTH, seededRandInt(`${owner.documentId}:${pollId}`))
+      : randomId();
+    $(el).attr('data-internal-id', newId);
+
+    // The copied end date belongs to the original poll
+    const propsStr = $(el).attr('data-props');
+    if (propsStr) {
+      try {
+        const props = JSON.parse(propsStr);
+        delete props.endDate;
+        delete props.durationEdited;
+        $(el).attr('data-props', JSON.stringify(props));
+      } catch { /* invalid props are handled when the poll is upserted */ }
+    }
+    modified = true;
+  });
+
+  return modified ? $.html() : originalContentsData;
+}
+
 export async function upsertPolls({
   revisionId,
   post,
@@ -201,9 +270,13 @@ export async function upsertPolls({
 
   const validExistingPolls = existingPolls.filter((fe): fe is DbForumEvent => !(fe instanceof Error) && !!fe?._id);
 
-  // Upsert a poll for each internal id found in the HTML
+  // Upsert a poll for each internal id found in the HTML, skipping any that
+  // belong to a different post or comment
   for (const data of pollData) {
     const existingPoll = validExistingPolls.find(poll => poll && poll._id === data._id);
+    if (existingPoll && !pollBelongsTo(existingPoll, { collectionName, documentId })) {
+      continue;
+    }
     await upsertPoll({ ...data, post: fetchedPost, comment, existingPoll }, context);
   }
 };
