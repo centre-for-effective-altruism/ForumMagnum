@@ -2,6 +2,8 @@ import { hasPolls } from '@/lib/betas';
 import { z } from 'zod';
 import { cheerioParse } from '@/server/utils/htmlUtil';
 import { createForumEvent, updateForumEvent } from '../collections/forumEvents/mutations';
+import { randomId, seededRandInt, ID_LENGTH } from '@/lib/random';
+import uniqBy from 'lodash/uniqBy';
 
 // Duplicate of ckEditor/src/ckeditor5-poll/constants.ts
 type PollProps = {
@@ -37,6 +39,19 @@ const PollPropsSchema = z.object({
 const ONE_MINUTE_MS = 60 * 1000;
 const ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
 const ONE_DAY_MS = 24 * ONE_HOUR_MS;
+const MAX_POLL_DURATION_MS = 365 * ONE_DAY_MS;
+
+/** Polls can run for at most a year */
+export function capPollEndDate(endDate: Date): Date {
+  return new Date(Math.min(endDate.getTime(), Date.now() + MAX_POLL_DURATION_MS));
+}
+
+export function pollEndDateFromDuration(duration: Partial<PollProps["duration"]>): Date {
+  const durationMs = ((duration.days || 0) * ONE_DAY_MS) +
+    ((duration.hours || 0) * ONE_HOUR_MS) +
+    ((duration.minutes || 0) * ONE_MINUTE_MS);
+  return new Date(Date.now() + Math.min(durationMs, MAX_POLL_DURATION_MS));
+}
 
 // Upsert a ForumEvent with eventFormat = "POLL"
 async function upsertPoll({
@@ -56,9 +71,7 @@ async function upsertPoll({
   post: Pick<DbPost, '_id' | 'draft'>;
   comment?: Pick<DbComment, '_id' | 'draft'>;
 } & PollProps, context: ResolverContext) {
-  const endDateFromDuration = new Date(
-    Date.now() + (duration.days * ONE_DAY_MS) + (duration.hours * ONE_HOUR_MS) + (duration.minutes * ONE_MINUTE_MS)
-  );
+  const endDateFromDuration = pollEndDateFromDuration(duration);
 
   const parentIsDraft = comment ? comment.draft : post.draft;
 
@@ -70,7 +83,7 @@ async function upsertPoll({
   if (parentIsDraft) {
     endDate = null;
   } else if (propsEndDate) {
-    endDate = new Date(propsEndDate);
+    endDate = capPollEndDate(new Date(propsEndDate));
   } else if (existingPoll?.endDate) {
     // Preserve existing endDate (old poll without endDate in HTML)
     endDate = existingPoll.endDate;
@@ -125,6 +138,83 @@ function getPollElements($: ReturnType<typeof cheerioParse>) {
   return $(".ck-poll[data-internal-id]");
 }
 
+type PollOwner = {
+  collectionName: CollectionNameString;
+  documentId?: string;
+};
+
+function pollBelongsTo(poll: Pick<DbForumEvent, "postId" | "commentId">, { collectionName, documentId }: PollOwner) {
+  if (!documentId) return false;
+  return collectionName === "Comments"
+    ? poll.commentId === documentId
+    : poll.postId === documentId && !poll.commentId;
+}
+
+/**
+ * Pasting a poll into the editor keeps its internal id, which would otherwise
+ * make the pasted copy edit the original poll. Give any poll whose id belongs
+ * to a different post or comment, or that repeats an earlier poll in the same
+ * document, a new id so it becomes a new poll instead.
+ *
+ * The editor may keep submitting the original id (e.g. a post editor that
+ * stays open after saving, or collaborative editing), so the new id is derived
+ * from the document and original id to keep it stable across saves.
+ */
+export async function assignUniquePollIds(
+  originalContentsData: string,
+  owner: PollOwner,
+  context: ResolverContext,
+): Promise<string> {
+  if (!originalContentsData.includes('ck-poll')) {
+    return originalContentsData;
+  }
+
+  const $ = cheerioParse(originalContentsData);
+  const pollElements = getPollElements($).toArray();
+  if (!pollElements.length) {
+    return originalContentsData;
+  }
+
+  const pollIds = pollElements.map((el) => $(el).attr('data-internal-id')!);
+  const existingPolls = await context.loaders.ForumEvents.loadMany(pollIds);
+
+  const occurrences = new Map<string, number>();
+  let modified = false;
+  pollElements.forEach((el, index) => {
+    const pollId = pollIds[index];
+    const occurrence = occurrences.get(pollId) ?? 0;
+    occurrences.set(pollId, occurrence + 1);
+    const existingPoll = existingPolls[index];
+    const belongsElsewhere = !!existingPoll && !(existingPoll instanceof Error) &&
+      !pollBelongsTo(existingPoll, owner);
+    if (occurrence === 0 && !belongsElsewhere) {
+      return;
+    }
+
+    const seed = occurrence === 0
+      ? `${owner.documentId}:${pollId}`
+      : `${owner.documentId}:${pollId}:${occurrence}`;
+    const newId = owner.documentId
+      ? randomId(ID_LENGTH, seededRandInt(seed))
+      : randomId();
+    $(el).attr('data-internal-id', newId);
+
+    // The copied end date belongs to the original poll
+    const propsStr = $(el).attr('data-props');
+    if (propsStr) {
+      try {
+        const props = JSON.parse(propsStr);
+        delete props.endDate;
+        delete props.durationEdited;
+        $(el).attr('data-props', JSON.stringify(props));
+      } catch { /* invalid props are handled when the poll is upserted */ }
+    }
+    modified = true;
+  });
+
+  return modified ? $.html() : originalContentsData;
+}
+
 export async function upsertPolls({
   revisionId,
   post,
@@ -147,7 +237,7 @@ export async function upsertPolls({
   if (!(html && (collectionName === "Posts" || collectionName === "Comments") && !!documentId)) return;
 
   const $ = cheerioParse(html);
-  const pollData = getPollElements($)
+  const parsedPollData = getPollElements($)
     .map((_, element) => {
       const internalId = $(element).attr("data-internal-id");
       const props = $(element).attr("data-props");
@@ -173,6 +263,7 @@ export async function upsertPolls({
     })
     .get()
     .filter((item): item is ({ _id: string } & PollProps) => item !== null);
+  const pollData = uniqBy(parsedPollData, "_id");
 
   if (!pollData?.length) return;
 
@@ -201,9 +292,13 @@ export async function upsertPolls({
 
   const validExistingPolls = existingPolls.filter((fe): fe is DbForumEvent => !(fe instanceof Error) && !!fe?._id);
 
-  // Upsert a poll for each internal id found in the HTML
+  // Upsert a poll for each internal id found in the HTML, skipping any that
+  // belong to a different post or comment
   for (const data of pollData) {
     const existingPoll = validExistingPolls.find(poll => poll && poll._id === data._id);
+    if (existingPoll && !pollBelongsTo(existingPoll, { collectionName, documentId })) {
+      continue;
+    }
     await upsertPoll({ ...data, post: fetchedPost, comment, existingPoll }, context);
   }
 };

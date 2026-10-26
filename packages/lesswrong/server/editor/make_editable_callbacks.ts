@@ -13,10 +13,7 @@ import { createRevision } from '../collections/revisions/mutations'
 import { buildRevision } from './conversionUtils'
 import { updateDenormalizedHtmlAttributionsDueToRev, upvoteOwnTagRevision } from '../callbacks/revisionCallbacks'
 import { cheerioParse } from '../utils/htmlUtil'
-
-const ONE_MINUTE_MS = 60 * 1000;
-const ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
-const ONE_DAY_MS = 24 * ONE_HOUR_MS;
+import { assignUniquePollIds, capPollEndDate, pollEndDateFromDuration } from '../callbacks/forumEventCallbacks'
 
 /**
  * Preprocess poll endDates in CKEditor markup before building the revision.
@@ -96,18 +93,14 @@ async function preprocessPollEndDates(
 
       if (props.endDate && !props.durationEdited) {
         // Already has endDate in props: keep it
-        newEndDate = props.endDate;
+        newEndDate = capPollEndDate(new Date(props.endDate)).toISOString();
       } else if (existingEndDate && !props.durationEdited) {
         // Old poll without endDate in HTML but has ForumEvent endDate: adopt ForumEvent endDate
         newEndDate = existingEndDate.toISOString();
       } else {
         // First publish or user edited duration: compute from now + duration
         const duration = props.duration || { days: 7, hours: 0, minutes: 0 };
-        const endDateMs = Date.now() +
-          ((duration.days || 0) * ONE_DAY_MS) +
-          ((duration.hours || 0) * ONE_HOUR_MS) +
-          ((duration.minutes || 0) * ONE_MINUTE_MS);
-        newEndDate = new Date(endDateMs).toISOString();
+        newEndDate = pollEndDateFromDuration(duration).toISOString();
       }
 
       // Update props with endDate and remove durationEdited flag
@@ -229,7 +222,12 @@ async function createInitialRevision<N extends CollectionNameString>(
     if (fieldName === 'contents' && (collectionName === 'Posts' || collectionName === 'Comments') &&
         originalContents.type === 'ckEditorMarkup') {
       const isDraft = !!(doc as AnyBecauseHard).draft;
-      const preprocessedData = await preprocessPollEndDates(originalContents.data, isDraft, context);
+      const uniquePollIdsData = await assignUniquePollIds(
+        originalContents.data,
+        { collectionName, documentId: (doc as AnyBecauseHard)._id },
+        context,
+      );
+      const preprocessedData = await preprocessPollEndDates(uniquePollIdsData, isDraft, context);
       originalContents = { ...originalContents, data: preprocessedData };
     }
 
@@ -320,7 +318,12 @@ async function createUpdateRevision<N extends CollectionNameString>(
     if (originalContents && fieldName === 'contents' && (collectionName === 'Posts' || collectionName === 'Comments') &&
         originalContents.type === 'ckEditorMarkup') {
       const isDraft = !!(newDocument as AnyBecauseHard).draft;
-      const preprocessedData = await preprocessPollEndDates(originalContents.data, isDraft, context);
+      const uniquePollIdsData = await assignUniquePollIds(
+        originalContents.data,
+        { collectionName, documentId: document._id },
+        context,
+      );
+      const preprocessedData = await preprocessPollEndDates(uniquePollIdsData, isDraft, context);
       originalContents = { type: originalContents.type, data: preprocessedData };
     }
 
