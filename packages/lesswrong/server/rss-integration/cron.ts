@@ -1,6 +1,7 @@
 import { addCronJob } from '../cron/cronUtil';
 import RSSFeeds from '../../server/collections/rssfeeds/collection';
 import Users from '../../server/collections/users/collection';
+import Posts from '../../server/collections/posts/collection';
 import { asyncForeachSequential } from '../../lib/utils/asyncUtils';
 import { userIsAdminOrMod } from '../../lib/vulcan-users/permissions';
 import { accessFilterSingle } from '../../lib/utils/schemaUtils';
@@ -14,6 +15,8 @@ import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
 import { createAnonymousContext } from "@/server/vulcan-lib/createContexts";
 import { updateRSSFeed } from '../collections/rssfeeds/mutations';
 import { fetchFeedItems } from './fetchFeedItems';
+import { toRawFeedItem } from './callbacks';
+import uniqBy from 'lodash/uniqBy';
 
 export const runRSSImport = async () => {
   const feeds = await RSSFeeds.find({status: {$ne: 'inactive'}}).fetch()
@@ -50,6 +53,13 @@ async function resyncFeed(feed: DbRSSFeed): Promise<void> {
   const failedGuids = new Set<string>();
 
   await asyncForeachSequential(newPosts, async newPost => {
+    // Guard against importing the same post twice, eg; if a previous run
+    // crashed before saving the seen posts
+    const existingPost = await Posts.findOne({feedId: feed._id, feedLink: newPost.link});
+    if (existingPost) {
+      return;
+    }
+
     const body = getRssPostContents(newPost);
 
     var post = {
@@ -84,11 +94,14 @@ async function resyncFeed(feed: DbRSSFeed): Promise<void> {
   })
 
   // Posts that failed to import aren't marked as seen, so that they're retried
-  // on the next run rather than being silently dropped
+  // on the next run rather than being silently dropped. Posts that we've seen
+  // before are kept even if they're no longer in the feed, so that they aren't
+  // imported if they reappear (eg; if the feed was temporarily empty).
   var set: any = {};
-  set.rawFeed = currentPosts.filter(
-    (post: AnyBecauseTodo) => !failedGuids.has(post.guid),
-  );
+  set.rawFeed = uniqBy([
+    ...currentPosts.filter((post: AnyBecauseTodo) => !failedGuids.has(post.guid)),
+    ...previousPosts,
+  ].map(toRawFeedItem), "guid");
 
   await updateRSSFeed({ data: { ...set }, selector: { _id: feed._id } }, createAnonymousContext())
 }
