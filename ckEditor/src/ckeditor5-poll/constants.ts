@@ -11,3 +11,5 @@ export type PollProps = {
 	/** Set by CKEditor when user edits duration on a published poll. Signals server to update endDate. */
 	durationEdited?: boolean;
 };
+
+export const MAX_POLL_DURATION_DAYS = 365;

@@ -6,6 +6,8 @@ import { Comments } from "../server/collections/comments/collection";
 import { updateComment } from "../server/collections/comments/mutations";
 import { computeContextFromUser } from "../server/vulcan-lib/apollo-server/context";
 
+const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+
 const pollMarkup = (internalId: string, days = 3) =>
   `<div class="ck-poll" data-internal-id="${internalId}" data-props='${JSON.stringify({
     question: "Is this a test?",
@@ -99,5 +101,17 @@ describe("Polls in comments", () => {
     expect(new Set(internalIds).size).toBe(2);
     const polls = await ForumEvents.find({ commentId: comment._id }).fetch();
     expect(polls.map(({ _id }) => _id).sort()).toEqual([...internalIds].sort());
+  });
+
+  it("caps the poll duration at one year", async () => {
+    const user = await createDummyUser();
+    const post = await createDummyPost(user);
+    const pollId = randomId();
+    await createPollComment(user, post._id, `<p>Poll</p>${pollMarkup(pollId, 1000000000)}`);
+
+    const poll = await ForumEvents.findOne({ _id: pollId });
+    const oneYearFromNow = Date.now() + ONE_YEAR_MS;
+    expect(poll!.endDate!.getTime()).toBeLessThanOrEqual(oneYearFromNow);
+    expect(poll!.endDate!.getTime()).toBeGreaterThan(oneYearFromNow - 60000);
   });
 });

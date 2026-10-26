@@ -39,6 +39,19 @@ const PollPropsSchema = z.object({
 const ONE_MINUTE_MS = 60 * 1000;
 const ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
 const ONE_DAY_MS = 24 * ONE_HOUR_MS;
+const MAX_POLL_DURATION_MS = 365 * ONE_DAY_MS;
+
+/** Polls can run for at most a year */
+export function capPollEndDate(endDate: Date): Date {
+  return new Date(Math.min(endDate.getTime(), Date.now() + MAX_POLL_DURATION_MS));
+}
+
+export function pollEndDateFromDuration(duration: Partial<PollProps["duration"]>): Date {
+  const durationMs = ((duration.days || 0) * ONE_DAY_MS) +
+    ((duration.hours || 0) * ONE_HOUR_MS) +
+    ((duration.minutes || 0) * ONE_MINUTE_MS);
+  return new Date(Date.now() + Math.min(durationMs, MAX_POLL_DURATION_MS));
+}
 
 // Upsert a ForumEvent with eventFormat = "POLL"
 async function upsertPoll({
@@ -58,9 +71,7 @@ async function upsertPoll({
   post: Pick<DbPost, '_id' | 'draft'>;
   comment?: Pick<DbComment, '_id' | 'draft'>;
 } & PollProps, context: ResolverContext) {
-  const endDateFromDuration = new Date(
-    Date.now() + (duration.days * ONE_DAY_MS) + (duration.hours * ONE_HOUR_MS) + (duration.minutes * ONE_MINUTE_MS)
-  );
+  const endDateFromDuration = pollEndDateFromDuration(duration);
 
   const parentIsDraft = comment ? comment.draft : post.draft;
 
@@ -72,7 +83,7 @@ async function upsertPoll({
   if (parentIsDraft) {
     endDate = null;
   } else if (propsEndDate) {
-    endDate = new Date(propsEndDate);
+    endDate = capPollEndDate(new Date(propsEndDate));
   } else if (existingPoll?.endDate) {
     // Preserve existing endDate (old poll without endDate in HTML)
     endDate = existingPoll.endDate;
