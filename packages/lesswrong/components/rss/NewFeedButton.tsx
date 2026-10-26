@@ -13,6 +13,7 @@ import { useFormErrors } from '@/components/tanstack-form-components/BaseAppForm
 import Loading from "../vulcan-core/Loading";
 import FormComponentCheckbox from "../form-components/FormComponentCheckbox";
 import MetaInfo from "../common/MetaInfo";
+import LWDialog from "../common/LWDialog";
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -170,7 +171,7 @@ const RSSFeedsForm = ({
 const NewFeedButton = ({classes, user, closeModal}: {
   classes: ClassesType<typeof styles>,
   user: UsersProfile,
-  closeModal?: any
+  closeModal: () => void,
 }) => {
   const currentUser = useCurrentUser();
   const { results: feeds, loading } = useMulti({
@@ -187,14 +188,12 @@ const NewFeedButton = ({classes, user, closeModal}: {
           <MetaInfo>Existing Feed:</MetaInfo>
           <div><a href={feed.url}>{feed.nickname}</a></div>
         </div>)}
-        {/* TODO: test this one at all */}
         <RSSFeedsForm
           userId={user._id}
           onSuccess={() => {
             closeModal();
           }}
         />
-        {/*FIXME: This close button doesn't work (closeModal is not a thing)*/}
         <Button onClick={() => closeModal()}>Close</Button>
       </div>
     )
@@ -203,6 +202,17 @@ const NewFeedButton = ({classes, user, closeModal}: {
   }
 }
 
-export default registerComponent('NewFeedButton', NewFeedButton, {styles});
+const NewFeedButtonComponent = registerComponent('NewFeedButton', NewFeedButton, {styles});
+
+export const NewFeedDialog = ({user, onClose}: {
+  user: UsersProfile,
+  onClose: () => void,
+}) => (
+  <LWDialog open={true} onClose={onClose}>
+    <NewFeedButtonComponent user={user} closeModal={onClose} />
+  </LWDialog>
+);
+
+export default NewFeedButtonComponent;
 
 

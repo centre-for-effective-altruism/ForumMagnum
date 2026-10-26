@@ -9,10 +9,10 @@ import { separatorBulletStyles } from "../../common/SectionFooter";
 import { hasKeywordAlerts } from "@/lib/betas";
 import CopyToClipboard from "react-copy-to-clipboard";
 import CopyIcon from "@/lib/vendor/@material-ui/icons/src/FileCopy";
-import NewFeedButton from "../../rss/NewFeedButton";
+import { NewFeedDialog } from "../../rss/NewFeedButton";
 import { Typography } from "../../common/Typography";
 import LWTooltip from "../../common/LWTooltip";
-import DialogGroup from "../../common/DialogGroup";
+import { useDialog } from "../../common/withDialog";
 
 const styles = (theme: ThemeType) => ({
   links: {
@@ -48,6 +48,7 @@ const EAUsersProfileLinks = ({user, classes}: {
 }) => {
   const currentUser = useCurrentUser();
   const {flash} = useMessages();
+  const {openDialog} = useDialog();
   const hasLinks = currentUser?.isAdmin || userCanEditUser(currentUser, user);
   if (!hasLinks) {
     return null;
@@ -75,12 +76,12 @@ const EAUsersProfileLinks = ({user, classes}: {
       }
       {currentUser?.isAdmin &&
         <div className={classes.registerRssLink}>
-          <DialogGroup
-            actions={[]}
-            trigger={<a>Register RSS</a>}
-          >
-            <div><NewFeedButton user={user} /></div>
-          </DialogGroup>
+          <a onClick={() => openDialog({
+            name: "NewFeedDialog",
+            contents: ({onClose}) => <NewFeedDialog user={user} onClose={onClose} />
+          })}>
+            Register RSS
+          </a>
         </div>
       }
       {isCurrentUser &&
