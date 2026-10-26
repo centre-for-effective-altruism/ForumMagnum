@@ -32,6 +32,27 @@ export const runRSSImport = async () => {
   })
 }
 
+/**
+ * Immediately import new posts from a single feed, for testing. Run with:
+ *   yarn repl dev packages/lesswrong/server/rss-integration/cron.ts 'forceRSSImport("<feedId>")'
+ * Pass `{resetSeenPosts: true}` to forget which posts have been seen, so that
+ * every post currently in the feed is imported (except any that have already
+ * been imported).
+ */
+export const forceRSSImport = async (
+  feedId: string,
+  {resetSeenPosts = false}: {resetSeenPosts?: boolean} = {},
+) => {
+  const feed = await RSSFeeds.findOne({_id: feedId});
+  if (!feed) {
+    throw new Error(`No RSS feed with id ${feedId}`);
+  }
+  if (resetSeenPosts) {
+    feed.rawFeed = [];
+  }
+  await resyncFeed(feed);
+}
+
 async function resyncFeed(feed: DbRSSFeed): Promise<void> {
   // create array of all posts in current rawFeed object
   let previousPosts = feed.rawFeed || [];
