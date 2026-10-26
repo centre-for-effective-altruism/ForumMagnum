@@ -118,6 +118,8 @@ const schema = {
     },
     graphql: {
       outputType: "JSON!",
+      // Populated on the server when the feed is created
+      inputType: "JSON",
       canRead: ["guests"],
       canUpdate: ["admins"],
       canCreate: ["members"],
