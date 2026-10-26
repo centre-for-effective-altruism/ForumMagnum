@@ -44,11 +44,13 @@ async function resyncFeed(feed: DbRSSFeed): Promise<void> {
     ),
   });
   
+  // Feeds list their newest posts first, so reverse them to import the oldest
+  // first, so that they appear on the site in the right order
   let newPosts: Array<any> = currentPosts.filter(function (post: AnyBecauseTodo) {
     return !previousPosts.some((prevPost: AnyBecauseTodo) => {
       return post.guid === prevPost.guid
     })
-  })
+  }).reverse();
 
   const failedGuids = new Set<string>();
 
