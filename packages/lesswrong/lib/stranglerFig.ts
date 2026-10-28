@@ -6,7 +6,9 @@ import { isServer } from './executionEnvironment';
 // These utilities help determine whether to use SPA navigation or full page
 // navigation based on cookies set by the new site's proxy.
 //
-// Cookie "prefer_ea_forum_v3": "true" if user has opted into new site
+// Cookie "prefer_ea_forum_v3": "false" if user has opted out of the new site.
+// The cookie is unset by default (so responses stay cacheable), which means
+// the user prefers the new site.
 
 // These take precedence over `newSitePatterns`
 const oldSitePatterns = [
@@ -60,10 +62,17 @@ const newSitePatterns = [
 ];
 
 export const isRouteOwnedByEAForumV3 = (href: string): boolean => {
-  if (isServer || new Cookies().get("prefer_ea_forum_v3") !== 'true') {
+  if (isServer) {
     return false;
   }
-  const { pathname, searchParams } = new URL(href, window.location.origin);
+  const preferNewSite: string | boolean | undefined = new Cookies().get("prefer_ea_forum_v3");
+  if (preferNewSite === "false" || preferNewSite === false) {
+    return false;
+  }
+  const { origin, pathname, searchParams } = new URL(href, window.location.origin);
+  if (origin !== window.location.origin) {
+    return false;
+  }
   if (oldSitePatterns.some((regex) => regex.test(pathname))) {
     return false;
   }
@@ -73,5 +82,5 @@ export const isRouteOwnedByEAForumV3 = (href: string): boolean => {
   ) {
     return false;
   }
-  return newSitePatterns.some((regex) => regex.test(href));
+  return newSitePatterns.some((regex) => regex.test(pathname));
 }
