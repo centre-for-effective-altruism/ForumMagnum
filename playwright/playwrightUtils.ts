@@ -1,4 +1,5 @@
 import type { Browser, BrowserContext, Cookie, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import pgp, { IDatabase } from "pg-promise";
 import getSlug from "speakingurl";
 
@@ -339,4 +340,14 @@ export const setPostContent = async (page: Page, {
     await page.getByLabel(bodyLabel).fill("");
     await page.getByLabel(bodyLabel).fill(body);
   }
+}
+
+/**
+ * Publishing a draft on the EA Forum opens a share popup, which repeats the post
+ * title and body. Check it appeared and close it so it doesn't match later locators.
+ */
+export const closeSharePostPopup = async (page: Page) => {
+  await expect(page.getByText("Post published")).toBeVisible();
+  await page.locator(".SharePostPopup-closeButton").click();
+  await expect(page.getByText("Post published")).not.toBeVisible();
 }

@@ -59,7 +59,7 @@ export const isRouteOwnedByEAForumV3 = (href: string): boolean => {
     return false;
   }
   const { origin, pathname } = new URL(href, window.location.origin);
-  if (origin !== window.location.origin) {
+  if (origin !== window.location.origin || pathname === window.location.pathname) {
     return false;
   }
   return newSitePatterns.some((regex) => regex.test(pathname));
