@@ -1,7 +1,5 @@
 # Forum Magnum
 
-[![Coverage Status](https://coveralls.io/repos/github/ForumMagnum/ForumMagnum/badge.svg?branch=master)](https://coveralls.io/github/ForumMagnum/ForumMagnum?branch=master)
-
 Forum Magnum is the codebase powering [LessWrong](https://lesswrong.com) and the
 [Effective Altruism Forum](https://forum.effectivealtruism.org).
 
@@ -244,7 +242,7 @@ We use [Jest](https://jestjs.io/) for unit and integration testing, and [Playwri
 * Run the unit test suite with `yarn unit`
 * Run the integration test suite with `yarn integration` (you may need to run `yarn create-integration-db` first so that the db is up-to-date)
 
-Both commands support a `-watch` suffix to watch the file system, and a `-coverage` suffix to generate a code coverage report. After generating both code coverage reports they can be combined into a single report with `yarn combine-coverage`.
+Both commands support a `-watch` suffix to watch the file system.
 
 ### Playwright
 

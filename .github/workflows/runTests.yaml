@@ -156,14 +156,6 @@ jobs:
       with:
         name: Upload schema to accept
         path: schema/schema_to_accept.sql
-    - name: Save coverage report
-      continue-on-error: true
-      uses: coverallsapp/github-action@v2
-      with:
-        file: unit-coverage/lcov.info
-        format: lcov
-        flag-name: Unit
-        parallel: true
 
   runIntegrationTests:
     runs-on: ubuntu-latest
@@ -194,21 +186,3 @@ jobs:
       run: yarn create-integration-db-ci
     - name: yarn run integration-ci
       run: yarn run integration-ci
-    - name: Save coverage report
-      continue-on-error: true
-      uses: coverallsapp/github-action@v2
-      with:
-        file: integration-coverage/lcov.info
-        format: lcov
-        flag-name: Integration
-        parallel: true
-
-  uploadCoverageReports:
-    needs: [runUnitTests, runIntegrationTests]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Upload to Coveralls
-      continue-on-error: true
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel-finished: true
