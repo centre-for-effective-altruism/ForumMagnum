@@ -10,6 +10,15 @@ import { isServer } from './executionEnvironment';
 // The cookie is unset by default (so responses stay cacheable), which means
 // the user prefers the new site.
 
+// These take precedence over `newSitePatterns`
+const oldSitePatterns = [
+  /^\/topics\/(all|create|random|dashboard|wiki)$/, // Special-case topic slugs
+];
+
+// Topic pages with these query params use legacy-only workflows (editing,
+// viewing revisions, and the tag flag dashboard)
+const legacyTopicPageParams = ["edit", "version", "revision", "flagId"];
+
 const newSitePatterns = [
   /^\/$/, // Home page
   /^\/posts\/[^/]+\/[^/]+$/, // Post pages: /posts/[id]/[slug]
@@ -27,6 +36,8 @@ const newSitePatterns = [
   /^\/contact$/, // Contact page
   /^\/tags$/, // Topics redirect
   /^\/topics$/, // Topics page
+  /^\/topics\/[^/]+$/, // Topic pages: /topics/[slug]
+  /^\/(tags|tag|topic)\/[^/]+$/, // Topic pages (legacy paths, redirect to /topics/[slug])
   /^\/copyright$/, // Copyright page
   /^\/cookie-policy$/, // Cookie policy
   /^\/cookiePolicy$/, // Cookie policy (camelCase, redirect to kebab-case)
@@ -58,8 +69,17 @@ export const isRouteOwnedByEAForumV3 = (href: string): boolean => {
   if (preferNewSite === "false" || preferNewSite === false) {
     return false;
   }
-  const { origin, pathname } = new URL(href, window.location.origin);
+  const { origin, pathname, searchParams } = new URL(href, window.location.origin);
   if (origin !== window.location.origin) {
+    return false;
+  }
+  if (oldSitePatterns.some((regex) => regex.test(pathname))) {
+    return false;
+  }
+  if (
+    /^\/topics\/[^/]+$/.test(pathname) &&
+    legacyTopicPageParams.some((param) => searchParams.has(param))
+  ) {
     return false;
   }
   return newSitePatterns.some((regex) => regex.test(pathname));
