@@ -1,12 +1,10 @@
 # Forum Magnum
 
-[![Coverage Status](https://coveralls.io/repos/github/ForumMagnum/ForumMagnum/badge.svg?branch=master)](https://coveralls.io/github/ForumMagnum/ForumMagnum?branch=master)
-
-Forum Magnum is the codebase powering [LessWrong](https://lesswrong.com) and the
-[Effective Altruism Forum](https://forum.effectivealtruism.org).
-
-The team behind LessWrong created this codebase in 2017 as a rewrite of the
-original version of LessWrong, which was a difficult-to-maintain fork of reddit.
+This codebase powers the older parts of the
+[EA Forum](https://forum.effectivealtruism.org), and is a fork of
+[LessWrong](https://github.com/ForumMagnum/ForumMagnum). We're in the process of
+migrating it to our
+[new codebase](https://github.com/centre-for-effective-altruism/ea-forum).
 
 ## Technologies
 
@@ -42,7 +40,7 @@ Forum Magnum is built on top of a number major open-source libraries.
 Clone our repo:
 
 ```
-git clone https://github.com/ForumMagnum/ForumMagnum.git
+git clone https://github.com/centre-for-effective-altruism/ForumMagnum.git
 ```
 
 Install dependencies:
@@ -80,18 +78,6 @@ TODOs:
 * You won't have any database settings yet. TODO: add instructions.
   * Then run `yarn ea-load-dev-db <settings file>` to load the database settings
     from the file. (TODO: example of the file)
-
-### Creating branch-specific development databases
-
-When developing features that require changing database schemas, it can be
-desirable to do this work without changing schemas in shared database instances
-that other developers are working on. To solve this problem, we have a script
-that can be used to create temporary clones of the dev database. The following
-commands are supported:
- - `yarn branchdb create` clones a new dev database for the current git branch
- - `yarn branchdb drop` drops the cloned database for the current git branch
- - `yarn branchdb clean` drops all cloned dev databases created by this git clone
- - `yarn branchdb list` lists all cloned dev databases created by this git clone
 
 ### Start the development server
 
@@ -136,10 +122,6 @@ Some relevant pieces of documentation that will help you understand aspects of t
 5. Lodash: [reference](https://lodash.com/docs/4.17.15)
 
 You can also see auto-generated documentation of our GraphQL API endpoints and try out queries using [GraphiQL](https://www.lesswrong.com/graphiql) on our server or on a development server.
-
-### Caching in CloudFront (CDN)
-
-You can set up CloudFront to cache pages for logged out users. See [this README](./packages/lesswrong/server/cache/README.md) for detailed instruction.
 
 ### Understanding the codebase
 
@@ -196,22 +178,13 @@ Eventually, it’ll be helpful to have a good understanding of each of those tec
 When developing, we make good use of project-wide search. One benefit of a
 monorepo codebase at a non-megacorp is that we can get good results just by
 searching for `hiddenRelatedQuestion` to find exactly how that database field is
-used.
+used. If you're trying to debug an email problem, you might want to know about
+`forcePendingEvents`.
 
 **Environment variables**
 
 - `SLOW_QUERY_REPORT_CUTOFF_MS`: You might want to set this to something other than the default (2000 ms), it can give a lot of false positives when you are running against a remote database.
 - `FM_WATCH`: Set this to `true` or `false` to override the `--watch` CLI flag for the build process. It can sometimes be annoying for the project to rebuild on every save.
-
-### Debugging
-
-* Use google chrome. Its debugging tools are superior.
-* Use 'debugger' in code. Then Ctrl+Shift+J on your open page, and you can interactively step through the breakpoint. You can also interact with variables in scope at each step using the console at the bottom.
-* Use `console.warn(variable)` when you want to see the stacktrace of `variable`
-* Add the [react dev tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) extension to chrome, and switch to the "React" tab after pressing Ctrl+Shift+J. You can see the react component tree. Once you click on a component in the tree, you will have access to it in the console as the variable `$r`. For example, you can check the props or state using `$r.props` or `$r.state`.
-* If you think a previous commit broke your feature, use [git's builtin debugging tools](https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git)
-* (Note: currently aspirational): If you fix a bug, **write a test for it**.
-* If you're trying to debug an email problem, you might want to know about `forcePendingEvents`.
 
 ## Database Migrations
 
@@ -244,7 +217,7 @@ We use [Jest](https://jestjs.io/) for unit and integration testing, and [Playwri
 * Run the unit test suite with `yarn unit`
 * Run the integration test suite with `yarn integration` (you may need to run `yarn create-integration-db` first so that the db is up-to-date)
 
-Both commands support a `-watch` suffix to watch the file system, and a `-coverage` suffix to generate a code coverage report. After generating both code coverage reports they can be combined into a single report with `yarn combine-coverage`.
+Both commands support a `-watch` suffix to watch the file system.
 
 ### Playwright
 
@@ -274,17 +247,5 @@ terminals while running the tests.
 
 ### Where to branch off of
 
-Branch off of `master` and submit to `master`. Deploys occur when `master` is
-merged into `ea-deploy` and `lw-deploy`.
-
-## EA Forum-Specific
-
-### \[CEA-Specific] Local Dev Database
-
-The local development database is actually hosted in the cloud like staging
-and production. There's no reason to host your own database. It's also shared
-with other developers, which means if someone adds a feature which requires
-manual database work, there's no need for you to also do that manual work.
-
-The test user admin credentials are in 1password. You're also welcome to create
-your own admin user.
+Branch off of `main` and submit to `main`. The deploys automatically when `main`
+is updated.

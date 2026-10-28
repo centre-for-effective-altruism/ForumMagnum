@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { createNewPost, loginNewUser, logout, setPostContent, uniqueId } from "./playwrightUtils";
+import { closeSharePostPopup, createNewPost, loginNewUser, logout, setPostContent, uniqueId } from "./playwrightUtils";
 
 test("create and edit post", async ({page, context}) => {
   await loginNewUser(context);
@@ -14,6 +14,7 @@ test("create and edit post", async ({page, context}) => {
 
   // Submitting navigates to the post page - check our new post is there
   await page.waitForURL(`/posts/**/test-post-${n}**`);
+  await closeSharePostPopup(page);
   await expect(page.getByText(title)).toBeVisible();
   await expect(page.getByText(body)).toBeVisible();
 
@@ -115,6 +116,7 @@ test("cannot create posts with duplicate title", async ({page, context}) => {
   // Submitting navigates to the post page - check our new post is there
   // This will have a slug derived from the initial title, rather than the one we just set.
   await page.waitForURL(`/posts/**/test-post-${n}**`);
+  await closeSharePostPopup(page);
   await expect(page.getByText(title)).toBeVisible();
   await expect(page.getByText(body)).toBeVisible();
 

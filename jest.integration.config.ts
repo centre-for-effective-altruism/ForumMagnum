@@ -10,11 +10,6 @@ export default {
   setupFiles: [
     `<rootDir>/${base}/testPreSetup.ts`,
   ],
-  coverageDirectory: "<rootDir>/integration-coverage/",
-  coveragePathIgnorePatterns: [
-    ...config.coveragePathIgnorePatterns,
-    "/unitTests/",
-  ],
   globals: {
     ...config.globals,
     bundleIsIntegrationTest: true,

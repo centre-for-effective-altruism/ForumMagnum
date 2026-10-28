@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { createCrosspostContexts, setPostContent } from "./playwrightUtils";
+import { closeSharePostPopup, createCrosspostContexts, setPostContent } from "./playwrightUtils";
 
 test("connect crossposting account and create post", async ({browser}) => {
   const {pages, users} = await createCrosspostContexts(browser);
@@ -38,7 +38,8 @@ test("connect crossposting account and create post", async ({browser}) => {
 
   // Check the post exists on the source site
   await pages[0].waitForURL("/posts/**/**");
-  await expect(pages[0].getByText(title, {exact: true})).toBeVisible();
+  await closeSharePostPopup(pages[0]);
+  await expect(pages[0].locator(".PostsPageTitle-link").getByText(title, {exact: true})).toBeVisible();
   await expect(pages[0].locator("#postBody").getByText(body)).toBeVisible();
   await expect(pages[0].getByText("Crossposted to")).toBeVisible();
 
@@ -46,7 +47,7 @@ test("connect crossposting account and create post", async ({browser}) => {
   await pages[1].goto(`/users/${users[1].slug}`);
   await pages[1].getByText(title).click();
   await pages[1].waitForURL("/posts/**/**");
-  await expect(pages[1].getByText(title, {exact: true})).toBeVisible();
+  await expect(pages[1].locator(".PostsPageTitle-link").getByText(title, {exact: true})).toBeVisible();
   await expect(pages[1].locator("#postBody").getByText(body)).toBeVisible();
   await expect(pages[1].getByText("Crossposted from")).toBeVisible();
 
@@ -67,12 +68,12 @@ test("connect crossposting account and create post", async ({browser}) => {
 
   // Check the edits were saved locally
   await pages[0].waitForURL("/posts/**/**");
-  await expect(pages[0].getByText(newTitle, {exact: true})).toBeVisible();
+  await expect(pages[0].locator(".PostsPageTitle-link").getByText(newTitle, {exact: true})).toBeVisible();
   await expect(pages[0].locator("#postBody").getByText(newBody)).toBeVisible();
 
   // Check the edits propagated to the foreign site
   await pages[1].reload();
-  await expect(pages[1].getByText(newTitle, {exact: true})).toBeVisible();
+  await expect(pages[1].locator(".PostsPageTitle-link").getByText(newTitle, {exact: true})).toBeVisible();
   await expect(pages[1].locator("#postBody").getByText(newBody)).toBeVisible();
 
   // Move the post to drafts on the local forum

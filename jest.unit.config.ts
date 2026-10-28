@@ -13,9 +13,4 @@ export default {
   setupFilesAfterEnv: [
     `<rootDir>/${base}/testSetup.ts`,
   ],
-  coverageDirectory: "<rootDir>/unit-coverage/",
-  coveragePathIgnorePatterns: [
-    ...config.coveragePathIgnorePatterns,
-    "/integrationTests/",
-  ],
 };
