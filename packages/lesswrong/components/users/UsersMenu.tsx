@@ -440,6 +440,7 @@ const UsersMenu = ({classes}: {
                 title={preferredHeadingCase("Log Out")}
                 to="/logout"
                 rawLink
+                onClick={() => posthog.reset()}
               />
             </div>
           </DropdownMenu>
