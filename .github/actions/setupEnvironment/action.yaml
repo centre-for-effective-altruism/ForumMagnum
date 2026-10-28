@@ -1,0 +1,29 @@
+name: 'Setup Environment'
+description: 'Setup the server environment for ForumMagnum'
+runs:
+  using: composite
+  steps:
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+
+    - name: Cache node modules
+      id: cache-node-modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: forum-env-cache-${{ hashFiles('yarn.lock') }}
+
+    - name: Setup node-gyp
+      shell: bash
+      run: yarn global add node-gyp
+
+    - name: Install dependencies
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      shell: bash
+      run: yarn install --frozen-lockfile
+
+    - name: Verify dependencies were installed
+      shell: bash
+      run: test -d node_modules
