@@ -195,11 +195,11 @@ export const styles = (theme: ThemeType) => ({
       fontWeight: 600,
       letterSpacing: "-0.035em",
       whiteSpace: "nowrap",
-      color: theme.palette.type === "dark" ? "#fcf8f4" : "#231f1b",
+      color: theme.palette.header.wordmark,
     }),
   },
   titleForum: {
-    color: theme.palette.type === "dark" ? "#8c8681" : "#625d59",
+    color: theme.palette.header.wordmarkSecondary,
   },
   menuButton: {
     marginLeft: -theme.spacing.unit,

@@ -67,6 +67,8 @@ export const eaForumTheme: SiteThemeSpecification = {
     header: {
       text: shadePalette.type === 'light' ? "rgba(0,0,0,.87)" : shadePalette.greyAlpha(.87),
       background: shadePalette.type === 'light' ? '#ffffff' : shadePalette.grey[30],
+      wordmark: shadePalette.type === 'light' ? '#231f1b' : '#fcf8f4',
+      wordmarkSecondary: shadePalette.type === 'light' ? '#625d59' : '#8c8681',
     },
     event: '#0C869B',
     group: '#538747',
