@@ -14,7 +14,7 @@ import { ThemeContextProvider } from '@/components/themes/useTheme';
 import AppComponent from '../components/vulcan-core/App';
 import posthog from 'posthog-js'; 
 import { PostHogProvider } from '@posthog/react' 
-import { isProduction } from '@/lib/executionEnvironment';
+import { getPosthogEnvironment } from '@/lib/posthogUtils';
 import { DatabasePublicSetting } from "@/lib/publicSettings";
 import { PosthogIdentifier } from './posthogIdentifier';
 import { isBotSiteSetting } from '@/lib/instanceSettings';
@@ -31,7 +31,7 @@ if (!isBotSiteSetting.get()) {
     cookieless_mode: 'on_reject',
     loaded: (ph) => {
       ph.register({
-        environment: isProduction ? "prod" : "dev",
+        environment: getPosthogEnvironment(),
         repo: "forum-magnum",
       });
     },

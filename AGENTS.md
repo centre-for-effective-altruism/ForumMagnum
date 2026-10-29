@@ -11,14 +11,14 @@
 
 ## EA Forum Branching And Deploys
 
-- Branch off of `ea-staging` and target PRs at `ea-staging`. It is the
+- Branch off of `main` and target PRs at `main`. It is the
   integration branch for EA Forum work.
 - **Do not touch `master`.** It is shared with LessWrong and is not in the
   EA Forum deploy path. Some old docs (including `README.md`) still tell you
   to — ignore them.
-- `ea-deploy` is the production branch, updated by merging `ea-staging` into
+- `ea-deploy` is the production branch, updated by merging `main` into
   it. Do not push feature work there directly.
-- Pushes to `ea-staging` trigger `Deploy EA Staging` and run staging
+- Pushes to `main` trigger `Deploy EA Staging` and run staging
   migrations. Pushes to `ea-deploy` trigger `Deploy EA Prod`, upload the
   CkEditor bundle, and run production migrations.
 - LessWrong deploys from its own branches (e.g. `lw-deploy`). Keep EA Forum
@@ -185,7 +185,7 @@ Implications:
   that repo, pass `PG_URL=...` instead.
 - Down migrations are treated as optional and may not work.
 - Staging and prod migrations run automatically via
-  `.github/actions/runMigrations` on pushes to `ea-staging` and `ea-deploy`.
+  `.github/actions/runMigrations` on pushes to `main` and `ea-deploy`.
   Do not run prod migrations manually outside that flow.
 
 ## Generated Files And Codegen

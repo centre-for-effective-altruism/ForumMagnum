@@ -6,6 +6,8 @@ import { spawn, ChildProcess } from 'child_process';
 import { createServer as createViteServer, type ViteDevServer} from "vite";
 import viteReact from "@vitejs/plugin-react";
 import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 import express from "express";
 import bodyParser from 'body-parser';
 // We explicitly need to override the native Node fetch implementation
@@ -411,6 +413,67 @@ class RunningServer {
   }
 }
 
+const runPosthogCli = (args: string[]): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const host = process.env.POSTHOG_CLI_HOST;
+    const cli = spawn("./node_modules/.bin/posthog-cli", [
+      ...(host ? ["--host", host] : []),
+      ...args,
+    ], {stdio: "inherit"});
+    cli.on("error", (err) => {
+      console.error("Failed to run posthog-cli:", err);
+      resolve(false);
+    });
+    cli.on("exit", (code) => resolve(code === 0));
+  });
+}
+
+/**
+ * Inject PostHog chunk ids into the production client bundle and upload its
+ * source maps so that PostHog error tracking can show unminified stack traces.
+ * The injection must finish before the server starts serving the bundle; the
+ * returned `upload` promise doesn't need to block startup.
+ *
+ * Reads credentials from POSTHOG_CLI_API_KEY (a personal API key with
+ * error tracking write access) and POSTHOG_CLI_PROJECT_ID, and optionally
+ * POSTHOG_CLI_HOST and POSTHOG_RELEASE_VERSION. If the credentials aren't
+ * defined this is skipped, and failures are logged but never fail the build.
+ */
+async function injectPosthogSourcemaps(clientOutfilePath: string): Promise<{upload: Promise<void>}> {
+  const skipped = {upload: Promise.resolve()};
+  if (!process.env.POSTHOG_CLI_API_KEY || !process.env.POSTHOG_CLI_PROJECT_ID) {
+    logWithTimestamp("Skipping PostHog sourcemap upload: POSTHOG_CLI_API_KEY or POSTHOG_CLI_PROJECT_ID is not set");
+    return skipped;
+  }
+
+  // The docker image doesn't include .git, so posthog-cli can't derive the
+  // release itself
+  const releaseVersion = process.env.POSTHOG_RELEASE_VERSION
+    || process.env.RENDER_GIT_COMMIT
+    || crypto.createHash("sha256").update(fs.readFileSync(clientOutfilePath)).digest("hex").slice(0, 12);
+  const sourcemapArgs = [
+    "--directory", path.dirname(clientOutfilePath),
+    "--release-name", "forum-magnum",
+    "--release-version", releaseVersion,
+  ];
+
+  logWithTimestamp(`Injecting PostHog chunk ids (release ${releaseVersion})`);
+  if (!await runPosthogCli(["sourcemap", "inject", ...sourcemapArgs])) {
+    console.error("PostHog sourcemap injection failed, skipping upload");
+    return skipped;
+  }
+
+  const upload = (async () => {
+    logWithTimestamp("Uploading sourcemaps to PostHog");
+    if (await runPosthogCli(["sourcemap", "upload", ...sourcemapArgs])) {
+      logWithTimestamp("Finished uploading sourcemaps to PostHog");
+    } else {
+      console.error("PostHog sourcemap upload failed");
+    }
+  })();
+  return {upload};
+}
+
 async function main() {
   const clientOutfilePath = `${getOutputDir()}/client/js/bundle.js`;
   const clientContext = await esbuild.context({
@@ -549,12 +612,20 @@ async function main() {
       clientContext.rebuild()
     ]);
     await esbuild.stop();
+    if (isProduction) {
+      const {upload} = await injectPosthogSourcemaps(clientOutfilePath);
+      void upload;
+    }
     serverProcess.startOrRestart();
   } else {
     await Promise.all([
       serverContext.rebuild(),
       clientContext.rebuild()
     ]);
+    if (isProduction) {
+      const {upload} = await injectPosthogSourcemaps(clientOutfilePath);
+      await upload;
+    }
     process.exit(0);
   }
 }

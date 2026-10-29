@@ -22,6 +22,9 @@ export const clientContextVars: {
   clientId?: string;
   tabId?: string | null;
   abTestGroupsUsed?: RelevantTestGroupAllocation
+  /** Whether the user has allowed analytics cookies. Server-side PostHog
+   * events are only linked to a user/client if this is true. */
+  analyticsCookiesAllowed?: boolean;
 } = {};
 
 function getShowAnalyticsDebug() {

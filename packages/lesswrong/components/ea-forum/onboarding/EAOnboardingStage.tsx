@@ -10,6 +10,7 @@ import { DialogContentText } from '../../widgets/DialogContentText';
 import { DialogActions } from '../../widgets/DialogActions';
 import { DialogTitle } from '../../widgets/DialogTitle';
 import { useCurrentUser } from "@/components/common/withUser";
+import { usePostHog } from "@posthog/react";
 import EAButton from "../EAButton";
 import LWDialog from "../../common/LWDialog";
 import { Typography } from "../../common/Typography";
@@ -145,6 +146,7 @@ const LogoutConfirmationDialog = (
   {open: boolean, onClose: () => void, classes: ClassesType<typeof styles>},
 ) => {
   const currentUser = useCurrentUser();
+  const posthog = usePostHog();
   return <LWDialog open={open} onClose={onClose} className={classes.logoutDialog}>
     <DialogTitle disableTypography>
       <Typography variant="display1" className={classes.logoutDialogTitle}>
@@ -160,7 +162,7 @@ const LogoutConfirmationDialog = (
       <EAButton onClick={onClose} style="grey">
         Cancel
       </EAButton>
-      <EAButton href="/logout" autoFocus>
+      <EAButton href="/logout" onClick={() => posthog.reset()} autoFocus>
         Logout
       </EAButton>
     </DialogActions>

@@ -266,6 +266,16 @@ registerCookie({
   description: "Miscellaneous cookies which may be set by Intercom",
 });
 
+// PostHog
+registerCookie({
+  name: "ph_[*]_posthog",
+  matches: (name: string) => name.startsWith("ph_") && name.endsWith("_posthog"),
+  type: "analytics",
+  thirdPartyName: "PostHog",
+  maxExpires: "12 months",
+  description: "Used by PostHog to store an anonymous identifier for this browser and the current session, so that page views and other events can be attributed to the same visitor.",
+});
+
 // Datadog
 registerCookie({
   name: "dd_cookie_test_",

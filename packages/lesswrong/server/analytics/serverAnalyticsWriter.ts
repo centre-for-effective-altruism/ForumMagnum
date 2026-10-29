@@ -1,14 +1,11 @@
 import { isDevelopment } from '@/lib/executionEnvironment';
 import { randomId } from '@/lib/random';
-import { PublicInstanceSetting, performanceMetricLoggingBatchSize } from '@/lib/instanceSettings';
+import { environmentDescriptionSetting, performanceMetricLoggingBatchSize } from '@/lib/instanceSettings';
 import { addStaticRoute } from '@/server/vulcan-lib/staticRoutes';
 import { pgPromiseLib, getAnalyticsConnection } from './postgresConnection'
 import chunk from 'lodash/chunk';
 import gql from 'graphql-tag';
 import { writeEventsToPosthog } from './posthog';
-
-// Since different environments are connected to the same DB, this setting cannot be moved to the database
-export const environmentDescriptionSetting = new PublicInstanceSetting<string>("analytics.environment", "misconfigured", "warning")
 
 export const serverId = randomId();
 
@@ -68,7 +65,7 @@ async function handleAnalyticsEventWriteRequest(events: AnyBecauseTodo, clientTi
     
     return {...event, timestamp: adjustedTimestamp};
   });
-  await writeEventsToAnalyticsDB(augmentedEvents);
+  await writeEventsToAnalyticsDB(augmentedEvents, "client");
   return true;
 }
 
@@ -79,8 +76,11 @@ const analyticsColumnSet = new pgPromiseLib.helpers.ColumnSet(['environment', 'e
 // If you want to capture an event, this is not the function you're looking for;
 // use captureEvent.
 // Writes an event to the analytics database.
-async function writeEventsToAnalyticsDB(events: {type: string, timestamp: Date, props: AnyBecauseTodo}[]) {
-  writeEventsToPosthog(events);
+async function writeEventsToAnalyticsDB(
+  events: {type: string, timestamp: Date, props: AnyBecauseTodo}[],
+  source: "client" | "server",
+) {
+  writeEventsToPosthog(events, source);
 
   const connection = getAnalyticsConnection()
   
@@ -232,7 +232,7 @@ export function serverWriteEvent(event: AnyBecauseTodo) {
       ...props,
       serverId: serverId,
     }
-  }]);
+  }], "server");
 }
 
 // Analytics events that were recorded during startup before we were ready
