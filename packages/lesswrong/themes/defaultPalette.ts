@@ -542,6 +542,8 @@ export const defaultComponentPalette = (shades: ThemeShadePalette): ThemeCompone
   header: {
     text: shades.greyAlpha(.87),
     background: shades.grey[30],
+    wordmark: shades.greyAlpha(.87),
+    wordmarkSecondary: shades.greyAlpha(.6),
   },
   datePicker: {
     selectedDate: "#428bca",

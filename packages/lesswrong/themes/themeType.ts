@@ -512,6 +512,8 @@ declare global {
     header: {
       text: ColorString,
       background: ColorString,
+      wordmark: ColorString,
+      wordmarkSecondary: ColorString,
     },
     datePicker: {
       selectedDate: ColorString,
