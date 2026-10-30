@@ -201,6 +201,16 @@ export const styles = (theme: ThemeType) => ({
   titleForum: {
     color: theme.palette.header.wordmarkSecondary,
   },
+  titleText: {
+    "@media (max-width: 399px)": {
+      display: "none",
+    },
+  },
+  titleTextSearchOpen: {
+    "@media (max-width: 519px)": {
+      display: "none",
+    },
+  },
   menuButton: {
     marginLeft: -theme.spacing.unit,
     marginRight: theme.spacing.unit,
@@ -214,7 +224,7 @@ export const styles = (theme: ThemeType) => ({
     marginRight: 6,
     [theme.breakpoints.down('sm')]: {
       marginLeft: -12,
-      marginRight: 3
+      marginRight: isEAForum ? 6 : 3,
     },
   },
   hideLgUp: {
@@ -318,15 +328,19 @@ export const styles = (theme: ThemeType) => ({
 const VOTING_PORTAL_PRIMARY_COLOR = requireCssVar("palette", "givingSeason", "votingPortalPrimary");
 
 /** On the EA Forum, "Forum" is a lighter colour in the wordmark */
-const renderTitle = (title: string, classes: ClassesType<typeof styles>) => {
+const renderTitle = (
+  title: string,
+  searchOpen: boolean,
+  classes: ClassesType<typeof styles>,
+) => {
   const forumSuffix = " Forum";
   if (!isEAForum || !title.endsWith(forumSuffix)) {
     return title;
   }
-  return <>
+  return <span className={classNames(classes.titleText, searchOpen && classes.titleTextSearchOpen)}>
     {title.slice(0, -forumSuffix.length)}{" "}
     <span className={classes.titleForum}>Forum</span>
-  </>;
+  </span>;
 }
 
 const Header = ({
@@ -596,7 +610,7 @@ const Header = ({
                     <div className={classes.titleFundraiserContainer}>
                       <Link to="/" className={classes.titleLink}>
                         {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaContrast={useContrastText}/></div>}
-                        {renderTitle(forumHeaderTitleSetting.get(), classes)}
+                        {renderTitle(forumHeaderTitleSetting.get(), searchOpen, classes)}
                       </Link>
                     </div>
                   </div>
@@ -604,7 +618,7 @@ const Header = ({
                 <div className={classNames(classes.hideMdUp, classes.titleFundraiserContainer)}>
                   <Link to="/" className={classes.titleLink}>
                     {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaContrast={useContrastText}/></div>}
-                    {renderTitle(forumShortTitleSetting.get(), classes)}
+                    {renderTitle(forumShortTitleSetting.get(), searchOpen, classes)}
                   </Link>
                 </div>
               </Typography>
