@@ -60,6 +60,7 @@ const newSitePatterns = [
   /^\/admin\/org-updates-test$/, // Admin org-updates layout test
   /^\/admin\/spotlights.*/, // Admin spotlights pages
   /^\/admin\/swap-user-emails$/, // Admin swap user emails page
+  /^\/search$/, // Search page
   /^\/robots.txt$/, // robots.txt
 ];
 
