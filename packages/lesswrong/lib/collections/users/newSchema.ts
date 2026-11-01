@@ -1324,6 +1324,13 @@ const schema = {
       canRead: [userOwns, "admins"],
       canUpdate: userOwns,
       canCreate: "guests",
+      onUpdate: ({ data }) => {
+        if (!data.lastNotificationsCheck) return data.lastNotificationsCheck;
+        // Unread notifications are found by comparing against server-generated
+        // createdAt timestamps, so use server time to avoid client clock skew
+        // hiding new notifications
+        return new Date();
+      },
       validation: {
         optional: true,
       },
