@@ -597,10 +597,6 @@ declare global {
     namesAttachedReactions: {
       selectedAnti: ColorString,
     },
-    ultraFeed: {
-      dim: ColorString,
-      cardSeparator: string,
-    }
     pangram: {
       scoreMidBackground: ColorString,
       scoreHighBackground: ColorString,
@@ -645,7 +641,6 @@ declare global {
 
       postStyle: JssStyles,
       commentStyle: JssStyles,
-      ultraFeedMobileStyle: JssStyles,
       commentBlockquote: JssStyles,
       commentHeader: JssStyles,
       errorStyle: JssStyles,

@@ -34,7 +34,6 @@ import { postGqlQueries, postGqlMutations, postGqlTypeDefs } from '@/server/reso
 import { alignmentForumMutations, alignmentForumTypeDefs } from '@/server/resolvers/alignmentForumMutations'
 import { allTagsActivityFeedGraphQLQueries, allTagsActivityFeedGraphQLTypeDefs } from '@/server/resolvers/allTagsActivityFeed';
 import { recentDiscussionFeedGraphQLQueries, recentDiscussionFeedGraphQLTypeDefs } from '@/server/resolvers/recentDiscussionFeed';
-import { ultraFeedGraphQLQueries, ultraFeedGraphQLTypeDefs } from '@/server/resolvers/ultraFeedResolver';
 import { subscribedUsersFeedGraphQLQueries, subscribedUsersFeedGraphQLTypeDefs } from '@/server/resolvers/subscribedUsersFeedResolver';
 import { tagHistoryFeedGraphQLQueries, tagHistoryFeedGraphQLTypeDefs } from '@/server/resolvers/tagHistoryFeed';
 import { subForumFeedGraphQLQueries, subForumFeedGraphQLTypeDefs, tagGraphQLTypeDefs, tagResolversGraphQLMutations, tagResolversGraphQLQueries } from '@/server/resolvers/tagResolvers';
@@ -204,7 +203,6 @@ import { createSurveyScheduleGqlMutation, updateSurveyScheduleGqlMutation, graph
 import { createSurveyGqlMutation, updateSurveyGqlMutation, graphqlSurveyTypeDefs } from "@/server/collections/surveys/mutations";
 import { createTagFlagGqlMutation, updateTagFlagGqlMutation, graphqlTagFlagTypeDefs } from "@/server/collections/tagFlags/mutations";
 import { createTagGqlMutation, updateTagGqlMutation, graphqlTagTypeDefs } from "@/server/collections/tags/mutations";
-import { createUltraFeedEventGqlMutation, graphqlUltraFeedEventTypeDefs } from "@/server/collections/ultraFeedEvents/mutations";
 import { createUserEAGDetailGqlMutation, updateUserEAGDetailGqlMutation, graphqlUserEAGDetailTypeDefs } from "@/server/collections/userEAGDetails/mutations";
 import { createUserJobAdGqlMutation, updateUserJobAdGqlMutation, graphqlUserJobAdTypeDefs } from "@/server/collections/userJobAds/mutations";
 import { createUserMostValuablePostGqlMutation, updateUserMostValuablePostGqlMutation, graphqlUserMostValuablePostTypeDefs } from "@/server/collections/userMostValuablePosts/mutations";
@@ -302,7 +300,6 @@ export const typeDefs = gql`
   ${diffGqlTypeDefs}
   ${recommendationsGqlTypeDefs}
   ${extraPostResolversGraphQLTypeDefs}
-  ${ultraFeedGraphQLTypeDefs}
   ${generateCoverImagesForPostGraphQLTypeDefs}
   ${flipSplashArtImageGraphQLTypeDefs}
   ${elicitQuestionPredictionsGraphQLTypeDefs}
@@ -434,7 +431,6 @@ export const typeDefs = gql`
   ${graphqlSurveyTypeDefs}
   ${graphqlTagFlagTypeDefs}
   ${graphqlTagTypeDefs}
-  ${graphqlUltraFeedEventTypeDefs}
   ${graphqlUserEAGDetailTypeDefs}
   ${graphqlUserJobAdTypeDefs}
   ${graphqlUserMostValuablePostTypeDefs}
@@ -485,7 +481,6 @@ export const resolvers = {
     ...diffGqlQueries,
     ...surveyResolversGraphQLQueries,
     ...tagResolversGraphQLQueries,
-    ...ultraFeedGraphQLQueries,
 
     // CRUD Query Handlers
     ...advisorRequestGqlQueryHandlers,
@@ -676,7 +671,6 @@ export const resolvers = {
     updateTagFlag: updateTagFlagGqlMutation,
     createTag: createTagGqlMutation,
     updateTag: updateTagGqlMutation,
-    createUltraFeedEvent: createUltraFeedEventGqlMutation,
     createUserEAGDetail: createUserEAGDetailGqlMutation,
     updateUserEAGDetail: updateUserEAGDetailGqlMutation,
     createUserJobAd: createUserJobAdGqlMutation,

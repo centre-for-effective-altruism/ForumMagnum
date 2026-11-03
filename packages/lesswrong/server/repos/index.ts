@@ -28,13 +28,11 @@ import RevisionsRepo from "./RevisionsRepo";
 import SequencesRepo from "./SequencesRepo";
 import SideCommentCachesRepo from "./SideCommentCachesRepo";
 import SplashArtCoordinatesRepo from "./SplashArtCoordinatesRepo";
-import SpotlightsRepo from "./SpotlightsRepo";
 import SurveysRepo from "./SurveysRepo";
 import SurveySchedulesRepo from "./SurveySchedulesRepo";
 import TagsRepo from "./TagsRepo";
 import TweetsRepo from "./TweetsRepo";
 import TypingIndicatorsRepo from "./TypingIndicatorsRepo";
-import UltraFeedEventsRepo from "./UltraFeedEventsRepo";
 import UsersRepo from "./UsersRepo";
 import VotesRepo from "./VotesRepo";
 import BookmarksRepo from "./BookmarksRepo";
@@ -80,13 +78,11 @@ const allRepos = {
   sequences: SequencesRepo,
   sideComments: SideCommentCachesRepo,
   splashArtCoordinates: SplashArtCoordinatesRepo,
-  spotlights: SpotlightsRepo,
   surveys: SurveysRepo,
   surveySchedules: SurveySchedulesRepo,
   tags: TagsRepo,
   tweets: TweetsRepo,
   typingIndicators: TypingIndicatorsRepo,
-  ultraFeedEvents: UltraFeedEventsRepo,
   users: UsersRepo,
   votes: VotesRepo,
 } as const;

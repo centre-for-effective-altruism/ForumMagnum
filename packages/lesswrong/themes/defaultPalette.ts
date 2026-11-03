@@ -675,10 +675,6 @@ export const defaultComponentPalette = (shades: ThemeShadePalette): ThemeCompone
   arbital: {
     arbitalGreen: '#004d40',
   },
-  ultraFeed: {
-    dim: shades.grey[600],
-    cardSeparator: `8px solid ${shades.greyAlpha(0.05)}`,
-  },
   pangram: {
     scoreMidBackground: "#fff8e1",
     scoreHighBackground: "#ffebee",

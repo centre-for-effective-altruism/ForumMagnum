@@ -81,7 +81,6 @@ import * as votesFragments from '../collections/votes/fragments';
 
 // Non-collection fragments
 import * as subscribedUserFeedFragments from '../subscribedUsersFeed';
-import * as ultraFeedFragments from '../ultraFeed';
 import { KeywordAlertDisplay } from '../keywordAlertHelpers';
 import { transformFragments } from './fragmentWrapper';
 
@@ -166,7 +165,6 @@ const staticFragments = transformFragments({
 
   // Non-collection fragments
   ...subscribedUserFeedFragments,
-  ...ultraFeedFragments,
   KeywordAlertDisplay,
 
   // Test fragments

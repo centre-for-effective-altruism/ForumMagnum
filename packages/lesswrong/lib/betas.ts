@@ -61,8 +61,6 @@ export const userHasPeopleDirectory = (user: UsersCurrent|DbUser|null) =>
 
 export const userHasSubscribeTabFeed = isLW ? shippedFeature : disabled;
 
-export const userHasUltraFeed = isLW ? isAdmin : disabled;
-
 export const userHasLlmChat = (currentUser: UsersCurrent|DbUser|null): currentUser is UsersCurrent|DbUser => {
   if (!currentUser) {
     return false

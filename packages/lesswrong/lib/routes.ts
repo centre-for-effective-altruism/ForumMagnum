@@ -78,7 +78,6 @@ import ModeratorInboxWrapper from '@/components/messaging/ModeratorInboxWrapper'
 import ModerationTemplatesPage from '@/components/moderationTemplates/ModerationTemplatesPage';
 import NotificationEmailPreviewPage from '@/components/notifications/NotificationEmailPreviewPage';
 import NotificationsPage from '@/components/notifications/NotificationsPage/NotificationsPage';
-import UltraFeedPage from '@/components/pages/UltraFeedPage';
 import AdminPaymentsPage from '@/components/payments/AdminPaymentsPage';
 import EditPaymentInfoPage from '@/components/payments/EditPaymentInfoPage';
 import PeopleDirectoryPage from '@/components/peopleDirectory/PeopleDirectoryPage';
@@ -1380,15 +1379,6 @@ const eaLwAfForumSpecificRoutes = forumSelect<Route[]>({
       path: '/petroyDayPoll',
       component: PetrovDayPoll,
       title: "Petrov Day Poll",
-    },
-    {
-      name: 'feed',
-      path: '/feed',
-      component: UltraFeedPage,
-      title: "LessWrong Feed",
-      subtitle: "The Feed",
-      hasLeftNavigationColumn: false,
-      navigationFooterBar: false,
     },
   ],
   AlignmentForum: [

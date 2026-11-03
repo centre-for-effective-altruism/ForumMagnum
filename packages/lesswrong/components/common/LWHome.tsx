@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { getReviewPhase, reviewIsActive, REVIEW_YEAR } from '../../lib/reviewUtils';
 import { showReviewOnFrontPageIfActive, lightconeFundraiserActive } from '../../lib/publicSettings';
@@ -16,7 +16,6 @@ import EAPopularCommentsSection from "../ea-forum/EAPopularCommentsSection";
 import QuickTakesSection from "../quickTakes/QuickTakesSection";
 import LWHomePosts from "./LWHomePosts";
 import HeadTags from "./HeadTags";
-import UltraFeed from "../ultraFeed/UltraFeed";
 
 const getStructuredData = () => ({
   "@context": "http://schema.org",
@@ -47,8 +46,6 @@ const getStructuredData = () => ({
 })
 
 const LWHome = () => {
-  const [isUltraFeedShowing, setIsUltraFeedShowing] = useState(false);
-
   return (
       <AnalyticsContext pageContext="homePage">
         <React.Fragment>
@@ -64,14 +61,11 @@ const LWHome = () => {
           <LWHomePosts>
             <QuickTakesSection />
             <EAPopularCommentsSection />
-            <UltraFeed onShowingChange={setIsUltraFeedShowing} />
-            {!isUltraFeedShowing && (
-              <RecentDiscussionFeed
-                af={false}
-                commentsLimit={4}
-                maxAgeHours={18}
-              />
-            )}
+            <RecentDiscussionFeed
+              af={false}
+              commentsLimit={4}
+              maxAgeHours={18}
+            />
           </LWHomePosts>
         </React.Fragment>
       </AnalyticsContext>

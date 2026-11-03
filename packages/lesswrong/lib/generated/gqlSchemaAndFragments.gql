@@ -1361,42 +1361,6 @@ extend type Mutation {
   increasePostViewCount(postId: String): Float
 }
 
-type FeedPost {
-  _id: String!
-  postMetaInfo: JSON
-  post: Post
-}
-
-type FeedCommentThread {
-  _id: String!
-  commentMetaInfos: JSON
-  comments: [Comment]
-  post: Post
-}
-
-type FeedSpotlightItem {
-  _id: String!
-  spotlight: Spotlight
-}
-
-type UltraFeedQueryResults {
-  cutoff: Date
-  endOffset: Int!
-  results: [UltraFeedEntryType!]
-  sessionId: String
-}
-
-type UltraFeedEntryType {
-  type: String!
-  feedCommentThread: FeedCommentThread
-  feedPost: FeedPost
-  feedSpotlight: FeedSpotlightItem
-}
-
-extend type Query {
-  UltraFeed(limit: Int, cutoff: Date, offset: Int, sessionId: String, settings: JSON): UltraFeedQueryResults!
-}
-
 extend type Mutation {
   generateCoverImagesForPost(postId: String!, prompt: String): [ReviewWinnerArt]
 }
@@ -6927,27 +6891,6 @@ extend type Mutation {
   updateTag(selector: SelectorInput!, data: UpdateTagDataInput!): TagOutput
 }
 
-input CreateUltraFeedEventDataInput {
-  documentId: String!
-  collectionName: String!
-  eventType: String!
-  userId: String
-  event: JSON
-  feedItemId: String
-}
-
-input CreateUltraFeedEventInput {
-  data: CreateUltraFeedEventDataInput!
-}
-
-type UltraFeedEventOutput {
-  data: UltraFeedEvent
-}
-
-extend type Mutation {
-  createUltraFeedEvent(data: CreateUltraFeedEventDataInput!): UltraFeedEventOutput
-}
-
 input CreateUserEAGDetailDataInput {
   legacyData: JSON
   lastUpdated: Date
@@ -7674,16 +7617,6 @@ fragment BookmarksDefaultFragment on Bookmark {
   userId
   lastUpdated
   active
-}
-
-fragment BookmarksFeedItemFragment on Bookmark {
-  ...BookmarksDefaultFragment
-  post {
-    ...PostsListWithVotes
-  }
-  comment {
-    ...UltraFeedComment
-  }
 }
 
 fragment BookmarksFriendlyFeedItemFragment on Bookmark {
@@ -8585,29 +8518,6 @@ fragment FeaturedResourcesFragment on FeaturedResource {
   ctaText
   ctaUrl
   expiresAt
-}
-
-fragment FeedCommentThreadFragment on FeedCommentThread {
-  _id
-  commentMetaInfos
-  comments {
-    ...UltraFeedComment
-  }
-}
-
-fragment FeedPostFragment on FeedPost {
-  _id
-  postMetaInfo
-  post {
-    ...PostsListWithVotes
-  }
-}
-
-fragment FeedSpotlightFragment on FeedSpotlightItem {
-  _id
-  spotlight {
-    ...SpotlightDisplay
-  }
 }
 
 fragment FieldChangeFragment on FieldChange {
@@ -11717,14 +11627,6 @@ fragment TypingIndicatorsDefaultFragment on TypingIndicator {
   lastUpdated
 }
 
-fragment UltraFeedComment on Comment {
-  ...CommentsList
-  post {
-    ...PostsMinimumInfo
-    votingSystem
-  }
-}
-
 fragment UltraFeedEventsDefaultFragment on UltraFeedEvent {
   _id
   createdAt
@@ -11734,21 +11636,6 @@ fragment UltraFeedEventsDefaultFragment on UltraFeedEvent {
   userId
   event
   feedItemId
-}
-
-fragment UltraFeedPostFragment on Post {
-  ...PostsDetails
-  ...PostsListWithVotes
-  contents {
-    _id
-    html
-    htmlHighlight
-    wordCount
-    plaintextDescription
-    version
-  }
-  autoFrontpage
-  votingSystem
 }
 
 fragment UnclaimedReportsList on Report {

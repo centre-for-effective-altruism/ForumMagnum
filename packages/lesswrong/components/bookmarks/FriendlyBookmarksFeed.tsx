@@ -2,8 +2,6 @@ import React from "react";
 import { registerComponent } from "@/lib/vulcan-lib/components";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { useCurrentUser } from "../common/withUser";
-import { UltraFeedObserverProvider } from "../ultraFeed/UltraFeedObserver";
-import { OverflowNavObserverProvider } from "../ultraFeed/OverflowNavObserverContext";
 import { useMulti } from "../../lib/crud/withMulti";
 import SingleColumnSection from "../common/SingleColumnSection";
 import SectionTitle from "../common/SectionTitle";
@@ -58,8 +56,6 @@ const BookmarksFeed = ({classes}: {classes: ClassesType<typeof styles>}) => {
 
   return (
     <AnalyticsContext pageSectionContext="bookmarksFeed">
-      <UltraFeedObserverProvider incognitoMode={true} >
-      <OverflowNavObserverProvider>
       <SingleColumnSection>
         <SectionTitle title="Saved comments & quick takes" />
         {bookmarks.map((bookmark) =>
@@ -79,8 +75,6 @@ const BookmarksFeed = ({classes}: {classes: ClassesType<typeof styles>}) => {
           </div>
         )}
       </SingleColumnSection>
-      </OverflowNavObserverProvider>
-      </UltraFeedObserverProvider>
     </AnalyticsContext>
   );
 };

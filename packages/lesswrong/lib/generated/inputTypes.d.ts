@@ -878,38 +878,6 @@ interface RssPostChangeInfo {
   htmlDiff: string;
 }
 
-interface FeedPost {
-  _id: string;
-  postMetaInfo: any;
-  post: Post | null;
-}
-
-interface FeedCommentThread {
-  _id: string;
-  commentMetaInfos: any;
-  comments: Array<Comment | null> | null;
-  post: Post | null;
-}
-
-interface FeedSpotlightItem {
-  _id: string;
-  spotlight: Spotlight | null;
-}
-
-interface UltraFeedQueryResults {
-  cutoff: Date | null;
-  endOffset: number;
-  results: Array<UltraFeedEntryType> | null;
-  sessionId: string | null;
-}
-
-interface UltraFeedEntryType {
-  type: string;
-  feedCommentThread: FeedCommentThread | null;
-  feedPost: FeedPost | null;
-  feedSpotlight: FeedSpotlightItem | null;
-}
-
 interface ElicitQuestionPredictionCreator {
   _id: string;
   displayName: string;
@@ -5924,23 +5892,6 @@ interface TagOutput {
   data: Tag | null;
 }
 
-interface CreateUltraFeedEventDataInput {
-  documentId: string;
-  collectionName: string;
-  eventType: string;
-  userId?: string | null;
-  event?: any;
-  feedItemId?: string | null;
-}
-
-interface CreateUltraFeedEventInput {
-  data: CreateUltraFeedEventDataInput;
-}
-
-interface UltraFeedEventOutput {
-  data: UltraFeedEvent | null;
-}
-
 interface CreateUserEAGDetailDataInput {
   legacyData?: any;
   lastUpdated?: Date | null;
@@ -6612,11 +6563,6 @@ interface GraphQLTypeMap {
   ToggleBookmarkInput: ToggleBookmarkInput;
   ToggleBookmarkOutput: ToggleBookmarkOutput;
   RssPostChangeInfo: RssPostChangeInfo;
-  FeedPost: FeedPost;
-  FeedCommentThread: FeedCommentThread;
-  FeedSpotlightItem: FeedSpotlightItem;
-  UltraFeedQueryResults: UltraFeedQueryResults;
-  UltraFeedEntryType: UltraFeedEntryType;
   ElicitQuestionPredictionCreator: ElicitQuestionPredictionCreator;
   AdvisorRequest: AdvisorRequest;
   SingleAdvisorRequestInput: SingleAdvisorRequestInput;
@@ -7146,9 +7092,6 @@ interface GraphQLTypeMap {
   UpdateTagDataInput: UpdateTagDataInput;
   UpdateTagInput: UpdateTagInput;
   TagOutput: TagOutput;
-  CreateUltraFeedEventDataInput: CreateUltraFeedEventDataInput;
-  CreateUltraFeedEventInput: CreateUltraFeedEventInput;
-  UltraFeedEventOutput: UltraFeedEventOutput;
   CreateUserEAGDetailDataInput: CreateUserEAGDetailDataInput;
   CreateUserEAGDetailInput: CreateUserEAGDetailInput;
   UpdateUserEAGDetailDataInput: UpdateUserEAGDetailDataInput;
@@ -7218,7 +7161,6 @@ interface CreateInputsByCollectionName {
   Surveys: CreateSurveyInput;
   TagFlags: CreateTagFlagInput;
   Tags: CreateTagInput;
-  UltraFeedEvents: CreateUltraFeedEventInput;
   UserEAGDetails: CreateUserEAGDetailInput;
   UserJobAds: CreateUserJobAdInput;
   UserMostValuablePosts: CreateUserMostValuablePostInput;
@@ -7271,6 +7213,7 @@ interface CreateInputsByCollectionName {
   TagRels: never;
   Tweets: never;
   TypingIndicators: never;
+  UltraFeedEvents: never;
   UserActivities: never;
   Votes: never;
 }
