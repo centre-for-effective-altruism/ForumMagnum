@@ -219,6 +219,24 @@ describe("SelectQuery", () => {
       expectedArgs: ["test"],
     },
     {
+      name: "escapes quotes in json field keys",
+      getQuery: () => new SelectQuery(testTable, {"c.x')::INT>0 OR 1=1 --": {$gte: 1}}),
+      expectedSql: 'SELECT "TestCollection".* FROM "TestCollection" WHERE ("c"->\'x\'\')::INT>0 OR 1=1 --\') >= $1',
+      expectedArgs: [1],
+    },
+    {
+      name: "only converts the final json accessor to a text accessor when a key contains an arrow",
+      getQuery: () => new SelectQuery(testTable, {"c.d->e.f": "test"}),
+      expectedSql: 'SELECT "TestCollection".* FROM "TestCollection" WHERE ("c"->\'d->e\'->>\'f\')::TEXT = $1',
+      expectedArgs: ["test"],
+    },
+    {
+      name: "escapes quotes in json field keys used for sorting",
+      getQuery: () => new SelectQuery(testTable, {}, {sort: {[String("c.x' DESC; --")]: -1}}),
+      expectedSql: 'SELECT "TestCollection".* FROM "TestCollection" ORDER BY ("c"->\'x\'\' DESC; --\') DESC NULLS LAST',
+      expectedArgs: [],
+    },
+    {
       name: "can build select query with array fields",
       getQuery: () => new SelectQuery(testTable, {"c.0": 3}),
       expectedSql: 'SELECT "TestCollection".* FROM "TestCollection" WHERE ("c"[0])::INTEGER = $1',
