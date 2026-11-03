@@ -116,13 +116,19 @@ class PostViewTimesRepo extends IncrementalViewRepo<"PostViewTimes"> {
 
     for (const chunk of chunks) {
       const values = chunk
-        .map(
-          (row) =>
-            `('${row._id}', '${row.clientId}', '${row.postId}', '${row.windowStart}', '${row.windowEnd}', ${
-              row.totalSeconds
-            }, NOW(), NOW())`
-        )
+        .map((_, index) => {
+          const offset = index * 6;
+          return `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5}, $${offset + 6}, NOW(), NOW())`;
+        })
         .join(",");
+      const args = chunk.flatMap((row) => [
+        row._id,
+        row.clientId,
+        row.postId,
+        row.windowStart,
+        row.windowEnd,
+        row.totalSeconds,
+      ]);
 
       const onConflictUpdate = `
         "clientId" = EXCLUDED."clientId",
@@ -147,7 +153,7 @@ class PostViewTimesRepo extends IncrementalViewRepo<"PostViewTimes"> {
         ) VALUES ${values}
         ON CONFLICT ("clientId", "postId", "windowStart", "windowEnd")
         DO UPDATE SET ${onConflictUpdate}
-      `);
+      `, args);
     }
   }
 

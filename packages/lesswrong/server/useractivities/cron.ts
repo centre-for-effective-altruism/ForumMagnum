@@ -178,7 +178,7 @@ async function concatNewActivity({
     return;
   }
   // validate against SQL injection attacks (userId and clientId are inserted verbatim from the analytics event)
-  const cleanedActivityData = newActivityData.filter(({userOrClientId}) => userOrClientId.length <= 17 || !userOrClientId.match(/^[A-Za-z0-9]+$/))
+  const cleanedActivityData = newActivityData.filter(({userOrClientId}) => userOrClientId.length <= 17 && /^[A-Za-z0-9]+$/.test(userOrClientId))
 
   // Get the existing user IDs from the UserActivities table, required to distinguish between newly active users and existing users
   const existingUserIds = (await dataDb.any(`
@@ -227,7 +227,8 @@ async function concatNewActivity({
     log(`Updating ${existingUsersData.length} existing rows for which there is new activity, in ${existingUsersDataChunked.length} chunks`)
     
     for (const dataChunk of existingUsersDataChunked) {
-      const tempTableValues = dataChunk.map(({ userOrClientId, activityArray: activity_array }) => `('${userOrClientId}', ARRAY[${activity_array.join(', ')}])`).join(', ');
+      const tempTableValues = dataChunk.map((_, index) => `($${(index * 2) + 3}, $${(index * 2) + 4})`).join(', ');
+      const tempTableParams = dataChunk.flatMap(({ userOrClientId, activityArray }) => [userOrClientId, activityArray]);
       const updateQuery = `
         WITH new_activity AS (
           SELECT * FROM (VALUES ${tempTableValues}) AS t(user_id, activity_array)
@@ -242,7 +243,7 @@ async function concatNewActivity({
           "UserActivities"."visitorId" = new_activity.user_id
           AND "UserActivities"."type" = '${visitorIdType}';
       `;
-      await dataDb.none(updateQuery, [paddedStartDate.toISOString(), updateEndDate.toISOString()]);
+      await dataDb.none(updateQuery, [paddedStartDate.toISOString(), updateEndDate.toISOString(), ...tempTableParams]);
     }
   }
 

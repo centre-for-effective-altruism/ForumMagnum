@@ -12,6 +12,7 @@ import { FeedFullPost, FeedPostFromDb } from "@/components/ultraFeed/ultraFeedTy
 import { TIME_DECAY_FACTOR, SCORE_BIAS } from "@/lib/scoring";
 import { accessFilterMultiple } from "@/lib/utils/schemaUtils";
 import { getSiteUrl } from "@/lib/vulcan-lib/utils";
+import { sqlStringLiteral } from "../sql/Query";
 
 type DbPostWithContents = DbPost & {contents?: DbRevision | null};
 
@@ -96,7 +97,7 @@ function constructFilteredScoreSql(filterSettings: FilterSettings): string {
 
   const additiveModifiersSql = tagsSoftFiltered.map(tag => `
     (CASE
-      WHEN COALESCE((p."tagRelevance"->'${tag.tagId}')::INTEGER, 0) > 0
+      WHEN COALESCE((p."tagRelevance"->${sqlStringLiteral(tag.tagId)})::INTEGER, 0) > 0
       THEN ${filterModeToAdditiveKarmaModifier(tag.filterMode)}
       ELSE 0
     END)`
@@ -104,7 +105,7 @@ function constructFilteredScoreSql(filterSettings: FilterSettings): string {
 
   const multiplicativeModifiersSql = tagsSoftFiltered.map(tag => `
     (CASE
-      WHEN COALESCE((p."tagRelevance"->'${tag.tagId}')::INTEGER, 0) > 0
+      WHEN COALESCE((p."tagRelevance"->${sqlStringLiteral(tag.tagId)})::INTEGER, 0) > 0
       THEN ${filterModeToMultiplicativeKarmaModifier(tag.filterMode)}
       ELSE 1
     END)`
@@ -1120,11 +1121,11 @@ class PostsRepo extends AbstractRepo<"Posts"> {
     const tagsExcluded = filterSettings.tags.filter(t => t.filterMode === "Hidden");
     
     const tagRequiredConditions = tagsRequired.map(tag => 
-      `COALESCE((p."tagRelevance"->'${tag.tagId}')::INTEGER, 0) >= 1`
+      `COALESCE((p."tagRelevance"->${sqlStringLiteral(tag.tagId)})::INTEGER, 0) >= 1`
     ).join(' AND ');
     
     const tagExcludedConditions = tagsExcluded.map(tag => 
-      `COALESCE((p."tagRelevance"->'${tag.tagId}')::INTEGER, 0) < 1`
+      `COALESCE((p."tagRelevance"->${sqlStringLiteral(tag.tagId)})::INTEGER, 0) < 1`
     ).join(' AND ');
     
     const tagFilterClause = [

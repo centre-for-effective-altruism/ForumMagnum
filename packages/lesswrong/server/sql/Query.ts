@@ -292,12 +292,16 @@ abstract class Query<T extends DbObject> {
         throw new NonScalarArrayAccessError(first, rest);
       } else if (fieldType) {
         const hint = this.getTypeHint(typeHint);
-        const result = "(" + this.prefixify(`"${first}"`) +
-          rest.map((element) => element.match(/^\d+$/) ? `[${element}]` : `->'${element}'`).join("") +
-          `)${hint}`;
-        return hint === "::TEXT"
-          ? result.replace(/->(?!.*->)/, "->>")
-          : result;
+        const isJsonKey = rest.map((element) => !element.match(/^\d+$/));
+        const lastJsonKeyIndex = hint === "::TEXT" ? isJsonKey.lastIndexOf(true) : -1;
+        const accessors = rest.map((element, i) => {
+          if (!isJsonKey[i]) {
+            return `[${element}]`;
+          }
+          const operator = i === lastJsonKeyIndex ? "->>" : "->";
+          return operator + sqlStringLiteral(element);
+        });
+        return "(" + this.prefixify(`"${first}"`) + accessors.join("") + `)${hint}`;
       }
     }
 
@@ -377,7 +381,7 @@ abstract class Query<T extends DbObject> {
    * better-optimized hand-rolled SQL.
    */
   private compileNonScalarArrayAccess(fieldName: string, path: string[], value: any): Atom<T>[] {
-    path = path.map((element: string) => `'${element}'`);
+    path = path.map(sqlStringLiteral);
     path.unshift("unnested");
     const last = path.pop();
     const selector = path.join("->") + "->>" + last;
@@ -692,7 +696,7 @@ abstract class Query<T extends DbObject> {
         // delete it?
         const tokens = array.split(".");
         const field = `"${tokens[0][0] === "$" ? tokens[0].slice(1) : tokens[0]}"`;
-        const path = tokens.slice(1).flatMap((name) => ["->", `'${name}'`]);
+        const path = tokens.slice(1).flatMap((name) => ["->", sqlStringLiteral(name)]);
         if (path.length) {
           path[path.length - 2] = "->>";
         }
@@ -750,7 +754,7 @@ abstract class Query<T extends DbObject> {
     if (path.length) {
       const [name, ...rest] = path;
       return [
-        `{ "${name}":`,
+        `{ ${escapeSqlStringContents(JSON.stringify(name))}:`,
         ...this.buildJsonArrayAtPath(rest, value),
         "}",
       ];
@@ -762,6 +766,14 @@ abstract class Query<T extends DbObject> {
       ];
     }
   }
+}
+
+function escapeSqlStringContents(value: string): string {
+  return value.replace(/'/g, "''");
+}
+
+export function sqlStringLiteral(value: string): string {
+  return `'${escapeSqlStringContents(String(value))}'`;
 }
 
 export function sanitizeSqlComment(comment: string): string {

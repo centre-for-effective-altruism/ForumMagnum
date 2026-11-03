@@ -12,6 +12,7 @@ import {
 } from '../lib/collections/users/recommendationSettings';
 import { isEAForum } from '../lib/instanceSettings';
 import SelectQuery from "./sql/SelectQuery";
+import { sqlStringLiteral } from "./sql/Query";
 import { getPositiveVoteThreshold } from '../lib/reviewUtils';
 import { getDefaultViewSelector } from '../lib/utils/viewUtils';
 import { EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID } from '../lib/collections/tags/helpers';
@@ -190,7 +191,7 @@ const allRecommendablePosts = async ({currentUser, algorithm}: {
     throw new Error("Posts is not a Postgres collection");
   }
   const joinHook = algorithm.onlyUnread && currentUser
-    ? `LEFT JOIN "ReadStatuses" rs ON rs."postId" = "Posts"._id AND rs."userId" = '${currentUser._id}' WHERE rs."isRead" IS NOT TRUE`
+    ? `LEFT JOIN "ReadStatuses" rs ON rs."postId" = "Posts"._id AND rs."userId" = ${sqlStringLiteral(currentUser._id)} WHERE rs."isRead" IS NOT TRUE`
     : undefined;
   const query = new SelectQuery(
     new SelectQuery(
