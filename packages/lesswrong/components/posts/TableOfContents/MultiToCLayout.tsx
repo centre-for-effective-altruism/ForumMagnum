@@ -72,12 +72,6 @@ const styles = (theme: ThemeType) => ({
       marginBottom: 0,
     },
   },
-  splashPageHeaderToc: {
-    marginTop: 'calc(-100vh - 64px)'
-  },
-  normalHeaderToc: {
-    
-  },
   commentToCMargin: {
     marginTop: 'unset',
   },
@@ -169,11 +163,10 @@ export type ToCLayoutSegment = {
   isCommentToC?: boolean,
 };
 
-const MultiToCLayout = ({segments, classes, tocRowMap = [], showSplashPageHeader = false, answerCount, commentCount, tocContext}: {
+const MultiToCLayout = ({segments, classes, tocRowMap = [], answerCount, commentCount, tocContext}: {
   segments: ToCLayoutSegment[],
   classes: ClassesType<typeof styles>,
   tocRowMap?: number[], // This allows you to specify which row each ToC should be in, where maybe you want a ToC to span more than one row
-  showSplashPageHeader?: boolean,
   answerCount?: number,
   commentCount?: number,
   tocContext?: 'tag' | 'post'
@@ -210,8 +203,6 @@ const MultiToCLayout = ({segments, classes, tocRowMap = [], showSplashPageHeader
             className={classNames(
               classes.toc,
               segment.isCommentToC && classes.commentToCMargin,
-              showSplashPageHeader && classes.splashPageHeaderToc,
-              !showSplashPageHeader && classes.normalHeaderToc,
             )}
           >
             <div className={classNames(

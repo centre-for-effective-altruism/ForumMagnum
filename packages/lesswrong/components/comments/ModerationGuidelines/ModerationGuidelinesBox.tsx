@@ -8,7 +8,7 @@ import { userCanModeratePost } from '../../../lib/collections/users/helpers';
 import { useSingle } from '../../../lib/crud/withSingle';
 import { useDialog } from '../../common/withDialog'
 import withErrorBoundary from '../../common/withErrorBoundary'
-import { frontpageGuidelines, defaultGuidelines } from './ForumModerationGuidelinesContent'
+import { frontpageGuidelinesEA, defaultGuidelinesEA } from './EAModerationGuidelinesContent'
 import { userCanModerateSubforum } from '../../../lib/collections/tags/helpers';
 import { preferredHeadingCase } from '../../../themes/forumTheme';
 import { TooltipSpan } from '@/components/common/FMTooltip';
@@ -83,11 +83,11 @@ const getPostModerationGuidelines = (
     ${(html || moderationStyle) ? userGuidelines : ""}
     ${(html && post.frontpageDate) ? '<hr/>' : ''}
     ${post.frontpageDate ?
-        frontpageGuidelines :
+        frontpageGuidelinesEA :
           (
             (html || moderationStyle) ?
               "" :
-              defaultGuidelines
+              defaultGuidelinesEA
           )
      }
   `

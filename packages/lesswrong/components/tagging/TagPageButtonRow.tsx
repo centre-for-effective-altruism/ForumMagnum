@@ -12,18 +12,14 @@ import classNames from 'classnames';
 import { useTagBySlug } from './useTag';
 import { tagGetHistoryUrl, tagMinimumKarmaPermissions, tagUserHasSufficientKarma, isTagAllowedType3Audio } from '../../lib/collections/tags/helpers';
 import { isLWorAF } from '@/lib/instanceSettings';
-import type { TagLens } from '@/lib/arbital/useTagLenses';
 import { isFriendlyUI } from '@/themes/forumTheme';
 import { AnalyticsContext, useTracking } from '@/lib/analyticsEvents';
 import LoginPopup from "../users/LoginPopup";
-import NewLensDialog from "./lenses/NewLensDialog";
 import LWTooltip from "../common/LWTooltip";
 import NotifyMeButton from "../notifications/NotifyMeButton";
 import TagDiscussionButton from "./TagDiscussionButton";
 import { ContentItemBody } from "../contents/ContentItemBody";
 import ForumIcon from "../common/ForumIcon";
-import { TagOrLensLikeButton } from "./lenses/LensTab";
-import { TagPageActionsMenuButton } from "./TagPageActionsMenu";
 
 const PODCAST_ICON_SIZE = 20;
 const PODCAST_ICON_PADDING = 3;
@@ -58,9 +54,6 @@ const styles = (theme: ThemeType) => ({
     [theme.breakpoints.down('sm')]: {
       display: "flex",
     },
-  },
-  likeButtonWrapper: {
-    fontSize: 12,
   },
   buttonTooltip: {
     display: "flex",
@@ -106,7 +99,6 @@ const styles = (theme: ThemeType) => ({
     color: theme.palette.grey[700],
     ...theme.typography.italic,
   },
-  newLensIcon: {},
   togglePodcastContainer: {
     alignSelf: 'center',
     color: theme.palette.text.dim3,
@@ -142,25 +134,19 @@ export function useTagEditingRestricted(tag: TagPageWithRevisionFragment | TagPa
 }
 const TagPageButtonRow = ({
   tag,
-  selectedLens,
   editing,
   setEditing,
   hideLabels = false,
   className,
-  refetchTag,
-  updateSelectedLens,
   toggleEmbeddedPlayer,
   showEmbeddedPlayer,
   classes
 }: {
   tag: TagPageWithRevisionFragment | TagPageFragment | TagPageWithArbitalContentFragment;
-  selectedLens?: TagLens;
   editing: boolean;
   setEditing: (editing: boolean) => void;
   hideLabels?: boolean;
   className?: string;
-  refetchTag?: () => Promise<void>;
-  updateSelectedLens?: (lensId: string) => void;
   toggleEmbeddedPlayer?: () => void;
   showEmbeddedPlayer?: boolean;
   classes: ClassesType<typeof styles>;
@@ -172,28 +158,6 @@ const TagPageButtonRow = ({
   const { captureEvent } = useTracking();
 
   const numFlags = tag.tagFlagsIds?.length
-
-  function handleNewLensClick() {
-    captureEvent('tagPageButtonRowNewLensClick');
-    if (!currentUser) {
-      openDialog({
-        name: "LoginPopup",
-        contents: ({onClose}) => <LoginPopup onClose={onClose} />
-      });
-      return;
-    }
-
-    if (!refetchTag || !updateSelectedLens) return;
-    openDialog({
-      name: "NewLensDialog",
-      contents: ({onClose}) => <NewLensDialog
-        onClose={onClose}
-        tag={tag}
-        refetchTag={refetchTag}
-        updateSelectedLens={updateSelectedLens}
-      />
-    });
-  }
 
   function handleEditClick(e: React.MouseEvent<HTMLAnchorElement>) {
     captureEvent('tagPageButtonRowEditClick');
@@ -209,13 +173,6 @@ const TagPageButtonRow = ({
   }
 
   const { canEdit, noEditNotAuthor, noEditKarmaTooLow } = useTagEditingRestricted(tag, editing, currentUser);
-  
-  const undeletedLensCount = 'lenses' in tag ? tag.lenses.filter(lens => !lens.deleted).length : 0;
-  const canCreateLens = !editing
-    && canEdit
-    && (!!refetchTag && !!updateSelectedLens)
-    && (undeletedLensCount < 5)
-    && isLWorAF;
 
   const editTooltipHasContent = noEditNotAuthor || noEditKarmaTooLow || (numFlags && !isLWorAF) || beginnersGuideContentTag
   const editTooltip = editTooltipHasContent && <>
@@ -302,9 +259,6 @@ const TagPageButtonRow = ({
         />
       </LWTooltip>}
       {<div className={classes.button}><TagDiscussionButton tag={tag} hideLabel={hideLabels} hideLabelOnMobile hideParens /></div>}
-      {selectedLens && <div className={classes.likeButtonWrapper}>
-        <TagOrLensLikeButton lens={selectedLens} isSelected={true} stylingVariant="buttonRow" />
-      </div>}
       {!userHasNewTagSubscriptions(currentUser) && !hideLabels && <LWTooltip
         className={classes.helpImprove}
         title={editTooltip}
@@ -313,12 +267,6 @@ const TagPageButtonRow = ({
           Help improve this page {!!numFlags && <>({numFlags} flag{numFlags > 1 ? "s" : ""})</>}
         </a>
       </LWTooltip>}
-      
-      {isLWorAF && <TagPageActionsMenuButton
-        tagOrLens={selectedLens}
-        createLens={canCreateLens ? handleNewLensClick : null}
-        handleEditClick={!editing && canEdit ? handleEditClick : null}
-      />}
     </div>
   </AnalyticsContext>
 }

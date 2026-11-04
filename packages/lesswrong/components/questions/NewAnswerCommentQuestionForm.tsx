@@ -3,9 +3,6 @@ import React, {Ref, useState} from 'react';
 import classNames from 'classnames';
 import FullscreenIcon from '@/lib/vendor/@material-ui/icons/src/Fullscreen';
 import FullscreenExitIcon from '@/lib/vendor/@material-ui/icons/src/FullscreenExit';
-import { afNonMemberDisplayInitialPopup } from "../../lib/alignment-forum/displayAFNonMemberPopups";
-import { useCurrentUser } from "../common/withUser";
-import { useDialog } from "../common/withDialog";
 import { TooltipRef, TooltipSpan } from '../common/FMTooltip';
 import CommentsNewForm from "../comments/CommentsNewForm";
 
@@ -76,15 +73,13 @@ const NewAnswerCommentQuestionForm = ({post, classes}: {
 }) => {
   const [selection, setSelection] = useState("answer");
   const [formFocus, setFormFocus] = useState(false);
-  const currentUser = useCurrentUser()
-  const { openDialog } = useDialog()
   const toggleFormFocus = () => {
     setFormFocus(!formFocus);
   }
 
   const isAnswer = selection === "answer";
 
-  return <div className={classes.root} onFocus={() => afNonMemberDisplayInitialPopup(currentUser, openDialog)}>
+  return <div className={classes.root}>
     <div className={classNames(classes.whitescreen, {[classes.displayWhitescreen]: formFocus})}/>
     <div className={classes.form}>
       <div className={classes.chooseResponseType}>

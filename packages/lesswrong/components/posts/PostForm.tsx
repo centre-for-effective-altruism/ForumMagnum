@@ -1,5 +1,4 @@
-import { hasSidenotes, userCanCreateAndEditJargonTerms } from "@/lib/betas";
-import { localGroupTypeFormOptions } from "@/lib/collections/localgroups/groupTypes";
+import { hasSidenotes } from "@/lib/betas";
 import { MODERATION_GUIDELINES_OPTIONS, postStatusLabels, EVENT_TYPES } from "@/lib/collections/posts/constants";
 import { EditablePost, postCanEditHideCommentKarma, PostSubmitMeta, userPassesCrosspostingKarmaThreshold, userCanEditCoauthors } from "@/lib/collections/posts/helpers";
 import { useCreate } from "@/lib/crud/withCreate";
@@ -28,14 +27,12 @@ import { PodcastEpisodeInput } from "../form-components/PodcastEpisodeInput";
 import { SelectLocalgroup } from "../form-components/SelectLocalgroup";
 import { SocialPreviewUpload } from "../form-components/SocialPreviewUpload";
 import { defineStyles, useStyles } from "../hooks/useStyles";
-import { GlossaryEditFormWrapper } from "../jargon/GlossaryEditFormWrapper";
 import { getUpdatedFieldValues } from "@/components/tanstack-form-components/helpers";
 import { LegacyFormGroupLayout } from "@/components/tanstack-form-components/LegacyFormGroupLayout";
 import { EditorFormComponent, useEditorFormCallbacks } from "../editor/EditorFormComponent";
 import { ImageUpload } from "@/components/form-components/ImageUpload";
 import { LocationFormComponent } from "@/components/form-components/LocationFormComponent";
 import { MuiTextField } from "@/components/form-components/MuiTextField";
-import { MultiSelectButtons } from "@/components/form-components/MultiSelectButtons";
 import { FormComponentSelect } from "@/components/form-components/FormComponentSelect";
 import { submitButtonStyles } from "@/components/tanstack-form-components/TanStackSubmit";
 import { DialogueSubmit } from "./dialogues/DialogueSubmit";
@@ -563,18 +560,6 @@ const PostForm = ({
                   label="Event Image"
                 />
               </LWTooltip>
-            )}
-          </form.Field>
-        </div>}
-
-        {isLWorAF && <div className={classes.fieldWrapper}>
-          <form.Field name="types">
-            {(field) => (
-              <MultiSelectButtons
-                field={field}
-                options={localGroupTypeFormOptions}
-                label="Group Type:"
-              />
             )}
           </form.Field>
         </div>}
@@ -1220,18 +1205,6 @@ const PostForm = ({
           </form.Field>
         </div>}
       </LegacyFormGroupLayout>
-
-      {userCanCreateAndEditJargonTerms(currentUser) && <LegacyFormGroupLayout label="Glossary" startCollapsed={false} hideHeader>
-        <div className={classes.fieldWrapper}>
-          <form.Field name="glossary">
-            {() => (
-              <GlossaryEditFormWrapper
-                document={form.state.values}
-              />
-            )}
-          </form.Field>
-        </div>
-      </LegacyFormGroupLayout>}
 
       {!isEAForum && tagGroup}
 

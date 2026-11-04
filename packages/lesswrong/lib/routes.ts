@@ -1,11 +1,9 @@
 import { 
   forumTypeSetting, PublicInstanceSetting, hasEventsSetting, taggingNamePluralSetting, taggingNameIsSet,
   taggingNamePluralCapitalSetting, taggingNameCapitalSetting, isEAForum, taggingNameSetting, aboutPostIdSetting,
-  isLW, isLWorAF, tagUrlBaseSetting, taggingNameCapitalizedWithPluralizationChoice } from './instanceSettings';
-import { blackBarTitle, legacyRouteAcronymSetting } from './publicSettings';
+  isLWorAF, tagUrlBaseSetting, taggingNameCapitalizedWithPluralizationChoice } from './instanceSettings';
+import { legacyRouteAcronymSetting } from './publicSettings';
 import { addRoute, RouterLocation, Route } from './vulcan-lib/routes';
-import { BEST_OF_LESSWRONG_PUBLISH_YEAR, REVIEW_YEAR } from './reviewUtils';
-import { forumSelect } from './forumTypeUtils';
 import pickBy from 'lodash/pickBy';
 import qs from 'qs';
 import { getPostPingbackById, getPostPingbackByLegacyId, getPostPingbackBySlug, getTagPingbackBySlug, getUserPingbackBySlug } from './pingback';
@@ -16,7 +14,6 @@ import { postRouteWillDefinitelyReturn200 } from './collections/posts/helpers';
 import { sequenceRouteWillDefinitelyReturn200 } from './collections/sequences/helpers';
 import { tagGetUrl, tagRouteWillDefinitelyReturn200 } from './collections/tags/helpers';
 import { GUIDE_PATH_PAGES_MAPPING } from './arbital/paths';
-import isEmpty from 'lodash/isEmpty';
 import { UserPageTitle } from '@/components/titles/UserPageTitle';
 import { SequencesPageTitle } from '@/components/titles/SequencesPageTitle';
 import { TagHistoryPageTitle } from '@/components/tagging/TagHistoryPageTitle';
@@ -33,24 +30,17 @@ import CurationPage from '@/components/admin/CurationPage';
 import MigrationsDashboard from '@/components/admin/migrations/MigrationsDashboard';
 import RandomUserPage from '@/components/admin/RandomUserPage';
 import TwitterAdmin from '@/components/admin/TwitterAdmin';
-import AFLibraryPage from '@/components/alignment-forum/AFLibraryPage';
-import AlignmentForumHome from '@/components/alignment-forum/AlignmentForumHome';
 import AuthorAnalyticsPage from '@/components/analytics/AuthorAnalyticsPage';
 import MyAnalyticsPage from '@/components/analytics/MyAnalyticsPage';
 import PostsAnalyticsPage from '@/components/analytics/PostsAnalyticsPage';
 import BookmarksPage from '@/components/bookmarks/BookmarksPage';
-import Book2018Landing from '@/components/books/Book2018Landing';
-import Book2019Landing from '@/components/books/Book2019Landing';
 import AllComments from '@/components/comments/AllComments';
 import LegacyCommentRedirect from '@/components/comments/LegacyCommentRedirect';
 import ModeratorComments from '@/components/comments/ModeratorComments';
 import UserCommentsReplies from '@/components/comments/UserCommentsReplies';
 import CookiePolicy from '@/components/common/CookieBanner/CookiePolicy';
-import LWHome from '@/components/common/LWHome';
-import SearchBar from '@/components/common/SearchBar';
 import Community from '@/components/community/Community';
 import CommunityMembersFullMap from '@/components/community/modules/CommunityMembersFullMap';
-import DialoguesPage from '@/components/dialogues/DialoguesPage';
 import EditDigest from '@/components/ea-forum/digest/EditDigest';
 import EABestOfPage from '@/components/ea-forum/EABestOfPage';
 import EADigestPage from '@/components/ea-forum/EADigestPage';
@@ -63,23 +53,16 @@ import PostCollaborationEditor from '@/components/editor/PostCollaborationEditor
 import EventsHome from '@/components/events/EventsHome';
 import AdminForumEventsPage from '@/components/forumEvents/AdminForumEventsPage';
 import EditForumEventPage from '@/components/forumEvents/EditForumEventPage';
-import GlossaryEditorPage from '@/components/jargon/GlossaryEditorPage';
-import PostsWithApprovedJargonPage from '@/components/jargon/PostsWithApprovedJargonPage';
-import AutocompleteModelSettings from '@/components/languageModels/AutocompleteModelSettings';
-import LlmConversationsViewingPage from '@/components/languageModels/LlmConversationsViewingPage';
 import AllGroupsPage from '@/components/localGroups/AllGroupsPage';
 import CommunityHome from '@/components/localGroups/CommunityHome';
 import GroupsMap from '@/components/localGroups/GroupsMap';
 import LocalGroupSingle from '@/components/localGroups/LocalGroupSingle';
-import ConversationWrapper from '@/components/messaging/ConversationWrapper';
 import InboxWrapper from '@/components/messaging/InboxWrapper';
 import MessageUser from '@/components/messaging/MessageUser';
 import ModeratorInboxWrapper from '@/components/messaging/ModeratorInboxWrapper';
 import ModerationTemplatesPage from '@/components/moderationTemplates/ModerationTemplatesPage';
 import NotificationEmailPreviewPage from '@/components/notifications/NotificationEmailPreviewPage';
 import NotificationsPage from '@/components/notifications/NotificationsPage/NotificationsPage';
-import AdminPaymentsPage from '@/components/payments/AdminPaymentsPage';
-import EditPaymentInfoPage from '@/components/payments/EditPaymentInfoPage';
 import PeopleDirectoryPage from '@/components/peopleDirectory/PeopleDirectoryPage';
 import AllPostsPage from '@/components/posts/AllPostsPage';
 import CurrentOpenThreadPage from '@/components/posts/CurrentOpenThreadPage';
@@ -92,40 +75,20 @@ import PostsEditPage from '@/components/posts/PostsEditPage';
 import PostsNewForm from '@/components/posts/PostsNewForm';
 import PostsSingle from '@/components/posts/PostsSingle';
 import PostsSingleRoute from '@/components/posts/PostsSingleRoute';
-import PostsSingleSlug from '@/components/posts/PostsSingleSlug';
 import PostsSingleSlugRedirect from '@/components/posts/PostsSingleSlugRedirect';
 import QuestionsPage from '@/components/questions/QuestionsPage';
 import RecommendationsPage from '@/components/recommendations/RecommendationsPage';
 import RecommendationsSamplePage from '@/components/recommendations/RecommendationsSamplePage';
-import AnnualReviewPage from '@/components/review/AnnualReviewPage';
-import BestOfLessWrongAdmin from '@/components/review/BestOfLessWrongAdmin';
-import NewLongformReviewForm from '@/components/review/NewLongformReviewForm';
-import Nominations2018 from '@/components/review/Nominations2018';
-import Nominations2019 from '@/components/review/Nominations2019';
-import ReviewAdminDashboard from '@/components/review/ReviewAdminDashboard';
-import Reviews2018 from '@/components/review/Reviews2018';
-import Reviews2019 from '@/components/review/Reviews2019';
-import UserReviews from '@/components/review/UserReviews';
 import PostsRevisionSelect from '@/components/revisions/PostsRevisionSelect';
 import TagPageRevisionSelect from '@/components/revisions/TagPageRevisionSelect';
 import SearchPageTabbed from '@/components/search/SearchPageTabbed';
-import PetrovDayPoll from '@/components/seasonal/petrovDay/PetrovDayPoll';
-import Books from '@/components/sequences/Books';
 import ChaptersEditForm from '@/components/sequences/ChaptersEditForm';
-import Codex from '@/components/sequences/Codex';
-import CollectionsSingle from '@/components/sequences/CollectionsSingle';
-import CoreSequences from '@/components/sequences/CoreSequences';
 import EAIntroCurriculum from '@/components/sequences/EAIntroCurriculum';
-import HPMOR from '@/components/sequences/HPMOR';
-import LibraryPage from '@/components/sequences/LibraryPage';
 import SequencesEditForm from '@/components/sequences/SequencesEditForm';
-import SequencesHighlightsCollection from '@/components/sequences/SequencesHighlightsCollection';
 import SequencesNewForm from '@/components/sequences/SequencesNewForm';
 import SequencesPost from '@/components/sequences/SequencesPost';
 import SequencesSingle from '@/components/sequences/SequencesSingle';
-import TopPostsPage from '@/components/sequences/TopPostsPage';
 import ShortformPage from '@/components/shortform/ShortformPage';
-import AllReactedCommentsPage from '@/components/sunshineDashboard/AllReactedCommentsPage';
 import { EmailHistoryPage } from '@/components/sunshineDashboard/EmailHistory';
 import ModerationAltAccounts from '@/components/sunshineDashboard/ModerationAltAccounts';
 import ModerationDashboard from '@/components/sunshineDashboard/ModerationDashboard';
@@ -135,7 +98,6 @@ import ModGPTDashboard from '@/components/sunshineDashboard/ModGPTDashboard';
 import SurveyAdminPage from '@/components/surveys/SurveyAdminPage';
 import SurveyEditPage from '@/components/surveys/SurveyEditPage';
 import SurveyScheduleEditPage from '@/components/surveys/SurveyScheduleEditPage';
-import ArbitalExplorePage from '@/components/tagging/ArbitalExplorePage';
 import EditTagPage from '@/components/tagging/EditTagPage';
 import TagHistoryPage from '@/components/tagging/history/TagHistoryPage';
 import NewTagPage from '@/components/tagging/NewTagPage';
@@ -162,9 +124,7 @@ import UsersViewABTests from '@/components/users/UsersViewABTests';
 import ViewSubscriptionsPage from '@/components/users/ViewSubscriptionsPage';
 import Digests from '@/components/ea-forum/digest/Digests';
 import EAAllTagsPage from '@/components/tagging/EAAllTagsPage';
-import AllWikiTagsPage from '@/components/tagging/AllWikiTagsPage';
 import { communityPath, getAllTagsPath, getAllTagsRedirectPaths } from './pathConstants';
-import LeaderboardComponent from '@/components/users/Leaderboard';
 import KeywordsPage from '@/components/keywords/KeywordsPage';
 import KeywordResultsPage from '@/components/keywords/KeywordResultsPage';
 import AdminEventPostEmailPage from '@/components/admin/AdminEventPostEmailPage';
@@ -179,13 +139,6 @@ import { GIVING_SEASON_ENABLED } from '@/lib/givingSeason';
 
 const communitySubtitle = { subtitleLink: communityPath, subtitle: isEAForum ? 'Groups' : 'Community' };
 
-const rationalitySubtitle = { subtitleLink: "/rationality", subtitle: "Rationality: A-Z" };
-const highlightsSubtitle = { subtitleLink: "/highlights", subtitle: "Sequence Highlights" };
-
-const hpmorSubtitle = { subtitleLink: "/hpmor", subtitle: "HPMoR" };
-const codexSubtitle = { subtitleLink: "/codex", subtitle: "SlateStarCodex" };
-const leastWrongSubtitle = { subtitleLink: "/leastwrong", subtitle: "The Best of LessWrong" };
-
 const taggingDashboardSubtitle = { subtitleLink: `/${taggingNamePluralSetting.get()}/dashboard`, subtitle: `${taggingNameIsSet.get() ? taggingNamePluralCapitalSetting.get() : 'Wiki-Tag'} Dashboard`}
 
 const faqPostIdSetting = new PublicInstanceSetting<string>('faqPostId', '2rWKkWuPrgTMpLRbp', isLWorAF ? "warning" : "optional") // Post ID for the /faq route
@@ -193,165 +146,6 @@ const contactPostIdSetting = new PublicInstanceSetting<string>('contactPostId', 
 const introPostIdSetting = new PublicInstanceSetting<string | null>('introPostId', null, "optional")
 
 const postBackground = "white"
-
-const lw18ReviewPosts = [
-  ['sketch', 'yeADMcScw8EW9yxpH', 'a-sketch-of-good-communication'],
-  ['babble', 'i42Dfoh4HtsCAfXxL', 'babble'],
-  ['babble2', 'wQACBmK5bioNCgDoG', 'more-babble'],
-  ['prune', 'rYJKvagRYeDM8E9Rf', 'prune'],
-  ['validity', 'WQFioaudEH8R7fyhm', 'local-validity-as-a-key-to-sanity-and-civilization'],
-  ['alarm', 'B2CfMNfay2P8f2yyc', 'the-loudest-alarm-is-probably-false'],
-  ['argument', 'NLBbCQeNLFvBJJkrt', 'varieties-of-argumentative-experience'],
-  ['toolbox', 'CPP2uLcaywEokFKQG', 'toolbox-thinking-and-law-thinking'],
-  ['technical', 'tKwJQbo6SfWF2ifKh', 'toward-a-new-technical-explanation-of-technical-explanation'],
-  ['nameless', '4ZwGqkMTyAvANYEDw', 'naming-the-nameless'],
-  ['lotus', 'KwdcMts8P8hacqwrX', 'noticing-the-taste-of-lotus'],
-  ['tails', 'asmZvCPHcB4SkSCMW', 'the-tails-coming-apart-as-metaphor-for-life'],
-  ['honesty', 'xdwbX9pFEr7Pomaxv', 'meta-honesty-firming-up-honesty-around-its-edge-cases'],
-  ['meditation', 'mELQFMi9egPn5EAjK', 'my-attempt-to-explain-looking-insight-meditation-and'],
-  ['robust', '2jfiMgKkh7qw9z8Do', 'being-a-robust-agent'],
-  ['punish', 'X5RyaEDHNq5qutSHK', 'anti-social-punishment'],
-  ['common', '9QxnfMYccz9QRgZ5z', 'the-costly-coordination-mechanism-of-common-knowledge'],
-  ['metacognition', 'K4eDzqS2rbcBDsCLZ', 'unrolling-social-metacognition-three-levels-of-meta-are-not'],
-  ['web', 'AqbWna2S85pFTsHH4', 'the-intelligent-social-web'],
-  ['market', 'a4jRN9nbD79PAhWTB', 'prediction-markets-when-do-they-work'],
-  ['spaghetti', 'NQgWL7tvAPgN2LTLn', 'spaghetti-towers'],
-  ['knowledge', 'nnNdz7XQrd5bWTgoP', 'on-the-loss-and-preservation-of-knowledge'],
-  ['voting', 'D6trAzh6DApKPhbv4', 'a-voting-theory-primer-for-rationalists'],
-  ['pavlov', '3rxMBRCYEmHCNDLhu', 'the-pavlov-strategy'],
-  ['commons', '2G8j8D5auZKKAjSfY', 'inadequate-equilibria-vs-governance-of-the-commons'],
-  ['science', 'v7c47vjta3mavY3QC', 'is-science-slowing-down'],
-  ['rescue', 'BhXA6pvAbsFz3gvn4', 'research-rescuers-during-the-holocaust'],
-  ['troll', 'CvKnhXTu9BPcdKE4W', 'an-untrollable-mathematician-illustrated'],
-  ['long1', 'mFqG58s4NE3EE68Lq', 'why-did-everything-take-so-long'],
-  ['long2', 'yxTP9FckrwoMjxPc4', 'why-everything-might-have-taken-so-long'],
-  ['clickbait', 'YicoiQurNBxSp7a65', 'is-clickbait-destroying-our-general-intelligence'],
-  ['active', 'XYYyzgyuRH5rFN64K', 'what-makes-people-intellectually-active'],
-  ['daemon', 'nyCHnY7T5PHPLjxmN', 'open-question-are-minimal-circuits-daemon-free'],
-  ['astro', 'Qz6w4GYZpgeDp6ATB', 'beyond-astronomical-waste'],
-  ['birthorder1', 'tj8QP2EFdP8p54z6i', 'historical-mathematicians-exhibit-a-birth-order-effect-too'],
-  ['birthorder2', 'QTLTic5nZ2DaBtoCv', 'birth-order-effect-found-in-nobel-laureates-in-physics'],
-  ['gaming', 'AanbbjYr5zckMKde7', 'specification-gaming-examples-in-ai-1'],
-  ['takeoff', 'AfGmsjGPXN97kNp57', 'arguments-about-fast-takeoff'],
-  ['rocket', 'Gg9a4y8reWKtLe3Tn', 'the-rocket-alignment-problem'],
-  ['agency', 'p7x32SEt43ZMC9r7r', 'embedded-agents'],
-  ['faq', 'Djs38EWYZG8o7JMWY', 'paul-s-research-agenda-faq'],
-  ['challenges', 'S7csET9CgBtpi7sCh', 'challenges-to-christiano-s-capability-amplification-proposal'],
-  ['response', 'Djs38EWYZG8o7JMWY', 'paul-s-research-agenda-faq?commentId=79jM2ecef73zupPR4'],
-  ['scale', 'bBdfbWfWxHN9Chjcq', 'robustness-to-scale'],
-  ['coherence', 'NxF5G6CJiof6cemTw', 'coherence-arguments-do-not-imply-goal-directed-behavior']
-]
-
-lw18ReviewPosts.forEach(
-  ([shortUrl, id, slug]) =>
-  addRoute({
-    name: `LessWrong 2018 Review ${id}/${slug}`,
-    path: `/2018/${shortUrl}`, 
-    redirect: () => `/posts/${id}/${slug}`
-  })
-)
-
-if (isLW) {
-  addRoute(
-    {
-      name: 'leaderboard',
-      path: '/leaderboard',
-      component: LeaderboardComponent,
-    },
-    // disabled except during review voting phase
-    {
-      name:'reviewVoting',
-      path: '/reviewVoting',
-      redirect: () => `/reviewVoting/${REVIEW_YEAR}`,
-    },
-    // {
-    //   name:'reviewVoting2019',
-    //   path: '/reviewVoting/2019',
-    //   title: "Voting 2019 Review",
-    //   component: ReviewVotingPage2019
-    // },
-    {
-      name:'reviewVotingByYear',
-      path: '/reviewVoting/:year',
-      title: "Review Voting",
-      component: AnnualReviewPage
-    },
-
-    {
-      name: 'reviewQuickPage',
-      path: '/reviewQuickPage',
-      redirect: () => `/quickReview/${REVIEW_YEAR}`
-    },
-
-    {
-      name: 'quickReview',
-      path: '/quickReview/:year',
-      component: AnnualReviewPage,
-      title: "Review Quick Page",
-      subtitle: "Quick Review Page"
-    },
-
-    {
-      name: 'quickReviewRedirect',
-      path: '/quickReview',
-      redirect: () => `/quickReview/${REVIEW_YEAR}`
-    },
-
-    {
-      name: "newLongformReviewForm",
-      path: '/newLongformReview',
-      title: "New Longform Review",
-      component: NewLongformReviewForm,
-    },
-
-    {
-      name: 'searchTest',
-      path: '/searchTest',
-      component: SearchBar
-    },
-
-    // Collections
-    {
-      name: 'collections',
-      path: '/collections/:_id',
-      component: CollectionsSingle,
-      hasLeftNavigationColumn: isLW,
-      navigationFooterBar: true,
-    },
-    {
-      name: 'highlights',
-      path: '/highlights',
-      title: "Sequences Highlights",
-      component: SequencesHighlightsCollection
-    },
-    {
-      name: 'highlights.posts.single',
-      path: '/highlights/:slug',
-      component: PostsSingleSlug,
-      previewComponent: PostLinkPreviewSlug,
-      ...highlightsSubtitle,
-      getPingback: (parsedUrl, context) => getPostPingbackBySlug(parsedUrl, parsedUrl.params.slug, context),
-      background: postBackground
-    },
-
-    {
-      name: 'votesByYear',
-      path: '/votesByYear/:year',
-      redirect: ({params}) => `/nominatePosts/${params.year}`
-    },
-    {
-      name: 'nominatePosts',
-      path: '/nominatePosts',
-      redirect: () => `/nominatePosts/${REVIEW_YEAR}`
-    },
-    {
-      name: 'nominatePostsByYear',
-      path: '/nominatePosts/:year',
-      title: "Nominate Posts",
-      component: AnnualReviewPage
-    },
-  );
-}
 
 // User-profile routes
 addRoute(
@@ -692,7 +486,7 @@ addRoute(
   {
     name: 'tagsAll',
     path: getAllTagsPath(),
-    component: isEAForum ? EAAllTagsPage : AllWikiTagsPage,
+    component: EAAllTagsPage,
     title: isEAForum ? `${taggingNamePluralCapitalSetting.get()} — Main Page` : "Concepts Portal",
     description: isEAForum ? `Browse the core ${taggingNamePluralSetting.get()} discussed on the EA Forum and an organised wiki of key ${taggingNameSetting.get()} pages` : undefined,
     hasLeftNavigationColumn: false,
@@ -705,30 +499,6 @@ addRoute(
     redirect: () => getAllTagsPath(),
   }))
 );
-
-if (isLWorAF) {
-  addRoute({
-    name: 'arbitalExplore',
-    title: 'Arbital',
-    path: '/arbital',
-    component: ArbitalExplorePage,
-    navigationFooterBar: true,
-  });
-}
-
-if (isLWorAF && tagUrlBaseSetting.get() !== 'p') {
-  addRoute(
-    {
-      name: 'slashPtoBaseRedirect',
-      path: '/p/:slug',
-      redirect: (location) => {
-        const { params: { slug }, query } = location;
-        const queryString = !isEmpty(query) ? `?${qs.stringify(query)}` : '';
-        return `/${tagUrlBaseSetting.get()}/${slug}${queryString}`;
-      }
-    }
-  );
-}
 
 export function initLegacyRoutes() {
   const legacyRouteAcronym = legacyRouteAcronymSetting.get()
@@ -761,8 +531,7 @@ export function initLegacyRoutes() {
   }
 }
 
-const eaLwAfForumSpecificRoutes = forumSelect<Route[]>({
-  EAForum: [
+const eaForumRoutes: Route[] = [
     {
       name: 'home',
       path: '/',
@@ -1115,505 +884,45 @@ const eaLwAfForumSpecificRoutes = forumSelect<Route[]>({
       title: 'Edit Election Candidate',
       isAdmin: true,
     },
-  ],
-  LessWrong: [
-    {
-      name: 'home',
-      path: '/',
-      component: LWHome,
-      enableResourcePrefetch: true,
-      sunshineSidebar: true, 
-      ...(blackBarTitle.get() ? { subtitleLink: "/tag/death", headerSubtitle: blackBarTitle.get()! } : {}),
-      hasLeftNavigationColumn: true,
-      navigationFooterBar: true,
-    },
-    {
-      name: 'dialogues',
-      path: '/dialogues',
-      component: DialoguesPage,
-      title: "All Dialogues",
-    },
-    {
-      name:'llmAutocompleteSettings',
-      path:'/autocompleteSettings',
-      component: AutocompleteModelSettings,
-      title: "LLM Autocomplete Model Settings",
-    },
-    {
-      name: 'about',
-      path: '/about',
-      component: PostsSingleRoute,
-      _id: aboutPostIdSetting.get(),
-      getPingback: async (parsedUrl) => await getPostPingbackById(parsedUrl, aboutPostIdSetting.get()),
-      background: postBackground
-    },
-    {
-      name: 'contact',
-      path:'/contact',
-      component: PostsSingleRoute,
-      _id: contactPostIdSetting.get(),
-      getPingback: async (parsedUrl) => await getPostPingbackById(parsedUrl, contactPostIdSetting.get()),
-      background: postBackground
-    },
-    {
-      name: 'faq',
-      path: '/faq',
-      component: PostsSingleRoute,
-      _id: faqPostIdSetting.get(),
-      getPingback: async (parsedUrl) => await getPostPingbackById(parsedUrl, faqPostIdSetting.get()),
-      background: postBackground
-    },
-    {
-      name: 'donate',
-      path: '/donate',
-      component: PostsSingleRoute,
-      _id:"LcpQQvcpWfPXvW7R9",
-      getPingback: async (parsedUrl) => await getPostPingbackById(parsedUrl, "LcpQQvcpWfPXvW7R9"),
-      background: postBackground
-    },
-    {
-      name: 'Meta',
-      path: '/meta',
-      redirect: () => `/tag/site-meta`,
-    },
-    {
-      name: 'bestOfLessWrongAdmin',
-      path: '/bestoflesswrongadmin',
-      // the "year + 2" is a hack because it's annoying to fetch ReviewWinnerArt by review year
-      // instead we fetch by createdAt date for the art, which is generally 2 years after review
-      redirect: () => `/bestoflesswrongadmin/${BEST_OF_LESSWRONG_PUBLISH_YEAR + 2}`,
-    },
-    {
-      name: 'bestOfLessWrongAdminYear',
-      path: '/bestoflesswrongadmin/:year',
-      component: BestOfLessWrongAdmin,
-      title: "Best of LessWrong Admin",
-    },
-    {
-      name: 'bestoflesswrong',
-      path: '/bestoflesswrong',
-      component: TopPostsPage,
-      title: "The Best of LessWrong",
-      background: "#f8f4ee",
-      ...leastWrongSubtitle,
-    },
-    {
-      name: 'bestoflesswrongByYear',
-      path: '/bestoflesswrong/:year/:topic',
-      component: TopPostsPage,
-      title: "The Best of LessWrong",
-      background: "#f8f4ee",
-      ...leastWrongSubtitle,
-    },
-    {
-      name: 'leastwrong',
-      path: '/leastwrong',
-      redirect: () => `/bestoflesswrong`,
-    },
-    { 
-      name: 'books',
-      path: '/books',
-      component: Books,
-      title: "Books",
-    },
-    {
-      name: 'HPMOR',
-      path: '/hpmor',
-      component: HPMOR,
-      title: "Harry Potter and the Methods of Rationality",
-      ...hpmorSubtitle,
-    },
-    {
-      name: 'Curated',
-      path: '/curated',
-      redirect: () => `/recommendations`,
-    },
-    {
-      name: 'bookmarks',
-      path: '/bookmarks',
-      component: BookmarksPage,
-      title: 'Bookmarks',
-    },
-    {
-      name: 'HPMOR.posts.single',
-      path: '/hpmor/:slug',
-      component: PostsSingleSlug,
-      previewComponent: PostLinkPreviewSlug,
-      ...hpmorSubtitle,
-      getPingback: (parsedUrl, context) => getPostPingbackBySlug(parsedUrl, parsedUrl.params.slug, context),
-      background: postBackground
-    },
+  ]
 
-    {
-      name: 'Codex',
-      path: '/codex',
-      component: Codex,
-      title: "The Codex",
-      ...codexSubtitle,
-    },
-    {
-      name: 'Codex.posts.single',
-      path: '/codex/:slug',
-      component: PostsSingleSlug,
-      previewComponent: PostLinkPreviewSlug,
-      ...codexSubtitle,
-      getPingback: (parsedUrl, context) => getPostPingbackBySlug(parsedUrl, parsedUrl.params.slug, context),
-      background: postBackground
-    },
-    {
-      name: 'book2018Landing',
-      path: '/books/2018',
-      component: Book2018Landing,
-      title: "Books: A Map that Reflects the Territory",
-      background: "white"
-    },
-    {
-      name: 'book2019Landing',
-      path: '/books/2019',
-      component: Book2019Landing,
-      title: "Books: Engines of Cognition",
-      background: "white"
-    },
-    {
-      name: 'editPaymentInfo',
-      path: '/payments/account',
-      component: EditPaymentInfoPage,
-      title: "Account Payment Info"
-    },
-    {
-      name: 'paymentsAdmin',
-      path: '/payments/admin',
-      component: AdminPaymentsPage,
-      title: "Payments Admin"
-    },
-    {
-      name: 'payments',
-      path: '/payments',
-      redirect: () => `/payments/admin`, // eventually, payments might be a userfacing feature, and we might do something else with this url
-    },
-    {
-      name: 'All Comments with Reacts',
-      path: '/allCommentsWithReacts',
-      component: AllReactedCommentsPage,
-      title: "All Comments with Reacts"
-    },
-    {
-      name: 'nominations2018-old',
-      path: '/nominations2018',
-      redirect: () => `/nominations/2018`,
-    },
-    {
-      name: 'nominations2018',
-      path: '/nominations/2018',
-      component: Nominations2018,
-      title: "2018 Nominations",
-    },
-    {
-      name: 'nominations2019-old',
-      path: '/nominations2019',
-      redirect: () => `/nominations/2019`,
-    },
-    {
-      name: 'nominations2019',
-      path: '/nominations/2019',
-      component: Nominations2019,
-      title: "2019 Nominations",
-    },
-    {
-      name: 'userReviews',
-      path:'/users/:slug/reviews',
-      redirect: (location) => `/users/${location.params.slug}/reviews/2019`,
-    },
-    {
-      name: 'reviews2018-old',
-      path: '/reviews2018',
-      redirect: () => `/reviews/2018`,
-    },
-    {
-      name: 'reviews2019-old',
-      path: '/reviews2019',
-      redirect: () => `/reviews/2019`,
-    },
-    {
-      name: 'library',
-      path: '/library',
-      component: LibraryPage,
-      title: "The Library",
-      hasLeftNavigationColumn: true,
-      navigationFooterBar: true,
-    },
-    {
-      name: 'Sequences',
-      path: '/sequences',
-      component: CoreSequences,
-      title: "Rationality: A-Z",
-    },
-    {
-      name: 'Rationality',
-      path: '/rationality',
-      component: CoreSequences,
-      title: "Rationality: A-Z",
-      ...rationalitySubtitle
-    },
-    {
-      name: 'Rationality.posts.single',
-      path: '/rationality/:slug',
-      component: PostsSingleSlug,
-      previewComponent: PostLinkPreviewSlug,
-      ...rationalitySubtitle,
-      getPingback: (parsedUrl, context) => getPostPingbackBySlug(parsedUrl, parsedUrl.params.slug, context),
-      background: postBackground
-    },
-    {
-      name: 'editor',
-      path: '/editor',
-      redirect: () => '/tag/guide-to-the-lesswrong-editor',
-    },
-    {
-      name: 'petrovDayPoll',
-      path: '/petrovDayPoll',
-      component: PetrovDayPoll,
-    },
-    {
-      name: 'petroyDayPoll',
-      path: '/petroyDayPoll',
-      component: PetrovDayPoll,
-      title: "Petrov Day Poll",
-    },
-  ],
-  AlignmentForum: [
-    {
-      name:'alignment.home',
-      path:'/',
-      component: AlignmentForumHome,
-      enableResourcePrefetch: true,
-      sunshineSidebar: true,
-      hasLeftNavigationColumn: true,
-      navigationFooterBar: true,
-    },
-    {
-      name: 'bestoflesswrong',
-      path: '/bestoflesswrong',
-      component: TopPostsPage,
-      title: "The Best of LessWrong",
-      background: "#f8f4ee",
-      ...leastWrongSubtitle,
-    },
-    {
-      name:'about',
-      path:'/about',
-      component: PostsSingleRoute,
-      _id: aboutPostIdSetting.get()
-    },
-    {
-      name: 'faq',
-      path: '/faq',
-      component: PostsSingleRoute,
-      _id: faqPostIdSetting.get(),
-      getPingback: async (parsedUrl) => await getPostPingbackById(parsedUrl, faqPostIdSetting.get()),
-      background: postBackground
-    },
-    {
-      name: 'Meta',
-      path: '/meta',
-      redirect: () => `/tag/site-meta`,
-    },
-    {
-      name: 'nominations2018-old',
-      path: '/nominations2018',
-      redirect: () => `/nominations/2018`,
-    },
-    {
-      name: 'nominations2018',
-      path: '/nominations/2018',
-      component: Nominations2018,
-      title: "2018 Nominations",
-    },
-    {
-      name: 'nominations2019-old',
-      path: '/nominations2019',
-      redirect: () => `/nominations/2019`,
-    },
-    {
-      name: 'nominations2019',
-      path: '/nominations/2019',
-      component: Nominations2019,
-      title: "2019 Nominations",
-    },
-    {
-      name: 'userReviews',
-      path:'/users/:slug/reviews',
-      redirect: (location) => `/users/${location.params.slug}/reviews/2019`,
-    },
-    {
-      name: 'reviews2018-old',
-      path: '/reviews2018',
-      redirect: () => `/reviews/2018`,
-    },
-    {
-      name: 'reviews2018',
-      path: '/reviews/2018',
-      component: Reviews2018,
-      title: "2018 Reviews",
-    },
-    {
-      name: 'reviews2019-old',
-      path: '/reviews2019',
-      redirect: () => `/reviews/2019`,
-    },
-    {
-      name: 'reviews2019',
-      path: '/reviews/2019',
-      component: Reviews2019,
-      title: "2019 Reviews",
-    },
-    {
-      name: 'library',
-      path: '/library',
-      component: AFLibraryPage,
-      enableResourcePrefetch: true,
-      title: "The Library",
-      hasLeftNavigationColumn: true,
-      navigationFooterBar: true,
-    },
-    {
-      name: 'Sequences',
-      path: '/sequences',
-      enableResourcePrefetch: true,
-      component: CoreSequences,
-      title: "Rationality: A-Z",
-    },
-    {
-      name: 'Rationality',
-      path: '/rationality',
-      component: CoreSequences,
-      title: "Rationality: A-Z",
-      ...rationalitySubtitle
-    },
-    {
-      name: 'Rationality.posts.single',
-      path: '/rationality/:slug',
-      component: PostsSingleSlug,
-      previewComponent: PostLinkPreviewSlug,
-      ...rationalitySubtitle,
-      getPingback: (parsedUrl, context) => getPostPingbackBySlug(parsedUrl, parsedUrl.params.slug, context),
-      background: postBackground
-    },
-    {
-      name: 'bookmarks',
-      path: '/bookmarks',
-      component: BookmarksPage,
-      title: 'Bookmarks',
-    },
-  ],
-  default: [
-    {
-      name:'home',
-      path:'/',
-      component: LWHome,
-      enableResourcePrefetch: true,
-      sunshineSidebar: true,
-      hasLeftNavigationColumn: true,
-      navigationFooterBar: true,
-    },
-    {
-      name:'about',
-      path:'/about',
-      component: PostsSingleRoute,
-      _id: aboutPostIdSetting.get()
-    },
-    {
-      name: 'faq',
-      path: '/faq',
-      component: PostsSingleRoute,
-      _id: faqPostIdSetting.get(),
-      getPingback: async (parsedUrl) => await getPostPingbackById(parsedUrl, faqPostIdSetting.get()),
-      background: postBackground
-    },
-    {
-      name: 'contact',
-      path:'/contact',
-      component: PostsSingleRoute,
-      _id: contactPostIdSetting.get(),
-      getPingback: async (parsedUrl) => await getPostPingbackById(parsedUrl, contactPostIdSetting.get()),
-      background: postBackground
-    },
-    {
-      name: 'savedAndRead',
-      path: '/saved',
-      component: BookmarksPage,
-      title: 'Saved & read',
-    },
-    {
-      name:'notifications',
-      path:'/notifications',
-      component: NotificationsPage,
-      title: "Notifications",
-    },
-  ],
-})
-
-addRoute(...eaLwAfForumSpecificRoutes)
+addRoute(...eaForumRoutes)
 
 // Inbox routes
-addRoute(...forumSelect<Route[]>({
-  LWAF: [
-    {
-      name: 'inbox',
-      path: '/inbox',
-      component: InboxWrapper,
-      title: "Inbox",
-    },
-    {
-      name: 'conversation',
-      path: '/inbox/:_id',
-      component: ConversationWrapper,
-      title: "Private Conversation",
-      background: "white",
-    },
-    {
-      name: 'moderatorInbox',
-      path: '/moderatorInbox',
-      component: ModeratorInboxWrapper,
-      title: "Moderator Inbox",
-      fullscreen: true,
-    },
-  ],
-  default: [
-    {
-      name: 'inbox',
-      path: '/inbox',
-      component: InboxWrapper,
-      title: "Inbox",
-      fullscreen: true,
-      hideFromSitemap: true,
-    },
-    {
-      name: 'conversation',
-      path: '/inbox/:_id',
-      component: InboxWrapper,
-      title: "Inbox",
-      fullscreen: true,
-      hideFromSitemap: true,
-    },
-    {
-      name: 'moderatorInbox',
-      path: '/moderatorInbox',
-      component: ModeratorInboxWrapper,
-      title: "Moderator Inbox",
-      fullscreen: true,
-      hideFromSitemap: true,
-    },
-    {
-      name: 'moderatorInboxConversation',
-      path: '/moderatorInbox/:_id',
-      component: ModeratorInboxWrapper,
-      title: "Moderator Inbox",
-      fullscreen: true,
-      hideFromSitemap: true,
-    },
-  ]
-}))
+addRoute(
+  {
+    name: 'inbox',
+    path: '/inbox',
+    component: InboxWrapper,
+    title: "Inbox",
+    fullscreen: true,
+    hideFromSitemap: true,
+  },
+  {
+    name: 'conversation',
+    path: '/inbox/:_id',
+    component: InboxWrapper,
+    title: "Inbox",
+    fullscreen: true,
+    hideFromSitemap: true,
+  },
+  {
+    name: 'moderatorInbox',
+    path: '/moderatorInbox',
+    component: ModeratorInboxWrapper,
+    title: "Moderator Inbox",
+    fullscreen: true,
+    hideFromSitemap: true,
+  },
+  {
+    name: 'moderatorInboxConversation',
+    path: '/moderatorInbox/:_id',
+    component: ModeratorInboxWrapper,
+    title: "Moderator Inbox",
+    fullscreen: true,
+    hideFromSitemap: true,
+  },
+)
 
 addRoute({
   name: 'userInitiateConversation',
@@ -1870,15 +1179,6 @@ addRoute(
     component: NotificationEmailPreviewPage,
     isAdmin: true,
   },
-  {
-    name: 'llmConversationsViewer',
-    path: '/admin/llmConversations',
-    component: LlmConversationsViewingPage,
-    title: 'LLM Conversations Viewer',
-    subtitle: 'LLM Conversations',
-    noFooter: true,
-    noIndex: true,
-  }
 );
 
 addRoute(
@@ -1939,61 +1239,12 @@ addRoute(
     component: PasswordResetPage,
   },
   {
-    name: 'nominations',
-    path: '/nominations',
-    redirect: () => `/reviewVoting/${REVIEW_YEAR}`,
-  },
-  {
-    name: 'userReviewsByYear',
-    path:'/users/:slug/reviews/:year',
-    component: UserReviews,
-    title: "User Reviews",
-  },
-  {
     name: 'userReplies',
     path:'/users/:slug/replies',
     component: UserCommentsReplies,
     title: "User Comment Replies",
   },
-  {
-    name: 'reviewsReroute',
-    path: '/reviews',
-    redirect: () => `/reviews/${REVIEW_YEAR}`,
-  },
-  {
-    name: 'reviews',
-    path:'/reviews/:year',
-    component: AnnualReviewPage,
-    title: "Reviews",
-  },
-  {
-    name: 'reviewAdmin',
-    path: '/reviewAdmin',
-    redirect: () => `/reviewAdmin/${REVIEW_YEAR}`,
-  },
-  {
-    name: 'reviewAdmin-year',
-    path: '/reviewAdmin/:year',
-    component: ReviewAdminDashboard,
-    title: "Review Admin Dashboard",
-    isAdmin: true,
-  }
 );
-
-//jargon routes
-if (isLW) {
-  addRoute({
-    title: "Glossary Editor",
-    name: 'glossaryEditor',
-    path: '/glossaryEditor',
-    component: GlossaryEditorPage,
-  }, {
-    title: "Posts with approved jargon",
-    name: 'postsWithApprovedJargon',
-    path: '/postsWithApprovedJargon',
-    component: PostsWithApprovedJargonPage,
-  });
-}
 
 if (hasKeywordAlerts) {
   addRoute(

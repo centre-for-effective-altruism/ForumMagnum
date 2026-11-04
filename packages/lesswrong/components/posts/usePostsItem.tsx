@@ -12,11 +12,9 @@ import {
 } from "../../lib/collections/posts/helpers";
 import qs from "qs";
 import type { Placement as PopperPlacementType } from "popper.js"
-import { AnnualReviewMarketInfo, getMarketInfo, highlightMarket } from "../../lib/collections/posts/annualReviewMarkets";
-import { Link } from '../../lib/reactRouterWrapper';
-import { commentGetPageUrl } from '../../lib/collections/comments/helpers';
-import { RECOMBEE_RECOMM_ID_QUERY_PARAM, VERTEX_ATTRIBUTION_ID_QUERY_PARAM } from './PostsPage/constants';
-import { recombeeEnabledSetting, vertexEnabledSetting } from "../../lib/publicSettings";
+import { AnnualReviewMarketInfo, getMarketInfo } from "../../lib/collections/posts/annualReviewMarkets";
+import { VERTEX_ATTRIBUTION_ID_QUERY_PARAM } from './PostsPage/constants';
+import { vertexEnabledSetting } from "../../lib/publicSettings";
 import type { PostsListViewType } from "../hooks/usePostsListView";
 
 const isSticky = (post: PostsList, terms: PostsViewTerms) =>
@@ -85,7 +83,6 @@ export type PostsItemConfig = {
   viewType?: PostsListViewType,
   /** Whether or not to show interactive voting arrows */
   isVoteable?: boolean,
-  recombeeRecommId?: string,
   vertexAttributionId?: string,
   /** Whether or not to make new post items have bold post item dates */
   emphasizeIfNew?: boolean,
@@ -134,7 +131,6 @@ export const usePostsItem = ({
   showKarma = true,
   useCuratedDate = true,
   isVoteable = false,
-  recombeeRecommId,
   vertexAttributionId,
   emphasizeIfNew = false,
   className,
@@ -148,9 +144,8 @@ export const usePostsItem = ({
   const currentUser = useCurrentUser();
 
   const recommendationEventOptions: RecommendationOptions = useMemo(() => ({
-    recombeeOptions: { recommId: recombeeRecommId },
     vertexOptions: { attributionId: vertexAttributionId },
-  }), [recombeeRecommId, vertexAttributionId]);
+  }), [vertexAttributionId]);
 
   const toggleComments = useCallback(
     () => {
@@ -187,10 +182,7 @@ export const usePostsItem = ({
     ? `/editPost?${qs.stringify({postId: post._id, eventForm: post.isEvent})}`
     : postGetPageUrl(post, false, sequenceId || chapter?.sequenceId);
 
-  if (recombeeRecommId && recombeeEnabledSetting.get()) {
-    postLink = `${postLink}?${RECOMBEE_RECOMM_ID_QUERY_PARAM}=${recombeeRecommId}`
-    // These shouldn't ever both be present at the same time
-  } else if (vertexAttributionId && vertexEnabledSetting.get()) {
+  if (vertexAttributionId && vertexEnabledSetting.get()) {
     postLink = `${postLink}?${VERTEX_ATTRIBUTION_ID_QUERY_PARAM}=${vertexAttributionId}`
   }
 
@@ -219,7 +211,7 @@ export const usePostsItem = ({
 
   const annualReviewMarketInfo = getMarketInfo(post)
 
-  const isRecommendation = !!recombeeRecommId || !!vertexAttributionId;
+  const isRecommendation = !!vertexAttributionId;
 
   return {
     post,

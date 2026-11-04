@@ -6,7 +6,7 @@ import { useCurrentUser } from '../../common/withUser';
 import withErrorBoundary from '../../common/withErrorBoundary'
 import { useRecordPostView } from '../../hooks/useRecordPostView';
 import { AnalyticsContext, useTracking } from "../../../lib/analyticsEvents";
-import {forumTitleSetting, isAF, isEAForum, isLWorAF} from '../../../lib/instanceSettings';
+import { forumTitleSetting, isAF, isEAForum } from '../../../lib/instanceSettings';
 import { cloudinaryCloudNameSetting } from '../../../lib/publicSettings';
 import classNames from 'classnames';
 import { hasPostRecommendations, commentsTableOfContentsEnabled, hasDigests, hasSidenotes } from '../../../lib/betas';
@@ -26,7 +26,6 @@ import { useOnServerSentEvent } from '../../hooks/useUnreadNotifications';
 import { subscriptionTypes } from '../../../lib/collections/subscriptions/helpers';
 import { CommentTreeNode, unflattenComments } from '../../../lib/utils/unflatten';
 import PostsAudioPlayerWrapper, { postHasAudioPlayer } from './PostsAudioPlayerWrapper';
-import { ImageProvider } from './ImageContext';
 import { getMarketInfo, highlightMarket } from '../../../lib/collections/posts/annualReviewMarkets';
 import isEqual from 'lodash/isEqual';
 import { usePostReadProgress } from '../usePostReadProgress';
@@ -36,11 +35,8 @@ import { useVote } from '@/components/votes/withVote';
 import { getVotingSystemByName } from '@/lib/voting/getVotingSystem';
 import DeferRender from '@/components/common/DeferRender';
 import { SideItemVisibilityContextProvider } from '@/components/dropdowns/posts/SetSideItemVisibility';
-import LWPostsPageHeader, { LW_POST_PAGE_PADDING } from './LWPostsPageHeader';
 import { useCommentLinkState } from '@/components/comments/CommentsItem/useCommentLink';
 import { useCurrentTime } from '@/lib/utils/timeUtil';
-import { getReviewPhase, postEligibleForReview, reviewIsActive } from '@/lib/reviewUtils';
-import { BestOfLWPostsPageSplashImage } from './BestOfLessWrong/BestOfLWPostsPageSplashImage';
 import { useNavigate, useSubscribedLocation } from "@/lib/routeUtil";
 import { useCurrentAndRecentForumEvents } from '@/components/hooks/useCurrentForumEvent';
 import SharePostPopup from "../SharePostPopup";
@@ -69,7 +65,6 @@ import PostBottomRecommendations from "../../recommendations/PostBottomRecommend
 import { NotifyMeDropdownItem } from "../../dropdowns/NotifyMeDropdownItem";
 import Row from "../../common/Row";
 import PostsPageQuestionContent from "../../questions/PostsPageQuestionContent";
-import AFUnreviewedCommentCount from "../../alignment-forum/AFUnreviewedCommentCount";
 import CommentsListSection from "../../comments/CommentsListSection";
 import CommentsTableOfContents from "../../comments/CommentsTableOfContents";
 import StickyDigestAd from "../../ea-forum/digestAd/StickyDigestAd";
@@ -77,10 +72,6 @@ import ForumEventPostPagePollSection from "../../forumEvents/ForumEventPostPageP
 import NotifyMeButton from "../../notifications/NotifyMeButton";
 import LWTooltip from "../../common/LWTooltip";
 import PostsPageDate from "./PostsPageDate";
-import FundraisingThermometer from "../../common/FundraisingThermometer";
-import PostPageReviewButton from "./PostPageReviewButton";
-import HoveredReactionContextProvider from "../../votes/lwReactions/HoveredReactionContextProvider";
-import FixedPositionToCHeading from '../TableOfContents/PostFixedPositionToCHeading';
 import { CENTRAL_COLUMN_WIDTH, MAX_COLUMN_WIDTH, RIGHT_COLUMN_WIDTH_WITH_SIDENOTES, RIGHT_COLUMN_WIDTH_WITHOUT_SIDENOTES, RIGHT_COLUMN_WIDTH_XS, SHARE_POPUP_QUERY_PARAM, sidenotesHiddenBreakpoint } from './constants';
 
 const HIDE_TOC_WORDCOUNT_LIMIT = 300
@@ -377,7 +368,7 @@ export const styles = (theme: ThemeType) => ({
     display: "none"
   },
   welcomeBox: {
-    marginTop: LW_POST_PAGE_PADDING,
+    marginTop: 110,
     maxWidth: 220,
     [theme.breakpoints.down('md')]: {
       display: 'none'
@@ -390,15 +381,6 @@ export const styles = (theme: ThemeType) => ({
     borderRadius: 5,
     display: "flex",
     justifyContent: "center",
-  },
-  splashHeaderImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '100vh',
-    width: '100vw',
   },
   reserveSpaceForSidenotes: {
     width: RIGHT_COLUMN_WIDTH_WITH_SIDENOTES,
@@ -426,10 +408,6 @@ export const styles = (theme: ThemeType) => ({
     color: theme.palette.text.dim3,
     fontSize: isFriendlyUI ? undefined : theme.typography.body2.fontSize,
     cursor: 'default'
-  },
-  reviewVoting: {
-    marginTop: 60,
-    marginBottom: -20 // to account or voting UI padding
   },
 })
 
@@ -530,13 +508,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
   const getSequenceId = () => {
     return params.sequenceId || fullPost?.canonicalSequenceId || null;
   }
-
-  // We don't want to show the splash header if the user is on a `/s/:sequenceId/p/:postId` route
-  // We explicitly don't use `getSequenceId` because that also gets the post's canonical sequence ID,
-  // and we don't want to hide the splash header for any post that _is_ part of a sequence, since that's many review winners
-
-  const isReviewWinner = ('reviewWinner' in post) && post.reviewWinner;
-  const showSplashPageHeader = isLWorAF && !!isReviewWinner && !params.sequenceId;
 
   useEffect(() => {
     if (!query[SHARE_POPUP_QUERY_PARAM]) return;
@@ -727,15 +698,7 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
   // rewrite crossposting.
   const hasTableOfContents = !!sectionData && !isCrosspostedQuestion;
   const tableOfContents = hasTableOfContents
-    ? (isLWorAF
-        ? <TableOfContents
-            sectionData={sectionData}
-            title={post.title}
-            heading={<FixedPositionToCHeading post={post}/>}
-            fixedPositionToc={true}
-          />
-        : <TableOfContents sectionData={sectionData} title={post.title} fixedPositionToc={false} />
-      )
+    ? <TableOfContents sectionData={sectionData} title={post.title} fixedPositionToc={false} />
     : null;
 
   const hashCommentId = location.hash.length >= 1 ? location.hash.slice(1) : null;
@@ -758,12 +721,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
       }
     }
   }, [fullPost, hashCommentId, isDebateResponseLink, linkedCommentId, showHashCommentFallback])
-
-  const splashHeaderImage = fullPost && showSplashPageHeader && <div className={classes.splashHeaderImage}>
-    <ImageProvider>
-      <BestOfLWPostsPageSplashImage post={fullPost} />
-    </ImageProvider>
-  </div>
 
   const header = <>
     {fullPost && !linkedCommentId && <>
@@ -793,24 +750,13 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
               className={classes.headerImage}
             />
           </div>}
-          {isBookUI && <LWPostsPageHeader
-            post={post}
-            showEmbeddedPlayer={showEmbeddedPlayer}
-            dialogueResponses={debateResponses}
-            answerCount={answerCount}
-            toggleEmbeddedPlayer={toggleEmbeddedPlayer}
-            annualReviewMarketInfo={marketInfo}
-            showSplashPageHeader={showSplashPageHeader}
-            />}
-          {!isBookUI && <PostsPagePostHeader
+          <PostsPagePostHeader
             post={post}
             answers={answers ?? []}
             showEmbeddedPlayer={showEmbeddedPlayer}
             toggleEmbeddedPlayer={toggleEmbeddedPlayer}
             dialogueResponses={debateResponses} 
-            annualReviewMarketInfo={marketInfo}/>}
-          {(post._id === '5n2ZQcbc7r4R8mvqc') &&
-            <FundraisingThermometer onPost />}
+            annualReviewMarketInfo={marketInfo}/>
         </div>
       </div>
     </AnalyticsContext>
@@ -867,7 +813,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
       >
         <PostBodyPrefix post={post} query={query}/>
         <AnalyticsContext pageSectionContext="postBody">
-          <HoveredReactionContextProvider voteProps={voteProps}>
           <CommentOnSelectionContentWrapper onClickComment={onClickCommentOnSelection}>
           <div id="postContent">
             {htmlWithAnchors && <>
@@ -883,7 +828,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
             }
           </div>
           </CommentOnSelectionContentWrapper>
-          </HoveredReactionContextProvider>
         </AnalyticsContext>
       </ContentStyles>}
 
@@ -925,9 +869,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
     </div>
   const betweenPostAndCommentsSection =
     <div className={classNames(classes.centralColumn, classes.betweenPostAndComments)}>
-      {reviewIsActive() && postEligibleForReview(post) && getReviewPhase() !== "RESULTS" && <div className={classes.reviewVoting}>
-        <PostPageReviewButton post={post} />
-      </div>}
       <PostsPagePostFooter post={post} sequenceId={sequenceId} />
       {showGlobalForumEventPoll && <DeferRender ssr={false}>
         <ForumEventPostPagePollSection postId={post._id} />
@@ -968,7 +909,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
             highlightDate={highlightDate ?? undefined}
             setHighlightDate={setHighlightDate}
           />}
-          {isAF && <AFUnreviewedCommentCount post={post}/>}
         </AnalyticsContext>
         {isFriendlyUI && Math.max(post.commentCount, results?.length ?? 0) < 1 &&
           <div className={classes.noCommentsPlaceholder}>
@@ -991,10 +931,8 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
   return <AnalyticsContext pageContext="postsPage" postId={post._id}>
     <PostsPageContext.Provider value={{fullPost: fullPost ?? null, postPreload: postPreload ?? null}}>
     <SideItemsContainer>
-    <ImageProvider>
     <SideItemVisibilityContextProvider post={fullPost}>
     <div ref={readingProgressBarRef} className={classes.readingProgressBar}></div>
-    {splashHeaderImage}
     {commentsTableOfContentsEnabled
       ? <MultiToCLayout
           segments={[
@@ -1014,7 +952,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
             }
           ]}
           tocRowMap={[0, 0, 2, 2]}
-          showSplashPageHeader={showSplashPageHeader}
           answerCount={answerCount}
           commentCount={displayedPublicCommentCount}
         />
@@ -1037,7 +974,6 @@ const PostsPage = ({fullPost, postPreload, eagerPostComments, refetch, classes}:
       />
     }
     </SideItemVisibilityContextProvider>
-    </ImageProvider>
     </SideItemsContainer>
     </PostsPageContext.Provider>
   </AnalyticsContext>

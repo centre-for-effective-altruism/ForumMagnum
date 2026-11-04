@@ -4,10 +4,9 @@ import { EditableUser, getUserEmail, SOCIAL_MEDIA_PROFILE_FIELDS, userCanEditUse
 import Button from '@/lib/vendor/@material-ui/core/src/Button';
 import { useCurrentUser } from '@/components/common/withUser';
 import { gql, useMutation, useApolloClient } from '@apollo/client';
-import { hasEventsSetting, isEAForum, isLW, isLWorAF, verifyEmailsSetting } from '@/lib/instanceSettings';
+import { hasEventsSetting, isEAForum, isLWorAF, verifyEmailsSetting } from '@/lib/instanceSettings';
 import { useThemeOptions, useSetTheme } from '@/components/themes/useTheme';
 import { captureEvent } from '@/lib/analyticsEvents';
-import { configureDatadogRum } from '@/client/datadogRum';
 import { isBookUI, isFriendlyUI, preferredHeadingCase } from '@/themes/forumTheme';
 import { useLocation, useNavigate } from '@/lib/routeUtil.tsx';
 import { registerComponent } from "@/lib/vulcan-lib/components";
@@ -40,7 +39,6 @@ import PrefixedInput from "../../form-components/PrefixedInput";
 import NotificationTypeSettingsWidget from "../../notifications/NotificationTypeSettings";
 import KarmaChangeNotifierSettings from "../KarmaChangeNotifierSettings";
 import UsersEmailVerification from "../UsersEmailVerification";
-import EmailConfirmationRequiredCheckbox from "../EmailConfirmationRequiredCheckbox";
 import FormComponentCheckbox from "../../form-components/FormComponentCheckbox";
 import ErrorAccessDenied from "../../common/ErrorAccessDenied";
 import { useFormErrors } from '@/components/tanstack-form-components/BaseAppForm';
@@ -922,17 +920,6 @@ const UsersForm = ({
           </form.Field>
         </div>}
 
-        {isLW && <div className={classes.fieldWrapper}>
-          <form.Field name="emailSubscribedToCurated">
-            {(field) => (
-              <EmailConfirmationRequiredCheckbox
-                field={field}
-                label="Email me new posts in Curated"
-              />
-            )}
-          </form.Field>
-        </div>}
-
         {isEAForum && <HighlightableField name="subscribedToDigest">
           <div className={classes.fieldWrapper}>
           <form.Field name="subscribedToDigest">
@@ -1005,21 +992,6 @@ const UsersForm = ({
             )}
           </form.Field>
         </div>
-
-        {/*
-        <div className={classes.fieldWrapper}>
-          <form.Field name="allowDatadogSessionReplay">
-            {(field) => (
-              <LWTooltip title="Allow us to capture a video-like recording of your browser session (using Datadog Session Replay) — this is useful for debugging and improving the site." placement="left-start" inlineBlock={false}>
-                <FormComponentCheckbox
-                  field={field}
-                  label="Allow Session Replay"
-                />
-              </LWTooltip>
-            )}
-          </form.Field>
-        </div>
-          */}
       </LegacyFormGroupLayout>}
 
       {userIsAdminOrMod(currentUser) && <LegacyFormGroupLayout label={preferredHeadingCase("Admin Options")} startCollapsed={true}>
@@ -1514,9 +1486,6 @@ const UsersEditForm = ({ terms }: {
       setTheme(theme);
       captureEvent("setUserTheme", theme);
     }
-
-    // reconfigure datadog RUM in case they have changed their settings
-    configureDatadogRum(user)
 
     flash(`User "${userGetDisplayName(user)}" edited`);
     try {

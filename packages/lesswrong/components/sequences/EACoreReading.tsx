@@ -1,6 +1,5 @@
 import React from 'react';
 import { registerComponent } from '../../lib/vulcan-lib/components';
-import type { CoreReadingCollection } from './LWCoreReading';
 import CollectionsCardContainer from "../collections/CollectionsCardContainer";
 import BigCollectionsCard from "../collections/BigCollectionsCard";
 import CollectionsCard from "../collections/CollectionsCard";
@@ -17,6 +16,27 @@ const styles = (theme: ThemeType) => ({
     },
   },
 });
+
+export interface CoreReadingCollection {
+  title: string,
+  subtitle?: string,
+  small?: boolean,
+  id: string,
+  userId: string,
+  summary: string,
+  hideSummaryOnMobile?: boolean,
+  imageId?: string,
+  imageWidth?: number,
+  imageUrl?: string,
+  color: string,
+  big?: boolean,
+  url: string,
+  firstPost?: {
+    postId: string,
+    postTitle: string,
+    postUrl: string
+  }
+}
 
 const coreReadingCollections: Array<CoreReadingCollection> = 
   [

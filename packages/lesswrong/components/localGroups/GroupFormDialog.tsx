@@ -8,9 +8,8 @@ import { useForm } from '@tanstack/react-form';
 import { defineStyles, useStyles } from '../hooks/useStyles';
 import { MuiTextField } from '@/components/form-components/MuiTextField';
 import { useSingle } from '@/lib/crud/withSingle';
-import { localGroupTypeFormOptions, GROUP_CATEGORIES } from '@/lib/collections/localgroups/groupTypes';
-import { isEAForum, isLW } from '@/lib/instanceSettings';
-import { MultiSelectButtons } from '@/components/form-components/MultiSelectButtons';
+import { GROUP_CATEGORIES } from '@/lib/collections/localgroups/groupTypes';
+import { isEAForum } from '@/lib/instanceSettings';
 import { FormComponentMultiSelect } from '@/components/form-components/FormComponentMultiSelect';
 import { isFriendlyUI, preferredHeadingCase } from '@/themes/forumTheme';
 import { FormUserMultiselect } from '@/components/form-components/UserMultiselect';
@@ -194,18 +193,6 @@ const LocalGroupForm = ({
           )}
         </form.Field>
       </div>
-
-      {isLW && <div className={classes.fieldWrapper}>
-        <form.Field name="types">
-          {(field) => (
-            <MultiSelectButtons
-              field={field}
-              label='Group Type:'
-              options={localGroupTypeFormOptions}
-            />
-          )}
-        </form.Field>
-      </div>}
 
       {isEAForum && <div className={classes.fieldWrapper}>
         <form.Field name="categories">

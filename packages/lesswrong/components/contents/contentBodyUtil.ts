@@ -1,12 +1,4 @@
 import type { ContentStyleType } from '../common/ContentStyles';
-import JargonTooltip from '../jargon/JargonTooltip';
-import InlineReactHoverableHighlight from '../votes/lwReactions/InlineReactHoverableHighlight';
-
-export const replacementComponentMap = {
-  JargonTooltip,
-  InlineReactHoverableHighlight,
-};
-
 export interface ContentItemBodyProps {
   /**
    * The content to show. This MUST come from a GraphQL resolver which does 
@@ -51,12 +43,6 @@ export interface ContentItemBodyProps {
   idInsertions?: Record<string, React.ReactNode>;
 
   /**
-   * Substrings to replace with an element. Used for highlighting inline
-   * reactions.
-   */
-  replacedSubstrings?: ContentReplacedSubstringComponentInfo[]
-
-  /**
    * A callback function that is called when all of the content substitutions
    * have been applied.
    */
@@ -88,17 +74,6 @@ export type ContentItemBodyImperative = {
   getText: () => string
 
   getAnchorEl: () => HTMLDivElement|null
-};
-
-export type ContentReplacementMode = 'first' | 'all';
-
-export type ContentReplacedSubstringComponentInfo = {
-  replacedString: string
-  componentName: 'JargonTooltip' | 'InlineReactHoverableHighlight',
-  replace: ContentReplacementMode,
-  caseInsensitive?: boolean,
-  isRegex?: boolean,
-  props: AnyBecauseHard
 };
 
 export const addNofollowToHTML = (html: string): string => {

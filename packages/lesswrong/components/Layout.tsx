@@ -12,14 +12,12 @@ import { CommentBoxManager } from './hooks/useCommentBox';
 import { ItemsReadContextWrapper } from './hooks/useRecordPostView';
 import { pBodyStyle } from '../themes/stylePiping';
 import { DatabasePublicSetting, blackBarTitle, googleTagManagerIdSetting } from '../lib/publicSettings';
-import { isAF, isEAForum, isLW, isLWorAF } from '../lib/instanceSettings';
+import { isAF, isEAForum, isLWorAF } from '../lib/instanceSettings';
 import { globalStyles } from '../themes/globalStyles/globalStyles';
 import { userCanDo } from '../lib/vulcan-users/permissions';
 import { Helmet } from '../lib/utils/componentsWithChildren';
 import { DisableNoKibitzContext } from './users/UsersNameDisplay';
 import { LayoutOptions, LayoutOptionsContext } from './hooks/useLayoutOptions';
-// enable during ACX Everywhere
-// import { HIDE_MAP_COOKIE } from '../lib/cookies/cookies';
 import Header, { HEADER_HEIGHT } from './common/Header';
 import { useCookiePreferences } from './hooks/useCookiesWithConsent';
 import { useHeaderVisible } from './hooks/useHeaderVisible';
@@ -32,7 +30,6 @@ export const petrovAfterTime = new DatabasePublicSetting<number>('petrov.afterTi
 
 import { LoginPopoverContextProvider } from './hooks/useLoginPopoverContext';
 import DeferRender from './common/DeferRender';
-import { userHasLlmChat } from '@/lib/betas';
 import { AutosaveEditorStateContext } from './editor/EditorFormComponent';
 
 import GlobalButtonBurst, { buttonBurstSetting } from './ea-forum/GlobalButtonBurst';
@@ -47,15 +44,11 @@ import EAOnboardingFlow from "./ea-forum/onboarding/EAOnboardingFlow";
 import BasicOnboardingFlow from "./onboarding/BasicOnboardingFlow";
 import { CommentOnSelectionPageWrapper } from "./comments/CommentOnSelection";
 import SidebarsWrapper from "./common/SidebarsWrapper";
-import HomepageCommunityMap from "./seasonal/HomepageMap/HomepageCommunityMap";
 import SiteToggle from "./admin/SiteToggle";
 import SunshineSidebar from "./sunshineDashboard/SunshineSidebar";
 import EAHomeRightHandSide from "./ea-forum/EAHomeRightHandSide";
 import ForumEventBanner from "./forumEvents/ForumEventBanner";
 import GlobalHotkeys from "./common/GlobalHotkeys";
-import LanguageModelLauncherButton from "./languageModels/LanguageModelLauncherButton";
-import LlmChatWrapper from "./languageModels/LlmChatWrapper";
-import LWBackgroundImage from "./LWBackgroundImage";
 import IntercomWrapper from "./common/IntercomWrapper";
 import CookieBanner from "./common/CookieBanner/CookieBanner";
 import { defineStyles, useStyles } from './hooks/useStyles';
@@ -215,12 +208,6 @@ const styles = defineStyles("Layout", (theme: ThemeType) => ({
     top: 0,
     width: "100%",
   },
-  // enable during ACX Everywhere
-  hideHomepageMapOnMobile: {
-    [theme.breakpoints.down('sm')]: {
-      display: "none"
-    }
-  },
   stickyWrapper: {
     transition: "transform 200ms ease-in-out",
     transform: `translateY(${STICKY_SECTION_TOP_MARGIN}px)`,
@@ -269,11 +256,6 @@ const Layout = ({currentUser, children}: {
   const {currentRoute, pathname} = useLocation();
   const layoutOptionsState = React.useContext(LayoutOptionsContext);
 
-  // enable during ACX Everywhere
-  // const [cookies] = useCookiesWithConsent()
-  const renderCommunityMap = false // replace with following line to enable during ACX Everywhere
-  // (isLW) && (currentRoute?.name === 'home') && (!currentUser?.hideFrontpageMap) && !cookies[HIDE_MAP_COOKIE]
-  
   const {mutate: updateUser} = useUpdate({
     collectionName: "Users",
     fragmentName: 'UsersCurrent',
@@ -346,7 +328,6 @@ const Layout = ({currentUser, children}: {
       // a property on routes themselves.
       standaloneNavigation: !currentRoute || !!currentRoute.hasLeftNavigationColumn,
       renderSunshineSidebar: !!currentRoute?.sunshineSidebar && !!(userCanDo(currentUser, 'posts.moderate.all') || currentUser?.groups?.includes('alignmentForumAdmins')) && !currentUser?.hideSunshineSidebar,
-      renderLanguageModelChatLauncher: !!currentUser && userHasLlmChat(currentUser),
       shouldUseGridLayout: !currentRoute || !!currentRoute.hasLeftNavigationColumn,
       unspacedGridLayout: !!currentRoute?.unspacedGrid,
     }
@@ -355,7 +336,6 @@ const Layout = ({currentUser, children}: {
 
     const standaloneNavigation = overrideLayoutOptions.standaloneNavigation ?? baseLayoutOptions.standaloneNavigation
     const renderSunshineSidebar = overrideLayoutOptions.renderSunshineSidebar ?? baseLayoutOptions.renderSunshineSidebar
-    const renderLanguageModelChatLauncher = overrideLayoutOptions.renderLanguageModelChatLauncher ?? baseLayoutOptions.renderLanguageModelChatLauncher
     const shouldUseGridLayout = overrideLayoutOptions.shouldUseGridLayout ?? baseLayoutOptions.shouldUseGridLayout
     const unspacedGridLayout = overrideLayoutOptions.unspacedGridLayout ?? baseLayoutOptions.unspacedGridLayout
     // The friendly home page has a unique grid layout, to account for the right hand side column.
@@ -372,7 +352,6 @@ const Layout = ({currentUser, children}: {
       <LoginPopoverContextProvider>
       <SidebarsWrapper>
       <AutosaveEditorStateContext.Provider value={autosaveEditorStateContext}>
-      <LlmChatWrapper>
       <DisableNoKibitzContext.Provider value={noKibitzContext}>
       <CommentOnSelectionPageWrapper>
       <GivingSeasonContext>
@@ -420,8 +399,6 @@ const Layout = ({currentUser, children}: {
                 backgroundColor={headerBackgroundColor}
               />}
               <ForumEventBanner />
-              {/* enable during ACX Everywhere */}
-              {renderCommunityMap && <span className={classes.hideHomepageMapOnMobile}><HomepageCommunityMap dontAskUserLocation={true}/></span>}
 
               <div className={classNames({
                 [classes.spacedGridActivated]: shouldUseGridLayout && !unspacedGridLayout,
@@ -459,7 +436,6 @@ const Layout = ({currentUser, children}: {
                   </ErrorBoundary>
                   {!currentRoute?.fullscreen && !currentRoute?.noFooter && <Footer />}
                 </div>
-                {isLW && <LWBackgroundImage standaloneNavigation={standaloneNavigation} />}
                 {!renderSunshineSidebar &&
                   friendlyHomeLayout &&
                   <MaybeStickyWrapper sticky={friendlyHomeLayout}>
@@ -473,11 +449,6 @@ const Layout = ({currentUser, children}: {
                     <SunshineSidebar/>
                   </DeferRender>
                 </div>}
-                {renderLanguageModelChatLauncher && <div>
-                  <DeferRender ssr={false}>
-                    <LanguageModelLauncherButton/>
-                  </DeferRender>
-                </div>}
               </div>
             </CommentBoxManager>
           </DialogManager>
@@ -486,7 +457,6 @@ const Layout = ({currentUser, children}: {
       </GivingSeasonContext>
       </CommentOnSelectionPageWrapper>
       </DisableNoKibitzContext.Provider>
-      </LlmChatWrapper>
       </AutosaveEditorStateContext.Provider>
       </SidebarsWrapper>
       </LoginPopoverContextProvider>

@@ -7,7 +7,6 @@ import classNames from "classnames";
 import DeferRender from "../common/DeferRender";
 import CommentsNodeInner from "../comments/CommentsNode";
 import QuickTakesCollapsedListItem from "./QuickTakesCollapsedListItem";
-import LWQuickTakesCollapsedListItem from "./LWQuickTakesCollapsedListItem";
 
 const styles = (_theme: ThemeType) => ({
   expandedRoot: {
@@ -37,7 +36,7 @@ const QuickTakesListItem = ({quickTake, classes}: {
     setExpanded(value);
     captureEvent(value ? "shortformItemExpanded" : "shortformItemCollapsed");
   }, [captureEvent, setExpanded]);
-  const CollapsedListItem = isFriendlyUI ? QuickTakesCollapsedListItem : LWQuickTakesCollapsedListItem;
+  const CollapsedListItem = QuickTakesCollapsedListItem;
 
   // We're doing both a NoSSR + conditional `display: 'none'` to toggle between the collapsed & expanded quick take
   // This is to eliminate a loading spinner (for the child comments) when someone expands a quick take,

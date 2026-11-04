@@ -11,7 +11,7 @@ import { getSqlClientOrThrow } from '@/server/sql/sqlClient';
 import { cyrb53Rand } from '@/server/perfMetrics';
 import JargonTermsRepo from '@/server/repos/JargonTermsRepo';
 import { randomId } from '@/lib/random';
-import { defaultExampleTerm, defaultExamplePost, defaultGlossaryPrompt, defaultExampleAltTerm, defaultExampleDefinition, JARGON_LLM_MODEL } from '@/components/jargon/GlossaryEditForm';
+import { defaultExampleTerm, defaultExamplePost, defaultGlossaryPrompt, defaultExampleAltTerm, defaultExampleDefinition, JARGON_LLM_MODEL } from './jargonDefaults';
 import { convertZodParserToAnthropicTool } from '@/server/languageModels/llmApiWrapper';
 import uniq from 'lodash/uniq';
 import { computeContextFromUser } from '../../vulcan-lib/apollo-server/context';
@@ -151,7 +151,7 @@ The jargon terms are:`
 
   // Integrity Alert! This is currently designed so if the model changes, users are informed
   // about what model is being used in the jargon generation process.
-  // If you change this architecture, make sure to update GlossaryEditForm.tsx and the Users' schema
+  // If you change this architecture, make sure to update the Users' schema
   const termsResponse = await client.messages.create({
     model: JARGON_LLM_MODEL,
     max_tokens: 5000,

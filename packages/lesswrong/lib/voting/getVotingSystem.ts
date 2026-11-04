@@ -1,17 +1,4 @@
-import { isEAForum } from "../instanceSettings";
-import { namesAttachedReactionsVotingSystem } from "./namesAttachedReactions";
-import { reactionsAndLikesVotingSystem } from "./reactionsAndLikes";
 import { defaultVotingSystem, eaEmojisVotingSystem, emojiReactionsVotingSystem, reactsBallotVotingSystem, twoAxisVotingSystem, type VotingSystem } from "./votingSystems";
-
-// const votingSystems: Partial<Record<string,VotingSystem>> = {
-//   default: defaultVotingSystem,
-//   twoAxis: twoAxisVotingSystem,
-//   namesAttachedReactions: namesAttachedReactionsVotingSystem,
-//   reactionsAndLikes: reactionsAndLikesVotingSystem,
-//   reactsBallot: reactsBallotVotingSystem,
-//   emojiReactions: emojiReactionsVotingSystem,
-//   eaEmojis: eaEmojisVotingSystem,
-// };
 
 export function getVotingSystemByName(name: string): VotingSystem {
   const votingSystems = getAllVotingSystems();
@@ -34,8 +21,6 @@ const getAllVotingSystems = (() => {
       votingSystems = {
         default: defaultVotingSystem,
         twoAxis: twoAxisVotingSystem,
-        namesAttachedReactions: namesAttachedReactionsVotingSystem,
-        reactionsAndLikes: reactionsAndLikesVotingSystem,
         reactsBallot: reactsBallotVotingSystem,
         emojiReactions: emojiReactionsVotingSystem,
         eaEmojis: eaEmojisVotingSystem,
@@ -51,11 +36,8 @@ export function getVotingSystems(): VotingSystem[] {
 }
 
 export async function getVotingSystemNameForDocument(document: VoteableType, collectionName: VoteableCollectionName, context: ResolverContext): Promise<string> {
-  if (collectionName === "MultiDocuments" || collectionName === "Tags") {
-    return "reactionsAndLikes";
-  }
   if ((document as DbComment).tagId) {
-    return isEAForum ? "eaEmojis" : "namesAttachedReactions";
+    return "eaEmojis";
   }
   if ((document as DbComment).postId) {
     const post = await context.loaders.Posts.load((document as DbComment).postId!);

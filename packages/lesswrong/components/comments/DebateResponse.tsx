@@ -12,7 +12,6 @@ import CommentBody from "./CommentsItem/CommentBody";
 import CommentsEditForm from "./CommentsEditForm";
 import CommentsMenu from "../dropdowns/comments/CommentsMenu";
 import DebateCommentsListSection from "./DebateCommentsListSection";
-import HoveredReactionContextProvider from "../votes/lwReactions/HoveredReactionContextProvider";
 
 const styles = (theme: ThemeType) => ({
   innerDebateComment: {
@@ -167,32 +166,30 @@ export const DebateResponse = ({classes, comment, replies, idx, responseCount, o
     const replyState = showReplyState && showReplyLink && replyCommentList;
 
     return (
-      <HoveredReactionContextProvider voteProps={voteProps}>
-        <div
-          key={`debate-comment-${comment._id}`}
-          id={`debate-comment-${comment._id}`}
-          className={classNames(classes.innerDebateComment, borderStyle, { [classes.blockMargin]: addBottomMargin })}
-        >
-          {header}
-          {menu}
-          <div className={classes.commentWithReplyButton}>
-            {commentBodyOrEditor}
-          </div>
-          {replyState}
-          <div className={classes.bottomUI}>
-            {VoteBottomComponent && <VoteBottomComponent
-              document={comment}
-              hideKarma={post.hideCommentKarma}
-              collectionName="Comments"
-              votingSystem={votingSystem}
-              commentBodyRef={commentBodyRef}
-              voteProps={voteProps}
-              post={post}
-            />}
-            {replyLink}
-          </div>
+      <div
+        key={`debate-comment-${comment._id}`}
+        id={`debate-comment-${comment._id}`}
+        className={classNames(classes.innerDebateComment, borderStyle, { [classes.blockMargin]: addBottomMargin })}
+      >
+        {header}
+        {menu}
+        <div className={classes.commentWithReplyButton}>
+          {commentBodyOrEditor}
         </div>
-      </HoveredReactionContextProvider>
+        {replyState}
+        <div className={classes.bottomUI}>
+          {VoteBottomComponent && <VoteBottomComponent
+            document={comment}
+            hideKarma={post.hideCommentKarma}
+            collectionName="Comments"
+            votingSystem={votingSystem}
+            commentBodyRef={commentBodyRef}
+            voteProps={voteProps}
+            post={post}
+          />}
+          {replyLink}
+        </div>
+      </div>
     );
   }
 

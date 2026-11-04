@@ -1,10 +1,9 @@
 import React from 'react';
+
 import { registerComponent } from '../../lib/vulcan-lib/components';
 import { useLocation } from '../../lib/routeUtil';
 import { useCurrentUser } from '../common/withUser';
 import { Link } from '../../lib/reactRouterWrapper';
-import { isFriendlyUI } from '../../themes/forumTheme';
-import InboxNavigation from "./InboxNavigation";
 import FriendlyInbox from "./FriendlyInbox";
 
 const ModeratorInboxWrapper = () => {
@@ -23,7 +22,7 @@ const ModeratorInboxWrapper = () => {
     return <FriendlyInbox terms={terms} currentUser={currentUser} conversationId={conversationId} isModInbox />;
   }
 
-  const InboxComponent = isFriendlyUI ? FriendlyInbox : InboxNavigation;
+  const InboxComponent = FriendlyInbox;
   return (
     <InboxComponent
       terms={terms}

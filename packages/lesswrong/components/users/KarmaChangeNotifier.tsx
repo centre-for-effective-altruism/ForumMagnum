@@ -25,7 +25,6 @@ import { Typography } from "../common/Typography";
 import LWClickAwayListener from "../common/LWClickAwayListener";
 import LWPopper from "../common/LWPopper";
 import ForumIcon from "../common/ForumIcon";
-import ReactionIcon from "../votes/ReactionIcon";
 import LWTooltip from "../common/LWTooltip";
 
 const styles = (theme: ThemeType) => ({
@@ -338,9 +337,7 @@ const NewReactions = ({reactionChanges, classes}: {
           }
           disabled={disableTooltip}
         >
-          {(EAEmojiComponent && isEAForum) ? <EAEmojiComponent /> : <ReactionIcon
-            react={reactionType}
-          />}
+          {EAEmojiComponent && <EAEmojiComponent />}
         </LWTooltip>
       </span>
     })}

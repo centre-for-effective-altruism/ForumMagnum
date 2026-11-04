@@ -13,7 +13,6 @@ import {
   hasCommentsTableOfContentSetting,
   hasSideCommentsSetting, 
   hasDialoguesSetting, 
-  hasPostInlineReactionsSetting,
   isBotSiteSetting,
   isLW,
 } from './instanceSettings'
@@ -77,7 +76,6 @@ export const userHasPostAutosave = isLWorAF ? adminOnly : disabled;
 // Non-user-specific features
 export const dialoguesEnabled = hasDialoguesSetting.get();
 export const ckEditorUserSessionsEnabled = isLWorAF;
-export const inlineReactsHoverEnabled = hasPostInlineReactionsSetting.get();
 export const allowSubscribeToUserComments = true;
 export const allowSubscribeToSequencePosts = isFriendlyUI;
 /** On the post page, do we show users other content they might want to read */

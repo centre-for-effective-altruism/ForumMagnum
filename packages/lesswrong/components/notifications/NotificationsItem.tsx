@@ -13,7 +13,6 @@ import { getUrlClass } from '@/server/utils/getUrlClass';
 import LWTooltip from "../common/LWTooltip";
 import PostsTooltip from "../posts/PostsPreviewTooltip/PostsTooltip";
 import ConversationPreview from "../messaging/ConversationPreview";
-import PostNominatedNotification from "../review/PostNominatedNotification";
 import TagRelNotificationItem from "./TagRelNotificationItem";
 
 const styles = (theme: ThemeType) => ({
@@ -119,17 +118,6 @@ const NotificationsItem = ({notification, lastNotificationsCheck, currentUser, c
       return (
         <TooltipWrapper
           title={notificationType.onsiteHoverView({notification})}
-          classes={classes}
-        >
-          {children}
-        </TooltipWrapper>
-      );
-    }
-
-    if (notification.type === "postNominated") {
-      return (
-        <TooltipWrapper
-          title={<PostNominatedNotification postId={documentId}/>}
           classes={classes}
         >
           {children}

@@ -1,12 +1,11 @@
 import React from 'react';
 import { registerComponent } from '../../../lib/vulcan-lib/components';
 import { useCurrentUser } from '../../common/withUser';
-import { isBookUI, isFriendlyUI } from '../../../themes/forumTheme';
+import { isFriendlyUI } from '../../../themes/forumTheme';
 import { hasCuratedPostsSetting } from '../../../lib/instanceSettings';
 import MoveToDraftDropdownItem from "./MoveToDraftDropdownItem";
 import BookmarkDropdownItem from "./BookmarkDropdownItem";
 import SuggestCuratedDropdownItem from "./SuggestCuratedDropdownItem";
-import SuggestAlignmentPostDropdownItem from "./SuggestAlignmentPostDropdownItem";
 import ReportPostDropdownItem from "./ReportPostDropdownItem";
 import DeleteDraftDropdownItem from "./DeleteDraftDropdownItem";
 import SetSideItemVisibility from "./SetSideItemVisibility";
@@ -14,7 +13,6 @@ import { ResyncRssDropdownItem } from "./ResyncRssDropdownItem";
 import MarkAsReadDropdownItem from "./MarkAsReadDropdownItem";
 import SummarizeDropdownItem from "./SummarizeDropdownItem";
 import MoveToFrontpageDropdownItem from "./MoveToFrontpageDropdownItem";
-import MoveToAlignmentPostDropdownItem from "./MoveToAlignmentPostDropdownItem";
 import ShortformDropdownItem from "./ShortformDropdownItem";
 import DropdownMenu from "../DropdownMenu";
 import EditTagsDropdownItem from "./EditTagsDropdownItem";
@@ -23,7 +21,6 @@ import DuplicateEventDropdownItem from "./DuplicateEventDropdownItem";
 import PostAnalyticsDropdownItem from "./PostAnalyticsDropdownItem";
 import ExcludeFromRecommendationsDropdownItem from "./ExcludeFromRecommendationsDropdownItem";
 import ApproveNewUserDropdownItem from "./ApproveNewUserDropdownItem";
-import SharePostSubmenu from "./SharePostSubmenu";
 import { PostSubscriptionsDropdownItem } from "./PostSubscriptionsDropdownItem";
 import DislikeRecommendationDropdownItem from "./DislikeRecommendationDropdownItem";
 import HideFrontPageButton from './HideFrontpagePostDropdownItem';
@@ -67,7 +64,6 @@ const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
     <DropdownMenu className={classes.root} >
       <EditPostDropdownItem post={post} />
       <ResyncRssDropdownItem post={post} closeMenu={closeMenu} />
-      {isBookUI && <SharePostSubmenu post={post} closeMenu={closeMenu} />}
       <DuplicateEventDropdownItem post={post} />
       <PostAnalyticsDropdownItem post={post} />
       <PostSubscriptionsDropdownItem post={post} />
@@ -86,8 +82,6 @@ const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
       <ShortformDropdownItem post={post} />
       <ExcludeFromRecommendationsDropdownItem post={post} />
       <ApproveNewUserDropdownItem post={post} />
-      <SuggestAlignmentPostDropdownItem post={post}/>
-      <MoveToAlignmentPostDropdownItem post={post}/>
     </DropdownMenu>
   );
 }

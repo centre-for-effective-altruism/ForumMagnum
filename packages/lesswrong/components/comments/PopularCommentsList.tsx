@@ -1,11 +1,11 @@
 import React from "react";
+
 import { registerComponent } from "../../lib/vulcan-lib/components";
 import { usePaginatedResolver } from "../hooks/usePaginatedResolver";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { isFriendlyUI } from "../../themes/forumTheme";
 import LoadMore from "../common/LoadMore";
 import FriendlyPopularComment from "./FriendlyPopularComment";
-import LWPopularComment from "./LWPopularComment";
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -26,7 +26,7 @@ const PopularCommentsList = ({classes}: {classes: ClassesType<typeof styles>}) =
     limit: 3,
     itemsPerPage: 5,
   });
-  const CommentComponent = isFriendlyUI ? FriendlyPopularComment : LWPopularComment;
+  const CommentComponent = FriendlyPopularComment;
   return (
     <AnalyticsContext pageSectionContext="popularCommentsList">
       <div className={classes.root}>

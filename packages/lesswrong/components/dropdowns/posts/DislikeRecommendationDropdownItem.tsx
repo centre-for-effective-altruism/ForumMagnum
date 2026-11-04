@@ -5,11 +5,7 @@ import { IsRecommendationContext } from './PostActions';
 import withErrorBoundary from '../../common/withErrorBoundary';
 import { useDialog } from '../../common/withDialog';
 import { useSetIsHiddenMutation } from './useSetIsHidden';
-import { recombeeEnabledSetting } from '@/lib/publicSettings';
-import { recombeeApi } from '@/lib/recombee/client';
-import { isRecombeeRecommendablePost } from '@/lib/collections/posts/helpers';
 import { registerComponent } from "../../../lib/vulcan-lib/components";
-import { fragmentTextForQuery } from "../../../lib/vulcan-lib/fragments";
 import LoginPopup from "../../users/LoginPopup";
 import DropdownItem from "../DropdownItem";
 
@@ -40,10 +36,6 @@ const DislikeRecommendationDropdownItem = ({post}: {post: PostsBase}) => {
         contents: ({onClose}) => <LoginPopup onClose={onClose} />
       });
       return;
-    }
-
-    if (!!currentUser && recombeeEnabledSetting.get() && isRecombeeRecommendablePost(post)) {
-      void recombeeApi.createRating(post._id, currentUser._id, "bigDownvote");
     }
 
     void setIsHiddenMutation({postId: post._id, isHidden: true})

@@ -2,10 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSingle } from '../../lib/crud/withSingle';
 import { useMessages } from '../common/withMessages';
 import { postGetPageUrl, postGetEditUrl, getPostCollaborateUrl, isNotHostedHere, canUserEditPostMetadata } from '../../lib/collections/posts/helpers';
-import { useDialog } from "../common/withDialog";
 import {useCurrentUser} from "../common/withUser";
-import { useUpdate } from "../../lib/crud/withUpdate";
-import { afNonMemberSuccessHandling } from "../../lib/alignment-forum/displayAFNonMemberPopups";
 import { userIsPodcaster } from '../../lib/vulcan-users/permissions';
 import { SHARE_POPUP_QUERY_PARAM } from './PostsPage/constants';
 import { isEAForum, isLW } from '../../lib/instanceSettings';
@@ -131,7 +128,6 @@ const PostsEditForm = ({ documentId, version }: {
   const { query } = useLocation();
   const navigate = useNavigate();
   const { flash } = useMessages();
-  const { openDialog } = useDialog();
   const currentUser = useCurrentUser();
 
   const [editorState, setEditorState] = useState<Editor|null>(null);
@@ -156,11 +152,6 @@ const PostsEditForm = ({ documentId, version }: {
     skip: !currentUser,
     extraVariables: { eventForm: 'Boolean' },
     extraVariablesValues: { eventForm: document?.isEvent }
-  });
-
-  const { mutate: updatePost } = useUpdate({
-    collectionName: "Posts",
-    fragmentName: 'SuggestAlignmentPost',
   });
 
   const rateLimitNextAbleToPost = userWithRateLimit?.rateLimitNextAbleToPost;
@@ -228,8 +219,6 @@ const PostsEditForm = ({ documentId, version }: {
             <PostForm
               initialData={document}
               onSuccess={(post, options) => {
-                const alreadySubmittedToAF = post.suggestForAlignmentUserIds && post.suggestForAlignmentUserIds.includes(post.userId!)
-                if (!post.draft && !alreadySubmittedToAF) afNonMemberSuccessHandling({currentUser, document: post, openDialog, updateDocument: updatePost})
                 if (options?.submitOptions?.redirectToEditor) {
                   navigate(postGetEditUrl(post._id, false, post.linkSharingKey ?? undefined));
                 } else {

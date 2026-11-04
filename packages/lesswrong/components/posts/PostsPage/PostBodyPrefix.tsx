@@ -1,20 +1,18 @@
 import React from 'react';
+
 import { registerComponent } from '../../../lib/vulcan-lib/components';
 import Info from '@/lib/vendor/@material-ui/icons/src/Info';
 import { siteNameWithArticleSetting } from '../../../lib/instanceSettings';
 import { useCurrentUser } from '../../common/withUser';
-import { getReviewPhase, postEligibleForReview, reviewIsActive } from '../../../lib/reviewUtils';
 import { forumSelect } from "../../../lib/forumTypeUtils";
 import { Link } from '../../../lib/reactRouterWrapper';
 import { isFriendlyUI } from '../../../themes/forumTheme';
 import UsersNameDisplay from "../../users/UsersNameDisplay";
-import AlignmentPendingApprovalMessage from "../../alignment-forum/AlignmentPendingApprovalMessage";
 import LinkPostMessage from "../LinkPostMessage";
 import PostsRevisionMessage from "./PostsRevisionMessage";
 import LWTooltip from "../../common/LWTooltip";
 import { ContentItemBody } from "../../contents/ContentItemBody";
 import ContentStyles from "../../common/ContentStyles";
-import PostPageReviewButton from "./PostPageReviewButton";
 
 const shortformDraftMessage = isFriendlyUI
   ? "This is a special post that holds your quick takes. Because it's marked as a draft, your quick takes will not be displayed. To un-draft it, pick Edit from the menu above, then click Publish."
@@ -71,10 +69,6 @@ const PostBodyPrefix = ({post, query, classes}: {
   const currentUser = useCurrentUser();
 
   return <>
-    {reviewIsActive() && postEligibleForReview(post) && getReviewPhase() !== "RESULTS" && <PostPageReviewButton post={post}/>}
-
-    <AlignmentPendingApprovalMessage post={post} />
-
     {post.shortform && post.draft && <div className={classes.contentNotice}>
       {shortformDraftMessage}
     </div>}

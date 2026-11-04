@@ -9,8 +9,7 @@ import keyBy from 'lodash/keyBy';
 import pickBy from 'lodash/pickBy';
 import fromPairs from 'lodash/fromPairs';
 import { VotingProps } from '../../components/votes/votingProps';
-import type { ContentItemBodyImperative, ContentReplacedSubstringComponentInfo } from '../../components/contents/contentBodyUtil';
-import { TagLens } from '../arbital/useTagLenses';
+import type { ContentItemBodyImperative } from '../../components/contents/contentBodyUtil';
 import EAEmojisVoteOnComment from '@/components/votes/EAEmojisVoteOnComment';
 import EAEmojisVoteOnPost from '@/components/votes/EAEmojisVoteOnPost';
 import EAEmojisVoteOnPostSecondary from '@/components/votes/EAEmojisVoteOnPostSecondary';
@@ -48,7 +47,6 @@ export type PostVotingComponent = React.ComponentType<PostVotingComponentProps>;
 export interface VotingSystem<ExtendedVoteType=any, ExtendedScoreType=any> {
   name: string,
   description: string,
-  hasInlineReacts?: boolean,
   userCanActivate?: boolean, // toggles whether non-admins use this voting system
   getCommentVotingComponent?: () => CommentVotingComponent,
   getCommentBottomComponent?: () => CommentVotingBottomComponent,
@@ -71,18 +69,6 @@ export interface VotingSystem<ExtendedVoteType=any, ExtendedScoreType=any> {
   computeExtendedScore: (votes: DbVote[], context: ResolverContext) => Promise<ExtendedScoreType>
   isAllowedExtendedVote?: (args: {user: UsersCurrent|DbUser, document: DbVoteableType, oldExtendedScore: ExtendedScoreType, extendedVote: ExtendedVoteType, skipRateLimits?: boolean}) => {allowed: true}|{allowed: false, reason: string},
   isNonblankExtendedVote: (vote: DbVote) => boolean,
-  getCommentHighlights?: (props: {
-    comment: CommentsList
-    voteProps: VotingProps<VoteableTypeClient>
-  }) => ContentReplacedSubstringComponentInfo[]
-  getPostHighlights?: (props: {
-    post: PostsBase
-    voteProps: VotingProps<VoteableTypeClient>
-  }) => ContentReplacedSubstringComponentInfo[]
-  getTagOrLensHighlights?: (props: {
-    tagOrLens: TagLens|TagPageFragment,
-    voteProps: VotingProps<VoteableTypeClient>
-  }) => ContentReplacedSubstringComponentInfo[]
 }
 
 export const defaultVotingSystem = defineVotingSystem({

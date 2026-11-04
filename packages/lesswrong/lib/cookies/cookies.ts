@@ -264,21 +264,6 @@ registerCookie({
   description: "Used by PostHog to store an anonymous identifier for this browser and the current session, so that page views and other events can be attributed to the same visitor.",
 });
 
-// Datadog
-registerCookie({
-  name: "dd_cookie_test_",
-  type: "analytics",
-  thirdPartyName: "Datadog",
-  description: "Cookie used by Datadog to test if cookies are enabled",
-});
-
-registerCookie({
-  name: "_dd_s",
-  type: "analytics",
-  thirdPartyName: "Datadog",
-  description: "Main cookie used by datadog to track sessions",
-});
-
 // Hotjar
 registerCookie({
   name: "_hjTLDTest",

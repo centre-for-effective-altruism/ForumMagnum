@@ -1,12 +1,12 @@
 import { accessFilterSingle } from '../../lib/utils/schemaUtils';
 import { Posts } from '../../server/collections/posts/collection'
 import { ReviewVotes } from '../../server/collections/reviewVotes/collection'
-import { GivingSeasonHeart } from "../../components/review/ReviewVotingCanvas";
 import { REVIEW_YEAR, reviewElectionName } from '../../lib/reviewUtils';
-import { TARGET_REVIEW_VOTING_NUM } from '../../components/review/ReviewProgressVoting';
 import gql from 'graphql-tag';
 import { createReviewVote, updateReviewVote } from '../collections/reviewVotes/mutations';
 import { createAnonymousContext } from "@/server/vulcan-lib/createContexts";
+
+const TARGET_REVIEW_VOTING_NUM = 6;
 
 export const reviewVoteGraphQLTypeDefs = gql`
   type GivingSeasonHeart {

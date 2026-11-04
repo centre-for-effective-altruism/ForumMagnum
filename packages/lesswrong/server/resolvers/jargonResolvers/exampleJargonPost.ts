@@ -1,4 +1,4 @@
-import { ExampleJargonGlossaryEntry } from "@/components/jargon/GlossaryEditForm";
+import { ExampleJargonGlossaryEntry } from "./jargonDefaults";
 
 export const exampleJargonPost = `<p>Following up on Alpha Fold, DeepMind has moved on to Alpha Proteo. We also got a rather simple prompt that can create a remarkably not-bad superforecaster for at least some classes of medium term events.</p>
 
