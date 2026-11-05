@@ -12,7 +12,7 @@ import { isServer } from './executionEnvironment';
 
 // These take precedence over `newSitePatterns`
 const oldSitePatterns = [
-  /^\/topics\/(all|create|random|dashboard|wiki)$/, // Special-case topic slugs
+  /^\/topics\/(create|random|dashboard|wiki)$/, // Special-case topic slugs
 ];
 
 // Topic pages with these query params use legacy-only workflows (editing,
@@ -59,11 +59,24 @@ const newSitePatterns = [
   /^\/admin\/featured$/, // Admin featured queue
   /^\/admin\/onboarding$/, // Admin onboarding test
   /^\/admin\/org-updates-test$/, // Admin org-updates layout test
+  /^\/admin\/migration-progress$/, // Admin migration progress
   /^\/admin\/search-indexes$/, // Admin search index tools
   /^\/admin\/spotlights.*/, // Admin spotlights pages
   /^\/admin\/swap-user-emails$/, // Admin swap user emails page
   /^\/search$/, // Search page
   /^\/robots.txt$/, // robots.txt
+  /^\/bestOf$/, // Best of (camelCase, redirect to kebab-case)
+  /^\/user\/[^/]+\/overview$/, // User profile overview (redirect to /users/[slug])
+  /^\/(wiki|concepts|wikitags)$/, // Topics page (legacy paths, redirect to /topics)
+  /^\/(tags|topics|concepts|wikitags)\/all$/, // Topics page (legacy paths, redirect to /topics)
+  /^\/tag\/[^/]+\/(discussion|history|edit)$/, // Topic subpages (legacy paths, redirect to /topics/[slug]/*)
+  /^\/(tagVoting|tagActivity|tagFeed)$/, // Topic activity (legacy paths, redirect to /topicsActivity and /topicsFeed)
+  /^\/(compare|revisions)\/tag\/[^/]+$/, // Topic revisions (legacy paths, redirect to /compare/topics and /revisions/topics)
+  /^\/topics\/[^/]+\/subforum$/, // Subforum (legacy path, redirect to /topics/[slug]/subforum2)
+  /^\/meta$/, // Community topic (redirect to /topics/community)
+  /^\/(groupsAndEvents|community)$/, // Groups (legacy paths, redirect to /groups)
+  /^\/bookmarks$/, // Saved (legacy path, redirect to /saved)
+  /^\/privacyPolicy$/, // Privacy policy (redirect to ev.org)
 ];
 
 export const isRouteOwnedByEAForumV3 = (href: string): boolean => {
