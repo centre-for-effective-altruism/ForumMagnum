@@ -2,7 +2,7 @@ import { registerComponent } from '../../lib/vulcan-lib/components';
 import React from 'react';
 import { Link } from '../../lib/reactRouterWrapper';
 import classNames from 'classnames';
-import type { CoreReadingCollection } from '../sequences/LWCoreReading';
+import type { CoreReadingCollection } from '../sequences/EACoreReading';
 import { isFriendlyUI } from '../../themes/forumTheme';
 import LinkCard from "../common/LinkCard";
 import CloudinaryImage from "../common/CloudinaryImage";

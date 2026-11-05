@@ -2,7 +2,6 @@ import AbstractRepo from "./AbstractRepo";
 import { DatabaseMetadata } from "../../server/collections/databaseMetadata/collection";
 import type { TimeSeries } from "../../lib/collections/posts/karmaInflation";
 import { randomId } from "../../lib/random";
-import type { GivingSeasonHeart } from "../../components/review/ReviewVotingCanvas";
 import keyBy from "lodash/keyBy";
 import { ELECTION_2025_MATCHED_AMOUNT } from "@/lib/givingSeason";
 

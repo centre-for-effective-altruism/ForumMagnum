@@ -233,7 +233,6 @@ export const performanceMetricLoggingSqlSampleRate = new PublicInstanceSetting<n
 export const hasSideCommentsSetting = new PublicInstanceSetting<boolean>("comments.sideCommentsEnabled", isLWorAF, "optional");
 export const hasCommentsTableOfContentSetting = new PublicInstanceSetting<boolean>("comments.tableOfContentsEnabled", isLWorAF, "optional");
 export const hasDialoguesSetting = new PublicInstanceSetting<boolean>("dialogues.enabled", true, "optional");
-export const hasPostInlineReactionsSetting = new PublicInstanceSetting<boolean>("posts.inlineReactionsEnabled", isLWorAF, "optional");
 
 const disableElastic = new PublicInstanceSetting<boolean>(
   "disableElastic",
@@ -302,12 +301,6 @@ export const homepagePostFeedsSetting = new PublicInstanceSetting<PostFeedDetail
     },
   ]
   , 'optional')
-
-/**
- * This is a filepath that is _relative_ to the location of the instance settings file itself.
- * See full explanation in `google-vertex/client.ts`
- */
-export const googleRecommendationsCredsPath = new PublicInstanceSetting<string | null>('google.recommendationsServiceCredsPath', null, "optional");
 
 export const recombeeCacheTtlMsSetting = new PublicInstanceSetting<number>('recombee.cacheTtlMs', 1000 * 60 * 60 * 24 * 30, "optional");
 

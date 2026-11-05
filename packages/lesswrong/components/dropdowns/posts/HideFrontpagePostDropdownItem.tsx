@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useCurrentUser } from '../../common/withUser';
 import { useTracking } from '../../../lib/analyticsEvents';
-import { AllowHidingFrontPagePostsContext, IsRecommendationContext } from './PostActions';
+import { AllowHidingFrontPagePostsContext } from './PostActions';
 import withErrorBoundary from '../../common/withErrorBoundary';
 import map from 'lodash/map';
 import { useDialog } from '../../common/withDialog';
@@ -20,7 +20,6 @@ const styles = (theme: ThemeType) => ({
 
 const HideFrontpagePostDropdownItem = ({post}: {post: PostsBase}) => {
   const allowHidingPosts = useContext(AllowHidingFrontPagePostsContext)
-  const isRecommendation = useContext(IsRecommendationContext)
   const currentUser = useCurrentUser();
   const {openDialog} = useDialog()
   const [hidden, setHiddenState] = useState(map((currentUser?.hiddenPostsMetadata || []), 'postId')?.includes(post._id));
@@ -28,8 +27,7 @@ const HideFrontpagePostDropdownItem = ({post}: {post: PostsBase}) => {
 
   const { setIsHiddenMutation } = useSetIsHiddenMutation();
 
-  // We do not show post hiding from frontpage and 'dislike recommendation' as the latter includes the former. See DislikeRecommendationDropdownItem.tsx
-  if (!allowHidingPosts || isRecommendation) {
+  if (!allowHidingPosts) {
     return null;
   }
 

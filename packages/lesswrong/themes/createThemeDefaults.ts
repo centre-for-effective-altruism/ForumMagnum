@@ -55,9 +55,6 @@ export const baseTheme: BaseThemeSpecification = {
         commentStyle: {
           fontFamily: palette.fonts.sansSerifStack,
         },
-        ultraFeedMobileStyle: {
-          fontFamily: palette.fonts.sansSerifStack,
-        },
         errorStyle: {
           color: palette.error.main,
           fontFamily: palette.fonts.sansSerifStack

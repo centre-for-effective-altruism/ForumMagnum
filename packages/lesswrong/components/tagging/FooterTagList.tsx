@@ -10,7 +10,7 @@ import { Card } from "@/components/widgets/Paper";
 import { Link } from '../../lib/reactRouterWrapper';
 import { forumSelect } from '../../lib/forumTypeUtils';
 import { useMessages } from '../common/withMessages';
-import { isLWorAF, taggingNamePluralSetting } from '../../lib/instanceSettings';
+import { taggingNamePluralSetting } from '../../lib/instanceSettings';
 import stringify from 'json-stringify-deterministic';
 import { isFriendlyUI } from '../../themes/forumTheme';
 import { FRIENDLY_HOVER_OVER_WIDTH } from '../common/FriendlyHoverOver';
@@ -23,7 +23,6 @@ import ContentStyles from "../common/ContentStyles";
 import Loading from "../vulcan-core/Loading";
 import AddTagButton from "./AddTagButton";
 import CoreTagsChecklist from "./CoreTagsChecklist";
-import PostsAnnualReviewMarketTag from "../posts/PostsAnnualReviewMarketTag";
 
 const styles = (theme: ThemeType) => ({
   root: isFriendlyUI ? {
@@ -326,11 +325,6 @@ const FooterTagList = ({
     {useAltAddTagButton && <span className={classNames(classes.altAddTagButton, noBackground && classes.noBackground)}>+</span>}
   </AddTagButton>
 
-  const postYear = new Date(post.createdAt!).getFullYear(); // 2023
-  const currentYear = new Date().getFullYear(); // 2025
-  const age = currentYear - postYear;
-  const isRecent = age < 2;
-
   const innerContent = (
     <>
       {!tagRight && currentUser && !hideAddTag && addTagButton}
@@ -358,9 +352,6 @@ const FooterTagList = ({
       )}
       {!hidePostTypeTag && postType}
       {eventTag}
-      {isLWorAF && annualReviewMarketInfo && isRecent && (
-        <PostsAnnualReviewMarketTag annualReviewMarketInfo={annualReviewMarketInfo} />
-      )}
       {tagRight && currentUser && !hideAddTag && addTagButton}
       {isAwaiting && <Loading />}
     </>

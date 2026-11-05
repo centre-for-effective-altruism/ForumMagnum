@@ -8,7 +8,6 @@ import { tagGetCommentLink } from "../../../lib/collections/tags/helpers";
 import { AnalyticsContext } from "../../../lib/analyticsEvents";
 import type { CommentTreeOptions } from '../commentTree';
 import { commentAllowTitle as commentAllowTitle, commentGetPageUrlFromIds } from '../../../lib/collections/comments/helpers';
-import { REVIEW_NAME_IN_SITU, REVIEW_YEAR, reviewIsActive, eligibleToNominate } from '../../../lib/reviewUtils';
 import startCase from 'lodash/startCase';
 import FlagIcon from '@/lib/vendor/@material-ui/icons/src/Flag';
 import CommentsItemMeta from './CommentsItemMeta';
@@ -25,13 +24,9 @@ import CommentsNewForm from "../CommentsNewForm";
 import ParentCommentSingle from "../ParentCommentSingle";
 import ForumIcon from "../../common/ForumIcon";
 import CommentDiscussionIcon from "./CommentDiscussionIcon";
-import LWTooltip from "../../common/LWTooltip";
 import PostsTooltip from "../../posts/PostsPreviewTooltip/PostsTooltip";
-import ReviewVotingWidget from "../../review/ReviewVotingWidget";
-import LWHelpIcon from "../../common/LWHelpIcon";
 import CoreTagIcon from "../../tagging/CoreTagIcon";
 import RejectedReasonDisplay from "../../sunshineDashboard/RejectedReasonDisplay";
-import HoveredReactionContextProvider from "../../votes/lwReactions/HoveredReactionContextProvider";
 import CommentBottom from "./CommentBottom";
 
 
@@ -127,18 +122,6 @@ const styles = (theme: ThemeType) => ({
     display: "block",
     color: theme.palette.link.dim2,
   },
-  reviewVotingButtons: {
-    borderTop: theme.palette.border.normal,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingLeft: 6,
-  },
-  updateVoteMessage: {
-    ...theme.typography.body2,
-    ...theme.typography.smallText,
-    color: theme.palette.grey[600]
-  },
   postTitleRow: {
     display: 'flex',
     columnGap: 8,
@@ -216,7 +199,7 @@ export const CommentsItem = ({
   const currentUser = useCurrentUser();
 
   const {
-    postPage, tag, post, refetch, showPostTitle, hideReviewVoteButtons,
+    postPage, tag, post, refetch, showPostTitle,
     moderatedCommentId, hideParentCommentToggleForTopLevel,
   } = treeOptions;
 
@@ -312,118 +295,99 @@ export const CommentsItem = ({
   const votingSystemName = comment.votingSystem || "default";
   const votingSystem = getVotingSystemByName(votingSystemName);
 
-  const displayReviewVoting = 
-    !hideReviewVoteButtons &&
-    reviewIsActive() &&
-    comment.reviewingForReview === REVIEW_YEAR+"" &&
-    post &&
-    currentUser?._id !== post.userId &&
-    eligibleToNominate(currentUser)
-
   const voteProps = useVote(comment, "Comments", votingSystem);
   const showInlineCancel = replyFormIsOpen && isMinimalist
 
   return (
     <AnalyticsContext pageElementContext="commentItem" commentId={comment._id}>
-    <HoveredReactionContextProvider voteProps={voteProps}>
-      <div className={classNames(
-        classes.root,
-        className,
-        "recent-comments-node",
-        comment.deleted && !comment.deletedPublic && classes.deleted,
-        treeOptions.isSideComment && classes.sideComment,
-        comment.tagCommentType === "SUBFORUM" && !comment.topLevelCommentId && classes.subforumTop,
-      )}>
-        { comment.parentCommentId && showParentState && (
-          <div className={classes.firstParentComment}>
-            <ParentCommentSingle
-              post={post} tag={tag}
-              documentId={comment.parentCommentId}
-              nestingLevel={nestingLevel - 1}
-              truncated={showParentDefault}
-              key={comment.parentCommentId}
-              treeOptions={{
-                hideParentCommentToggleForTopLevel,
-              }}
-            />
-          </div> 
-        )}
-        
-        <div className={classes.postTitleRow}>
-          {showPinnedOnProfile && comment.isPinnedOnProfile && <div className={classes.pinnedIconWrapper}>
-            <ForumIcon icon="Pin" className={classes.pinnedIcon} />
-          </div>}
-          {moderatedCommentId === comment._id && <FlagIcon className={classes.flagIcon} />}
-          {showPostTitle && !isChild && hasPostField(comment) && comment.postId && comment.post && <PostsTooltip inlineBlock postId={comment.postId}>
-              <Link className={classes.postTitle} to={commentGetPageUrlFromIds({postId: comment.postId, commentId: comment._id, postSlug: ""})}>
-                {comment.post.draft && "[Draft] "}
-                {comment.post.title}
-              </Link>
-            </PostsTooltip>}
-          {showPostTitle && !isChild && hasTagField(comment) && comment.tag && <Link className={classes.postTitle} to={tagGetCommentLink({tagSlug: comment.tag.slug, tagCommentType: comment.tagCommentType})}>
-            {startCase(comment.tag.name)}
-          </Link>}
-        </div>
-        <div className={classNames(classes.body)}>
-          {showCommentTitle && <div className={classes.title}>
-            {(displayTagIcon && tag) ? <span className={classes.tagIcon}>
-              <CoreTagIcon tag={tag} />
-            </span> : <CommentDiscussionIcon
-              comment={comment}
-            />}
-            {comment.title}
-          </div>}
-          <CommentsItemMeta
-            {...{
-              treeOptions,
-              comment,
-              showCommentTitle,
-              isParentComment,
-              parentCommentId,
-              showParentState,
-              toggleShowParent,
-              scrollIntoView,
-              parentAnswerId,
-              setSingleLine,
-              collapsed,
-              toggleCollapse,
-              setShowEdit,
+    <div className={classNames(
+      classes.root,
+      className,
+      "recent-comments-node",
+      comment.deleted && !comment.deletedPublic && classes.deleted,
+      treeOptions.isSideComment && classes.sideComment,
+      comment.tagCommentType === "SUBFORUM" && !comment.topLevelCommentId && classes.subforumTop,
+    )}>
+      { comment.parentCommentId && showParentState && (
+        <div className={classes.firstParentComment}>
+          <ParentCommentSingle
+            post={post} tag={tag}
+            documentId={comment.parentCommentId}
+            nestingLevel={nestingLevel - 1}
+            truncated={showParentDefault}
+            key={comment.parentCommentId}
+            treeOptions={{
+              hideParentCommentToggleForTopLevel,
             }}
           />
-          {comment.promoted && comment.promotedByUser && <div className={classes.metaNotice}>
-            Pinned by {comment.promotedByUser.displayName}
-          </div>}
-          {comment.rejected && <p><RejectedReasonDisplay reason={comment.rejectedReason}/></p>}
-          {renderBodyOrEditor(voteProps)}
-          {!comment.deleted && !collapsed && <CommentBottom
-            comment={comment}
-            post={post}
-            treeOptions={treeOptions}
-            votingSystem={votingSystem}
-            voteProps={voteProps}
-            commentBodyRef={commentBodyRef}
-            replyButton={
-              treeOptions?.replaceReplyButtonsWith?.(comment) || <a
-                className={classNames("comments-item-reply-link", classes.replyLink)}
-                onClick={showInlineCancel ? closeReplyForm : openReplyForm}
-              >
-                {showInlineCancel ? "Cancel" : "Reply"}
-              </a>
-            }
-          />}
-        </div>
-        {displayReviewVoting && !collapsed && <div className={classes.reviewVotingButtons}>
-          <div className={classes.updateVoteMessage}>
-            <LWTooltip title={`If this review changed your mind, update your ${REVIEW_NAME_IN_SITU} vote for the original post `}>
-              Update your {REVIEW_NAME_IN_SITU} vote for this post. 
-              <LWHelpIcon/>
-            </LWTooltip>
-          </div>
-          {post && <ReviewVotingWidget post={post} showTitle={false}/>}
+        </div> 
+      )}
+      
+      <div className={classes.postTitleRow}>
+        {showPinnedOnProfile && comment.isPinnedOnProfile && <div className={classes.pinnedIconWrapper}>
+          <ForumIcon icon="Pin" className={classes.pinnedIcon} />
         </div>}
-        { replyFormIsOpen && !collapsed && renderReply() }
+        {moderatedCommentId === comment._id && <FlagIcon className={classes.flagIcon} />}
+        {showPostTitle && !isChild && hasPostField(comment) && comment.postId && comment.post && <PostsTooltip inlineBlock postId={comment.postId}>
+            <Link className={classes.postTitle} to={commentGetPageUrlFromIds({postId: comment.postId, commentId: comment._id, postSlug: ""})}>
+              {comment.post.draft && "[Draft] "}
+              {comment.post.title}
+            </Link>
+          </PostsTooltip>}
+        {showPostTitle && !isChild && hasTagField(comment) && comment.tag && <Link className={classes.postTitle} to={tagGetCommentLink({tagSlug: comment.tag.slug, tagCommentType: comment.tagCommentType})}>
+          {startCase(comment.tag.name)}
+        </Link>}
       </div>
-    </HoveredReactionContextProvider>
+      <div className={classNames(classes.body)}>
+        {showCommentTitle && <div className={classes.title}>
+          {(displayTagIcon && tag) ? <span className={classes.tagIcon}>
+            <CoreTagIcon tag={tag} />
+          </span> : <CommentDiscussionIcon
+            comment={comment}
+          />}
+          {comment.title}
+        </div>}
+        <CommentsItemMeta
+          {...{
+            treeOptions,
+            comment,
+            showCommentTitle,
+            isParentComment,
+            parentCommentId,
+            showParentState,
+            toggleShowParent,
+            scrollIntoView,
+            parentAnswerId,
+            setSingleLine,
+            collapsed,
+            toggleCollapse,
+            setShowEdit,
+          }}
+        />
+        {comment.promoted && comment.promotedByUser && <div className={classes.metaNotice}>
+          Pinned by {comment.promotedByUser.displayName}
+        </div>}
+        {comment.rejected && <p><RejectedReasonDisplay reason={comment.rejectedReason}/></p>}
+        {renderBodyOrEditor(voteProps)}
+        {!comment.deleted && !collapsed && <CommentBottom
+          comment={comment}
+          post={post}
+          treeOptions={treeOptions}
+          votingSystem={votingSystem}
+          voteProps={voteProps}
+          commentBodyRef={commentBodyRef}
+          replyButton={
+            treeOptions?.replaceReplyButtonsWith?.(comment) || <a
+              className={classNames("comments-item-reply-link", classes.replyLink)}
+              onClick={showInlineCancel ? closeReplyForm : openReplyForm}
+            >
+              {showInlineCancel ? "Cancel" : "Reply"}
+            </a>
+          }
+        />}
+      </div>
+      { replyFormIsOpen && !collapsed && renderReply() }
+    </div>
     </AnalyticsContext>
   )
 }

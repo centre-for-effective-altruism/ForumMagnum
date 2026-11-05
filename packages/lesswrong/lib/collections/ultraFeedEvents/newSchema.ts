@@ -1,4 +1,3 @@
-import { FeedItemDisplayStatus } from "@/components/ultraFeed/ultraFeedTypes";
 import { DEFAULT_CREATED_AT_FIELD, DEFAULT_ID_FIELD } from "@/lib/collections/helpers/sharedFieldConstants";
 
 const ALLOWED_COLLECTION_NAMES = ["Posts", "Comments", "Spotlights"];
@@ -102,6 +101,8 @@ const schema = {
 } satisfies Record<string, CollectionFieldSpecification<"UltraFeedEvents">>;
 
 export default schema;
+
+type FeedItemDisplayStatus = "expanded" | "collapsed" | "hidden";
 
 interface ExpandedEventData {
   expansionLevel: number;

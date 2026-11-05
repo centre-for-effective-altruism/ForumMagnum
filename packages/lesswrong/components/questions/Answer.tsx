@@ -24,7 +24,6 @@ import UsersName from "../users/UsersName";
 import { Typography } from "../common/Typography";
 import CommentBottom from "../comments/CommentsItem/CommentBottom";
 import CommentsNewForm from "../comments/CommentsNewForm";
-import HoveredReactionContextProvider from "../votes/lwReactions/HoveredReactionContextProvider";
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -209,61 +208,59 @@ const Answer = ({ comment, post, childComments, classes }: {
         :
         <div>
           <AnalyticsContext pageElementContext="answerItem">
-          <HoveredReactionContextProvider voteProps={voteProps}>
-            <div className={classes.answer} id={comment._id}>
-              <div className={classes.answerHeader}>
-                {comment.user && <Typography variant="body1" className={classes.author}>
-                  { <UsersName user={comment.user} />}
-                </Typography >}
-                <Typography variant="subheading" className={classes.date}>
-                  <CommentsItemDate comment={comment} post={post}/>
-                </Typography>
-                <span className={classes.vote}>
-                  <SmallSideVote document={comment} collectionName="Comments"/>
-                </span>
-                {isFriendlyUI &&
-                  <CommentLinkWrapper>
-                    <ForumIcon icon="Link" className={classNames(classes.linkIcon, {[classes.linkIconHighlighted]: highlightLinkIcon})} />
-                  </CommentLinkWrapper>
-                }
-                <CommentsMenu
-                  className={classes.menu}
-                  showEdit={setShowEditTrue}
-                  comment={comment}
-                  post={post}
-                  icon={menuIcon}
-                />
-              </div>
-              { comment.promotedByUser && <div className={classes.metaNotice}>
-                Pinned by {comment.promotedByUser.displayName}
-              </div>}
-              { showEdit
-                ? <CommentsEditForm
-                    comment={comment}
-                    successCallback={hideEdit}
-                    cancelCallback={hideEdit}
-                  />
-                : <CommentBody
-                    commentBodyRef={commentBodyRef}
-                    comment={comment}
-                    voteProps={voteProps}
-                  />
+          <div className={classes.answer} id={comment._id}>
+            <div className={classes.answerHeader}>
+              {comment.user && <Typography variant="body1" className={classes.author}>
+                { <UsersName user={comment.user} />}
+              </Typography >}
+              <Typography variant="subheading" className={classes.date}>
+                <CommentsItemDate comment={comment} post={post}/>
+              </Typography>
+              <span className={classes.vote}>
+                <SmallSideVote document={comment} collectionName="Comments"/>
+              </span>
+              {isFriendlyUI &&
+                <CommentLinkWrapper>
+                  <ForumIcon icon="Link" className={classNames(classes.linkIcon, {[classes.linkIconHighlighted]: highlightLinkIcon})} />
+                </CommentLinkWrapper>
               }
-              <CommentBottom
+              <CommentsMenu
+                className={classes.menu}
+                showEdit={setShowEditTrue}
                 comment={comment}
                 post={post}
-                treeOptions={treeOptions}
-                votingSystem={votingSystem}
-                voteProps={voteProps}
-                commentBodyRef={commentBodyRef}
-                replyButton={
-                  !replyFormIsOpen && <Typography variant="body2" onClick={()=>setReplyFormIsOpen(true)} className={classNames(classes.newComment)}>
-                    <a>Add Comment</a>
-                  </Typography>
-                }
+                icon={menuIcon}
               />
             </div>
-          </HoveredReactionContextProvider>
+            { comment.promotedByUser && <div className={classes.metaNotice}>
+              Pinned by {comment.promotedByUser.displayName}
+            </div>}
+            { showEdit
+              ? <CommentsEditForm
+                  comment={comment}
+                  successCallback={hideEdit}
+                  cancelCallback={hideEdit}
+                />
+              : <CommentBody
+                  commentBodyRef={commentBodyRef}
+                  comment={comment}
+                  voteProps={voteProps}
+                />
+            }
+            <CommentBottom
+              comment={comment}
+              post={post}
+              treeOptions={treeOptions}
+              votingSystem={votingSystem}
+              voteProps={voteProps}
+              commentBodyRef={commentBodyRef}
+              replyButton={
+                !replyFormIsOpen && <Typography variant="body2" onClick={()=>setReplyFormIsOpen(true)} className={classNames(classes.newComment)}>
+                  <a>Add Comment</a>
+                </Typography>
+              }
+            />
+          </div>
           </AnalyticsContext>
           <div>
             {replyFormIsOpen &&

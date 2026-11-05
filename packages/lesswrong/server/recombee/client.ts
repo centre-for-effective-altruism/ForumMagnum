@@ -7,7 +7,6 @@ import { truncate } from '../../lib/editor/ellipsize';
 import { accessFilterMultiple } from '../../lib/utils/schemaUtils';
 import { aboutPostIdSetting, recombeeCacheTtlMsSetting, recombeeDatabaseIdSetting, recombeePrivateApiTokenSetting } from '../../lib/instanceSettings';
 import { viewTermsToQuery } from '../../lib/utils/viewUtils';
-import { stickiedPostTerms } from '../../components/posts/RecombeePostsList';
 import groupBy from 'lodash/groupBy';
 import uniq from 'lodash/uniq';
 import { recommendationsTabManuallyStickiedPostIdsSetting } from '../../lib/publicSettings';
@@ -19,6 +18,12 @@ import { fetchFragmentSingle } from '../fetchFragment';
 import { createAdminContext } from '../vulcan-lib/createContexts';
 import { FilterSettings, getDefaultFilterSettings } from '@/lib/filterSettings';
 import type { RecommendedPost, RecombeeRecommendedPost, NativeRecommendedPost } from '@/lib/recombee/types';
+
+const stickiedPostTerms: PostsViewTerms = {
+  view: 'stickied',
+  limit: 4, // seriously, shouldn't have more than 4 stickied posts
+  forum: true
+};
 
 export const getRecombeeClientOrThrow = (() => {
   let client: ApiClient;

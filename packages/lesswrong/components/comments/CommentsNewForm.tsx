@@ -8,8 +8,6 @@ import { hideUnreviewedAuthorCommentsSettings } from '../../lib/publicSettings';
 import { userCanDo } from '../../lib/vulcan-users/permissions';
 import { requireNewUserGuidelinesAck, userIsAllowedToComment } from '../../lib/collections/users/helpers';
 import { useMessages } from '../common/withMessages';
-import { useUpdate } from "../../lib/crud/withUpdate";
-import { afNonMemberDisplayInitialPopup, afNonMemberSuccessHandling } from "../../lib/alignment-forum/displayAFNonMemberPopups";
 import { TagCommentType } from '../../lib/collections/comments/types';
 import { commentDefaultToAlignment } from '../../lib/collections/comments/helpers';
 import { isInFuture } from '../../lib/utils/timeUtil';
@@ -203,10 +201,6 @@ const CommentsNewForm = ({
   const [_,setForceRefreshState] = useState(0);
 
   const { openDialog } = useDialog();
-  const { mutate: updateComment } = useUpdate({
-    collectionName: "Comments",
-    fragmentName: 'SuggestAlignmentComment',
-  })
   
   // On focus (this bubbles out from the text editor), show moderation guidelines.
   // Defer this through a setTimeout, because otherwise clicking the Cancel button
@@ -235,7 +229,6 @@ const CommentsNewForm = ({
 
   const { pathname } = useLocation();
   const wrappedSuccessCallback = (comment: CommentsList) => {
-    afNonMemberSuccessHandling({currentUser, document: comment, openDialog, updateDocument: updateComment })
     if (comment.deleted && comment.deletedReason) {
       flash(comment.deletedReason);
     }
@@ -359,7 +352,6 @@ const CommentsNewForm = ({
             rateLimitMessage={rateLimitMessage}
           />}
           <div onFocus={(ev) => {
-            afNonMemberDisplayInitialPopup(currentUser, openDialog)
             ev.preventDefault()
           }}>
             <CommentForm

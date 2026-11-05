@@ -28,7 +28,6 @@ import NotificationsMenu from "../notifications/NotificationsMenu";
 import KarmaChangeNotifier from "../users/KarmaChangeNotifier";
 import { Typography } from "./Typography";
 import ForumIcon from "./ForumIcon";
-import ActiveDialogues from "../dialogues/ActiveDialogues";
 import SiteLogo from "../ea-forum/SiteLogo";
 import MessagesMenuButton from "../messaging/MessagesMenuButton";
 import { requireCssVar } from '@/themes/cssVars';
@@ -630,7 +629,6 @@ const Header = ({
                   Giving season <span>2025</span>
                 </Link>
               )}
-              {!isEAForum &&<ActiveDialogues />}
               {rightHeaderItemsNode}
             </Toolbar>
           </header>

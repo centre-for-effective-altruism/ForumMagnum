@@ -4,7 +4,6 @@ import type { Placement as PopperPlacementType } from "popper.js"
 import { isFriendlyUI } from "../../themes/forumTheme";
 import HoverOver from "../common/HoverOver";
 import EAUserTooltipContent from "./EAUserTooltipContent";
-import LWUserTooltipContent from "./LWUserTooltipContent";
 
 const styles = () => ({
   root: isFriendlyUI
@@ -34,9 +33,7 @@ const UserTooltip = ({user, placement, inlineBlock, hideFollowButton, disabled, 
   children: ReactNode,
   classes: ClassesType<typeof styles>,
 }) => {
-  const content = isFriendlyUI 
-    ? <EAUserTooltipContent user={user} />
-    : <LWUserTooltipContent user={user} hideFollowButton={hideFollowButton} />;
+  const content = <EAUserTooltipContent user={user} />;
   return (
     <HoverOver
       title={content}

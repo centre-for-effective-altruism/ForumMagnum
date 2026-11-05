@@ -7,11 +7,8 @@ import { nofollowKarmaThreshold } from '../../../lib/publicSettings';
 import ContentStyles, { ContentStyleType } from '../../common/ContentStyles';
 import { VotingProps } from '../../votes/votingProps';
 import { ContentItemBody } from '../../contents/ContentItemBody';
-import { type ContentItemBodyImperative, type ContentReplacedSubstringComponentInfo } from '../../contents/contentBodyUtil';
-
-import { getVotingSystemByName } from '../../../lib/voting/getVotingSystem';
+import { type ContentItemBodyImperative } from '../../contents/contentBodyUtil';
 import CommentDeletedMetadata from "./CommentDeletedMetadata";
-import InlineReactSelectionWrapper from "../../votes/lwReactions/InlineReactSelectionWrapper";
 
 const styles = (theme: ThemeType) => ({
   commentStyling: {
@@ -84,31 +81,16 @@ const CommentBody = ({
     contentType = 'comment';
   }
   
-  const votingSystem = getVotingSystemByName(comment.votingSystem);
-  let highlights: ContentReplacedSubstringComponentInfo[]|undefined = undefined;
-  if (voteProps && votingSystem.getCommentHighlights) {
-    highlights = votingSystem.getCommentHighlights({comment, voteProps});
-  }
-
-  const contentBody = <ContentStyles contentType={contentType} className={classes.root}>
+  return <ContentStyles contentType={contentType} className={classes.root}>
     <ContentItemBody
       ref={commentBodyRef ?? undefined}
       className={bodyClasses}
       dangerouslySetInnerHTML={{__html: innerHtml }}
       description={`comment ${comment._id}`}
       nofollow={(comment.user?.karma || 0) < nofollowKarmaThreshold.get()}
-      replacedSubstrings={highlights}
       contentStyleType={contentType}
     />
   </ContentStyles>
-
-  if (votingSystem.hasInlineReacts && voteProps) {
-    return <InlineReactSelectionWrapper contentRef={commentBodyRef} voteProps={voteProps} styling="comment" >
-      {contentBody}
-    </InlineReactSelectionWrapper>
-  } else {
-    return contentBody
-  }
 }
 
 export default registerComponent('CommentBody', CommentBody, {styles});

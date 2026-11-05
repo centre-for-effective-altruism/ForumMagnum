@@ -103,12 +103,6 @@ export interface CommentTreeOptions {
   singleLinePostTitle?: boolean,
   
   /**
-   * If passed, comments that are part of the yearly review will
-   * nevertheless not have review-voting UI attached.
-   */
-  hideReviewVoteButtons?: boolean,
-  
-  /**
    * If passed, all comments in the tree will start out as single-line
    * comments. (This takes precedence over forceNotSingleLine). Used for
    * shortform comments on the All Posts page, and in the yearly review.

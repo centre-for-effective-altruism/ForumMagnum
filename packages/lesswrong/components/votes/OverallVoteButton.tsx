@@ -1,11 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
+
 import { registerComponent } from '../../lib/vulcan-lib/components';
 import { useCurrentUser } from '../common/withUser';
 import { useDialog } from '../common/withDialog';
 import { useTracking } from '../../lib/analyticsEvents';
-import { recombeeApi } from '../../lib/recombee/client';
-import { RecombeeRecommendationsContext } from '../recommendations/RecombeeRecommendationsContextWrapper';
-import { recombeeEnabledSetting } from '../../lib/publicSettings';
 import LoginPopup from "../users/LoginPopup";
 import VoteButton from "./VoteButton";
 import VoteArrowIcon from "./VoteArrowIcon";
@@ -38,7 +36,6 @@ const OverallVoteButton = <T extends VoteableTypeClient>({
   const currentUser = useCurrentUser();
   const { openDialog } = useDialog();
   const { captureEvent } = useTracking();
-  const recombeeRecommendationsContext = useContext(RecombeeRecommendationsContext);
 
   const wrappedVote = (strength: "big"|"small"|"neutral") => {
     const voteType = strength === 'neutral' ? 'neutral' : strength+upOrDown;
@@ -51,9 +48,6 @@ const OverallVoteButton = <T extends VoteableTypeClient>({
     } else {
       vote?.({document, voteType: voteType, extendedVote: document?.currentUserExtendedVote, currentUser});
       captureEvent("vote", {collectionName});
-      if (recombeeEnabledSetting.get() && collectionName === "Posts" && recombeeRecommendationsContext?.postId === document._id) {
-        void recombeeApi.createRating(document._id, currentUser._id, voteType, recombeeRecommendationsContext.recommId);
-      }
     }
   }
 

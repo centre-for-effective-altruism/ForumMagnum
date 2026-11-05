@@ -1188,7 +1188,7 @@ interface DbRecommendationsCache extends DbObject {
   legacyData: any | null
   postId: string
   scenario: string
-  source: "recombee" | "vertex"
+  source: "recombee"
   ttlMs: number
   userId: string
 }

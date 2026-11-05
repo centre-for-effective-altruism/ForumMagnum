@@ -218,18 +218,6 @@ export const LLM_CHAT_EXPANDED = registerCookie({
   description: "Whether the LLM chat has expanded size",
 })
 
-export const ULTRA_FEED_ENABLED_COOKIE = registerCookie({
-  name: 'ultra_feed_enabled',
-  type: "functional",
-  description: "Whether the ultra feed mode is enabled, which hides QuickTakes and Popular Comments",
-})
-
-export const ULTRA_FEED_PAGE_VISITED_COOKIE = registerCookie({
-  name: 'ultra_feed_page_visited',
-  type: "functional",
-  description: "Whether the user has ever visited the ultra feed page",
-})
-
 
 // Third party cookies
 
@@ -274,21 +262,6 @@ registerCookie({
   thirdPartyName: "PostHog",
   maxExpires: "12 months",
   description: "Used by PostHog to store an anonymous identifier for this browser and the current session, so that page views and other events can be attributed to the same visitor.",
-});
-
-// Datadog
-registerCookie({
-  name: "dd_cookie_test_",
-  type: "analytics",
-  thirdPartyName: "Datadog",
-  description: "Cookie used by Datadog to test if cookies are enabled",
-});
-
-registerCookie({
-  name: "_dd_s",
-  type: "analytics",
-  thirdPartyName: "Datadog",
-  description: "Main cookie used by datadog to track sessions",
 });
 
 // Hotjar

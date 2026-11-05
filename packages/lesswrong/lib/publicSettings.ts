@@ -150,9 +150,6 @@ export const adminAccountSetting = new DatabasePublicSetting<AccountInfo|null>('
 
 export const crosspostKarmaThreshold = new DatabasePublicSetting<number | null>('crosspostKarmaThreshold', 100);
 
-export const ddTracingSampleRate = new DatabasePublicSetting<number>('datadog.tracingSampleRate', 100) // Sample rate for backend traces, between 0 and 100
-export const ddRumSampleRate = new DatabasePublicSetting<number>('datadog.rumSampleRate', 100) // Sample rate for backend traces, between 0 and 100
-export const ddSessionReplaySampleRate = new DatabasePublicSetting<number>('datadog.sessionReplaySampleRate', 100) // Sample rate for backend traces, between 0 and 100
 
 /** Will we show our logo prominently, such as in the header */
 export const hasProminentLogoSetting = new DatabasePublicSetting<boolean>("hasProminentLogo", false);
@@ -189,7 +186,6 @@ export const blackBarTitle = new DatabasePublicSetting<string | null>('blackBarT
 
 export const quickTakesTagsEnabledSetting = new DatabasePublicSetting<boolean>('quickTakes.tagsEnabled', isEAForum)
 
-export const vertexEnabledSetting = new DatabasePublicSetting<boolean>('googleVertex.enabled', false);
 
 /** Whether to show permalinked (?commentId=...) comments at the top of the page, vs scrolling to show them in context */
 export const commentPermalinkStyleSetting = new DatabasePublicSetting<'top' | 'in-context'>('commentPermalinkStyle', isEAForum ? 'in-context' : 'top');

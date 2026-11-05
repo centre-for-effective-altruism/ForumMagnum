@@ -2,7 +2,7 @@ import AbstractRepo from "./AbstractRepo";
 import Votes from "../../server/collections/votes/collection";
 import type { RecentVoteInfo } from "../../lib/rateLimits/types";
 import groupBy from "lodash/groupBy";
-import { NamesAttachedReactionsVote } from "../../lib/voting/namesAttachedReactions";
+import type { NamesAttachedReactionsVote } from "../../lib/voting/namesAttachedReactionsTypes";
 import { eaEmojiPalette, getEAEmojisForKarmaChanges } from "../../lib/voting/eaEmojiPalette";
 import { recordPerfMetrics } from "./perfMetricWrapper";
 import type {

@@ -13,7 +13,6 @@ import EyeIcon from '@/lib/vendor/@material-ui/icons/src/Visibility';
 import { useCurrentUser } from '../common/withUser';
 import { useDialog } from '../common/withDialog'
 import { useHover } from '../common/withHover'
-import {afNonMemberDisplayInitialPopup} from "../../lib/alignment-forum/displayAFNonMemberPopups";
 import { MINIMUM_COAUTHOR_KARMA } from "@/lib/collections/posts/helpers";
 import { DisableNoKibitzContext } from './UsersNameDisplay';
 import { useAdminToggle } from '../admin/useAdminToggle';
@@ -27,7 +26,6 @@ import { tagUserHasSufficientKarma } from '../../lib/collections/tags/helpers';
 import { InteractionWrapper } from '../common/useClickableCell';
 import NewDialogueDialog from "../posts/NewDialogueDialog";
 import NewShortformDialog from "../shortform/NewShortformDialog";
-import AFApplicationForm from "../alignment-forum/AFApplicationForm";
 import LWPopper from "../common/LWPopper";
 import LWTooltip from "../common/LWTooltip";
 import ThemePickerMenu from "../themes/ThemePickerMenu";
@@ -310,11 +308,7 @@ const UsersMenu = ({classes}: {
       </LWTooltip>
     </InteractionWrapper>
   ) : (
-    <div onClick={(ev) => {
-      if (afNonMemberDisplayInitialPopup(currentUser, openDialog)) {
-        ev.preventDefault()
-      }
-    }}>
+    <div>
       {order.map((itemName, i) => {
         const Component = items[itemName];
         return <Component key={i} />
@@ -350,15 +344,6 @@ const UsersMenu = ({classes}: {
 
               {!isFriendlyUI && <DropdownDivider />}
 
-              {isAF && !isAfMember &&
-                <DropdownItem
-                  title={preferredHeadingCase("Apply for Membership")}
-                  onClick={() => openDialog({
-                    name: "AFApplicationForm",
-                    contents: ({onClose}) => <AFApplicationForm onClose={onClose}/>
-                  })}
-                />
-              }
               {currentUser.noKibitz &&
                 <DropdownItem
                   title={preferredHeadingCase(

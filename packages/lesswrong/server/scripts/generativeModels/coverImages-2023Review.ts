@@ -9,10 +9,11 @@ import { moveImageToCloudinary } from '../convertImagesToCloudinary.ts';
 import { fal } from '@fal-ai/client';
 import sample from 'lodash/sample';
 import { falApiKey } from '@/lib/instanceSettings.ts';
-import { artPrompt } from '@/components/review/GenerateImagesButton.tsx';
 import { createAdminContext } from '@/server/vulcan-lib/createContexts.ts';
 import { createReviewWinnerArt } from '@/server/collections/reviewWinnerArts/mutations.ts';
 import { createSplashArtCoordinate } from '@/server/collections/splashArtCoordinates/mutations.ts';
+
+const artPrompt = ", aquarelle artwork fading out to the left, in the style of ethereal watercolor washes, clear focal point on the right half of image, juxtaposition of hard and soft lines, muted colors, drenched in watercolor, aquarelle, smooth color gradients, ethereal watercolor, beautiful fade to white, white, soaking wet watercolors fading into each other, smooth edges, topographic maps, left side of the image is fading to white, right side has a visceral motif, left fade right intense, image fades to white on left, left side white, smooth texture";
 
 /*
 This script makes AI-generated images for Best of LessWrong posts.

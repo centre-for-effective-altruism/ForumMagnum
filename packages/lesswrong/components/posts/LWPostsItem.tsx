@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import { NEW_COMMENT_MARGIN_BOTTOM } from '../comments/constants';
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { cloudinaryCloudNameSetting } from '../../lib/publicSettings';
-import { getReviewPhase, postEligibleForReview, postPassedNomination, REVIEW_YEAR } from '../../lib/reviewUtils';
+import { getReviewPhase } from '../../lib/reviewUtils';
 import { PostsItemConfig, usePostsItem } from './usePostsItem';
 import PostsItemTrailingButtons, { MENU_WIDTH, DismissButton } from './PostsItemTrailingButtons';
 import DebateIcon from '@/lib/vendor/@material-ui/icons/src/Forum';
@@ -32,8 +32,6 @@ import PostsItemNewCommentsWrapper from "./PostsItemNewCommentsWrapper";
 import PostsItemNewDialogueResponses from "./PostsItemNewDialogueResponses";
 import AnalyticsTracker from "../common/AnalyticsTracker";
 import AddToCalendarButton from "./AddToCalendar/AddToCalendarButton";
-import PostsItemReviewVote from "../review/PostsItemReviewVote";
-import ReviewPostButton from "../review/ReviewPostButton";
 import PostReadCheckbox from "./PostReadCheckbox";
 import PostMostValuableCheckbox from "./PostMostValuableCheckbox";
 import { ResponseIcon } from "./PostsPage/RSVPs";
@@ -446,7 +444,7 @@ const LWPostsItem = ({classes, ...props}: PostsList2Props) => {
     className,
   } = usePostsItem(props);
 
-  const { hover, eventHandlers } = useHover();
+  const { eventHandlers } = useHover();
 
   if (isRepeated) {
     return null;
@@ -512,7 +510,6 @@ const LWPostsItem = ({classes, ...props}: PostsList2Props) => {
                     {...(showPersonalIcon ? {showPersonalIcon} : {})}
                     curatedIconLeft={curatedIconLeft}
                     strikethroughTitle={strikethroughTitle}
-                    postItemHovered={hover}
                   />
                 </AnalyticsTracker>
               </span>
@@ -581,13 +578,6 @@ const LWPostsItem = ({classes, ...props}: PostsList2Props) => {
                     newPromotedComments={hasNewPromotedComments}
                   />
                 </div>}
-
-                {getReviewPhase() === "NOMINATIONS" && <PostsItemReviewVote post={post}/>}
-
-                {postEligibleForReview(post) && postPassedNomination(post) && getReviewPhase() === "REVIEWS" && <span className={classes.reviewPostButton}>
-                  <ReviewPostButton post={post} year={REVIEW_YEAR+""} reviewMessage={<LWTooltip title={<div><div>What was good about this post? How it could be improved? Does it stand the test of time?</div><p><em>{post.reviewCount || "No"} review{post.reviewCount !== 1 && "s"}</em></p></div>} placement="top">
-                  Review
-                </LWTooltip>}/></span>}
 
                 {(showNominationCount || showReviewCount) && <LWTooltip title={reviewCountsTooltip} placement="top">
 

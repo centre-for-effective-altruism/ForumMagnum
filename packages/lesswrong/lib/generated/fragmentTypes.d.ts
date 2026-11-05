@@ -136,11 +136,6 @@ interface BookmarksDefaultFragment { // fragment on Bookmarks
   readonly active: boolean,
 }
 
-interface BookmarksFeedItemFragment extends BookmarksDefaultFragment { // fragment on Bookmarks
-  readonly post: PostsListWithVotes|null,
-  readonly comment: UltraFeedComment|null,
-}
-
 interface BookmarksFriendlyFeedItemFragment extends BookmarksDefaultFragment { // fragment on Bookmarks
   readonly comment: ShortformComments|null,
 }
@@ -999,23 +994,6 @@ interface FeaturedResourcesFragment { // fragment on FeaturedResources
   readonly ctaText: string,
   readonly ctaUrl: string,
   readonly expiresAt: Date,
-}
-
-interface FeedCommentThreadFragment { // fragment on non-collection type
-  readonly _id: any,
-  readonly commentMetaInfos: any,
-  readonly comments: any,
-}
-
-interface FeedPostFragment { // fragment on non-collection type
-  readonly _id: any,
-  readonly postMetaInfo: any,
-  readonly post: any,
-}
-
-interface FeedSpotlightFragment { // fragment on non-collection type
-  readonly _id: any,
-  readonly spotlight: any,
 }
 
 interface FieldChangeFragment { // fragment on FieldChanges
@@ -2483,7 +2461,7 @@ interface RecommendationsCachesDefaultFragment { // fragment on RecommendationsC
   readonly legacyData: any,
   readonly userId: string|null,
   readonly postId: string|null,
-  readonly source: "recombee" | "vertex",
+  readonly source: "recombee",
   readonly scenario: string|null,
   readonly attributionId: string|null,
   readonly ttlMs: number|null,
@@ -3718,14 +3696,6 @@ interface TypingIndicatorsDefaultFragment { // fragment on TypingIndicators
   readonly lastUpdated: Date|null,
 }
 
-interface UltraFeedComment extends CommentsList { // fragment on Comments
-  readonly post: UltraFeedComment_post|null,
-}
-
-interface UltraFeedComment_post extends PostsMinimumInfo { // fragment on Posts
-  readonly votingSystem: string|null,
-}
-
 interface UltraFeedEventsDefaultFragment { // fragment on UltraFeedEvents
   readonly _id: string,
   readonly createdAt: Date,
@@ -3735,21 +3705,6 @@ interface UltraFeedEventsDefaultFragment { // fragment on UltraFeedEvents
   readonly userId: string|null,
   readonly event: any,
   readonly feedItemId: string|null,
-}
-
-interface UltraFeedPostFragment extends PostsDetails, PostsListWithVotes { // fragment on Posts
-  readonly contents: UltraFeedPostFragment_contents|null,
-  readonly autoFrontpage: "show" | "hide" | null,
-  readonly votingSystem: string|null,
-}
-
-interface UltraFeedPostFragment_contents { // fragment on Revisions
-  readonly _id: string,
-  readonly html: string|null,
-  readonly htmlHighlight: string,
-  readonly wordCount: number,
-  readonly plaintextDescription: string,
-  readonly version: string,
 }
 
 interface UnclaimedReportsList { // fragment on Reports
@@ -5681,7 +5636,6 @@ interface FragmentTypes {
   BookEdit: BookEdit
   BookPageFragment: BookPageFragment
   BookmarksDefaultFragment: BookmarksDefaultFragment
-  BookmarksFeedItemFragment: BookmarksFeedItemFragment
   BookmarksFriendlyFeedItemFragment: BookmarksFriendlyFeedItemFragment
   BookmarksWithDocumentFragment: BookmarksWithDocumentFragment
   BooksDefaultFragment: BooksDefaultFragment
@@ -5744,9 +5698,6 @@ interface FragmentTypes {
   ExplorePageTagFragment: ExplorePageTagFragment
   FeaturedResourcesDefaultFragment: FeaturedResourcesDefaultFragment
   FeaturedResourcesFragment: FeaturedResourcesFragment
-  FeedCommentThreadFragment: FeedCommentThreadFragment
-  FeedPostFragment: FeedPostFragment
-  FeedSpotlightFragment: FeedSpotlightFragment
   FieldChangeFragment: FieldChangeFragment
   FieldChangesDefaultFragment: FieldChangesDefaultFragment
   ForumEventsDefaultFragment: ForumEventsDefaultFragment
@@ -5959,9 +5910,7 @@ interface FragmentTypes {
   TweetsDefaultFragment: TweetsDefaultFragment
   TypingIndicatorInfo: TypingIndicatorInfo
   TypingIndicatorsDefaultFragment: TypingIndicatorsDefaultFragment
-  UltraFeedComment: UltraFeedComment
   UltraFeedEventsDefaultFragment: UltraFeedEventsDefaultFragment
-  UltraFeedPostFragment: UltraFeedPostFragment
   UnclaimedReportsList: UnclaimedReportsList
   UserActivitiesDefaultFragment: UserActivitiesDefaultFragment
   UserAltAccountsFragment: UserAltAccountsFragment
@@ -6027,7 +5976,7 @@ interface FragmentTypesByCollection {
   ArbitalTagContentRels: "ArbitalTagContentRelsDefaultFragment"
   AutomatedContentEvaluations: "AutomatedContentEvaluationsDefaultFragment"
   Bans: "BansAdminPageFragment"|"BansDefaultFragment"
-  Bookmarks: "BookmarksDefaultFragment"|"BookmarksFeedItemFragment"|"BookmarksFriendlyFeedItemFragment"|"BookmarksWithDocumentFragment"
+  Bookmarks: "BookmarksDefaultFragment"|"BookmarksFriendlyFeedItemFragment"|"BookmarksWithDocumentFragment"
   Books: "BookEdit"|"BookPageFragment"|"BooksDefaultFragment"
   Chapters: "ChaptersDefaultFragment"|"ChaptersEdit"|"ChaptersFragment"
   CkEditorUserSessions: "CkEditorUserSessionInfo"|"CkEditorUserSessionsDefaultFragment"
@@ -6035,7 +5984,7 @@ interface FragmentTypesByCollection {
   Collections: "CollectionContinueReadingFragment"|"CollectionsBestOfFragment"|"CollectionsDefaultFragment"|"CollectionsEditFragment"|"CollectionsPageFragment"
   CommentAwards: "CommentAwardsDefaultFragment"
   CommentModeratorActions: "CommentModeratorActionDisplay"|"CommentModeratorActionsDefaultFragment"
-  Comments: "CommentEdit"|"CommentWithRepliesFragment"|"CommentsDefaultFragment"|"CommentsForAutocomplete"|"CommentsForAutocompleteWithParents"|"CommentsList"|"CommentsListWithModGPTAnalysis"|"CommentsListWithModerationMetadata"|"CommentsListWithParentMetadata"|"CommentsListWithTopLevelComment"|"DeletedCommentsMetaData"|"DeletedCommentsModerationLog"|"DraftComments"|"QuickTakesRecentDiscussion"|"ShortformComments"|"StickySubforumCommentFragment"|"SuggestAlignmentComment"|"UltraFeedComment"|"WithVoteComment"
+  Comments: "CommentEdit"|"CommentWithRepliesFragment"|"CommentsDefaultFragment"|"CommentsForAutocomplete"|"CommentsForAutocompleteWithParents"|"CommentsList"|"CommentsListWithModGPTAnalysis"|"CommentsListWithModerationMetadata"|"CommentsListWithParentMetadata"|"CommentsListWithTopLevelComment"|"DeletedCommentsMetaData"|"DeletedCommentsModerationLog"|"DraftComments"|"QuickTakesRecentDiscussion"|"ShortformComments"|"StickySubforumCommentFragment"|"SuggestAlignmentComment"|"WithVoteComment"
   Conversations: "ConversationsDefaultFragment"|"ConversationsList"|"ConversationsListWithReadStatus"|"ConversationsMinimumInfo"
   CronHistories: "CronHistoriesDefaultFragment"
   CurationEmails: "CurationEmailsDefaultFragment"
@@ -6052,9 +6001,6 @@ interface FragmentTypesByCollection {
   ElicitQuestions: "ElicitQuestionFragment"|"ElicitQuestionsDefaultFragment"
   EmailTokenses: "EmailTokensDefaultFragment"
   FeaturedResources: "FeaturedResourcesDefaultFragment"|"FeaturedResourcesFragment"
-  FeedCommentThreads: "FeedCommentThreadFragment"
-  FeedPosts: "FeedPostFragment"
-  FeedSpotlightItems: "FeedSpotlightFragment"
   FieldChanges: "FieldChangeFragment"|"FieldChangesDefaultFragment"
   ForumEvents: "ForumEventsDefaultFragment"|"ForumEventsDisplay"|"ForumEventsEdit"|"ForumEventsMinimumInfo"
   GardenCodes: "GardenCodeFragment"|"GardenCodeFragmentEdit"|"GardenCodesDefaultFragment"
@@ -6084,7 +6030,7 @@ interface FragmentTypesByCollection {
   PostRelations: "PostRelationsDefaultFragment"
   PostViewTimes: "PostViewTimesDefaultFragment"
   PostViewses: "PostViewsDefaultFragment"
-  Posts: "HighlightWithHash"|"PostForReviewWinnerItem"|"PostQuickTakesRecentDiscussion"|"PostSequenceNavigation"|"PostSideComments"|"PostWithDialogueMessage"|"PostWithGeneratedSummary"|"PostsAuthors"|"PostsBase"|"PostsBestOfList"|"PostsDefaultFragment"|"PostsDetails"|"PostsEdit"|"PostsEditMutationFragment"|"PostsEditQueryFragment"|"PostsExpandedHighlight"|"PostsForAutocomplete"|"PostsHTML"|"PostsList"|"PostsListBase"|"PostsListTag"|"PostsListTagWithVotes"|"PostsListWithVotes"|"PostsListWithVotesAndSequence"|"PostsMinimumInfo"|"PostsModerationGuidelines"|"PostsOriginalContents"|"PostsPage"|"PostsPlaintextDescription"|"PostsPostsPageBannerDetails"|"PostsRSSFeed"|"PostsRecentDiscussion"|"PostsReviewVotingList"|"PostsRevision"|"PostsRevisionEdit"|"PostsRevisionsList"|"PostsTopItemInfo"|"PostsTwitterAdmin"|"PostsWithNavigation"|"PostsWithNavigationAndRevision"|"PostsWithVotes"|"SuggestAlignmentPost"|"SunshineCurationPostsList"|"SunshinePostsList"|"UltraFeedPostFragment"|"UsersBannedFromPostsModerationLog"|"WithVotePost"
+  Posts: "HighlightWithHash"|"PostForReviewWinnerItem"|"PostQuickTakesRecentDiscussion"|"PostSequenceNavigation"|"PostSideComments"|"PostWithDialogueMessage"|"PostWithGeneratedSummary"|"PostsAuthors"|"PostsBase"|"PostsBestOfList"|"PostsDefaultFragment"|"PostsDetails"|"PostsEdit"|"PostsEditMutationFragment"|"PostsEditQueryFragment"|"PostsExpandedHighlight"|"PostsForAutocomplete"|"PostsHTML"|"PostsList"|"PostsListBase"|"PostsListTag"|"PostsListTagWithVotes"|"PostsListWithVotes"|"PostsListWithVotesAndSequence"|"PostsMinimumInfo"|"PostsModerationGuidelines"|"PostsOriginalContents"|"PostsPage"|"PostsPlaintextDescription"|"PostsPostsPageBannerDetails"|"PostsRSSFeed"|"PostsRecentDiscussion"|"PostsReviewVotingList"|"PostsRevision"|"PostsRevisionEdit"|"PostsRevisionsList"|"PostsTopItemInfo"|"PostsTwitterAdmin"|"PostsWithNavigation"|"PostsWithNavigationAndRevision"|"PostsWithVotes"|"SuggestAlignmentPost"|"SunshineCurationPostsList"|"SunshinePostsList"|"UsersBannedFromPostsModerationLog"|"WithVotePost"
   RSSFeeds: "RSSFeedMinimumInfo"|"RSSFeedMutationFragment"|"RSSFeedsDefaultFragment"|"newRSSFeedFragment"
   ReadStatuses: "ReadStatusesDefaultFragment"
   RecommendationsCaches: "RecommendationsCachesDefaultFragment"
@@ -6134,7 +6080,6 @@ interface CollectionNamesByFragmentName {
   BookEdit: "Books"
   BookPageFragment: "Books"
   BookmarksDefaultFragment: "Bookmarks"
-  BookmarksFeedItemFragment: "Bookmarks"
   BookmarksFriendlyFeedItemFragment: "Bookmarks"
   BookmarksWithDocumentFragment: "Bookmarks"
   BooksDefaultFragment: "Books"
@@ -6197,9 +6142,6 @@ interface CollectionNamesByFragmentName {
   ExplorePageTagFragment: "Tags"
   FeaturedResourcesDefaultFragment: "FeaturedResources"
   FeaturedResourcesFragment: "FeaturedResources"
-  FeedCommentThreadFragment: never
-  FeedPostFragment: never
-  FeedSpotlightFragment: never
   FieldChangeFragment: "FieldChanges"
   FieldChangesDefaultFragment: "FieldChanges"
   ForumEventsDefaultFragment: "ForumEvents"
@@ -6412,9 +6354,7 @@ interface CollectionNamesByFragmentName {
   TweetsDefaultFragment: "Tweets"
   TypingIndicatorInfo: "TypingIndicators"
   TypingIndicatorsDefaultFragment: "TypingIndicators"
-  UltraFeedComment: "Comments"
   UltraFeedEventsDefaultFragment: "UltraFeedEvents"
-  UltraFeedPostFragment: "Posts"
   UnclaimedReportsList: "Reports"
   UserActivitiesDefaultFragment: "UserActivities"
   UserAltAccountsFragment: "Users"

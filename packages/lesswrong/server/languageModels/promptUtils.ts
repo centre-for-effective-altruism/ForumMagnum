@@ -3,7 +3,7 @@ import { htmlToMarkdown } from "../editor/conversionUtils";
 import { CommentTreeNode, unflattenComments } from "@/lib/utils/unflatten";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
-import { PromptContextOptions } from "@/components/languageModels/LlmChatWrapper";
+import { PromptContextOptions } from "./llmChatTypes";
 
 interface NestedComment {
   _id: string;

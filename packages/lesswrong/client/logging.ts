@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/browser';
 import * as SentryIntegrations from '@sentry/integrations';
 import { sentryUrlSetting, sentryReleaseSetting, sentryEnvironmentSetting } from '../lib/instanceSettings';
 import { getUserEmail } from "../lib/collections/users/helpers";
-import { configureDatadogRum } from './datadogRum';
 
 const sentryUrl = sentryUrlSetting.get()
 const sentryEnvironment = sentryEnvironmentSetting.get()
@@ -55,5 +54,4 @@ function addUserIdToGoogleAnalytics(user: UsersCurrent | null) {
 export function onUserChanged(user: UsersCurrent) {
   identifyUserToSentry(user);
   addUserIdToGoogleAnalytics(user);
-  configureDatadogRum(user);
 }

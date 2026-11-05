@@ -46,7 +46,7 @@ const schema = {
       canUpdate: ["admins"],
       canCreate: ["admins"],
       validation: {
-        allowedValues: ["recombee", "vertex"],
+        allowedValues: ["recombee"],
       },
     },
   },

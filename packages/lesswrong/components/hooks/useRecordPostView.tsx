@@ -3,10 +3,6 @@ import { useMutation, gql } from '@apollo/client';
 import { useCurrentUser } from '../common/withUser';
 import { useNewEvents } from '../../lib/events/withNewEvents';
 import { hookToHoc } from '../../lib/hocUtils';
-import { recombeeApi } from '../../lib/recombee/client';
-import { recombeeEnabledSetting, vertexEnabledSetting } from '../../lib/publicSettings';
-import { isRecombeeRecommendablePost } from '@/lib/collections/posts/helpers';
-import { useClientId } from '@/lib/abTestImpl';
 
 export type ItemsReadContextType = {
   postsRead: Record<string,boolean>,
@@ -24,38 +20,15 @@ export const withItemsRead = hookToHoc(useItemsRead);
 
 type ViewablePost = Pick<PostsBase, "_id" | "isRead" | "title" | "draft">;
 
-interface RecombeeOptions {
-  recommId?: string;
-}
-
-interface VertexOptions {
-  attributionId?: string;
-}
-
-export interface RecommendationOptions {
-  skip?: boolean;
-  recombeeOptions?: RecombeeOptions;
-  vertexOptions?: VertexOptions;
-}
-
 interface RecordPostViewArgs {
   post: PostsListBase;
   extraEventProperties?: Record<string,any>;
-  recommendationOptions?: RecommendationOptions
 }
 
 export const useRecordPostView = (post: ViewablePost) => {
   const [increasePostViewCount] = useMutation(gql`
     mutation increasePostViewCountMutation($postId: String) {
       increasePostViewCount(postId: $postId)
-    }
-  `, {
-    ignoreResults: true
-  });
-
-  const [sendVertexViewItemEvent] = useMutation(gql`
-    mutation sendVertexViewItemEventMutation($postId: String!, $attributionId: String) {
-      sendVertexViewItemEvent(postId: $postId, attributionId: $attributionId)
     }
   `, {
     ignoreResults: true
@@ -71,11 +44,10 @@ export const useRecordPostView = (post: ViewablePost) => {
   
   const {recordEvent} = useNewEvents()
   const currentUser = useCurrentUser();
-  const clientId = useClientId();
   const {postsRead, setPostRead} = useItemsRead();
   const isRead = post && !!((post._id in postsRead) ? postsRead[post._id] : post.isRead)
   
-  const recordPostView = useCallback(async ({post, extraEventProperties, recommendationOptions}: RecordPostViewArgs) => {
+  const recordPostView = useCallback(async ({post, extraEventProperties}: RecordPostViewArgs) => {
     try {
       if (!post) throw new Error("Tried to record view of null post");
       
@@ -106,31 +78,11 @@ export const useRecordPostView = (post: ViewablePost) => {
         };
         
         recordEvent('post-view', true, eventProperties);
-
-        if (vertexEnabledSetting.get() && !recommendationOptions?.skip && !post.draft) {
-          void sendVertexViewItemEvent({
-            variables: {
-              postId: post._id,
-              attributionId: recommendationOptions?.vertexOptions?.attributionId
-            }
-          })
-        }
-      }
-
-      const attributedUserId = currentUser?._id ?? clientId;
-
-      if (attributedUserId
-        && recombeeEnabledSetting.get()
-        && !recommendationOptions?.skip
-        && isRecombeeRecommendablePost(post)
-        && (!currentUser || !excludeUserFromRecombee(currentUser))
-      ) {
-        void recombeeApi.createDetailView(post._id, attributedUserId, recommendationOptions?.recombeeOptions?.recommId);
       }
     } catch(error) {
       console.log("recordPostView error:", error); // eslint-disable-line
     }
-  }, [postsRead, setPostRead, increasePostViewCount, sendVertexViewItemEvent, currentUser, clientId, recordEvent]);
+  }, [postsRead, setPostRead, increasePostViewCount, currentUser, recordEvent]);
 
   const recordPostCommentsView = ({ post }: Pick<RecordPostViewArgs, 'post'>) => {
     if (currentUser) {
@@ -150,13 +102,6 @@ export const useRecordPostView = (post: ViewablePost) => {
   };
   
   return { recordPostView, recordPostCommentsView, isRead };
-}
-
-/**
- * If a user looks like a spambot, don't send their events to Recombee
- */
-function excludeUserFromRecombee(user: UsersCurrent) {
-  return user.spamRiskScore <= 0.1;
 }
 
 

@@ -10,7 +10,7 @@ import { isBeingUndrafted } from "@/server/editor/utils";
 import { subscriptionTypes } from "@/lib/collections/subscriptions/helpers";
 import { isAnyTest, isE2E } from "@/lib/executionEnvironment";
 import { eaFrontpageDateDefault, isEAForum, requireReviewToFrontpagePostsSetting } from "@/lib/instanceSettings";
-import { recombeeEnabledSetting, vertexEnabledSetting } from "@/lib/publicSettings";
+import { recombeeEnabledSetting } from "@/lib/publicSettings";
 import { asyncForeachSequential } from "@/lib/utils/asyncUtils";
 import { isWeekend } from "@/lib/utils/timeUtil";
 import { userIsAdmin } from "@/lib/vulcan-users/permissions";
@@ -20,7 +20,6 @@ import { EventDebouncer } from "../debouncer";
 import { wrapAndSendEmail } from "../emails/renderEmail";
 import { updatePostEmbeddings } from "../embeddings";
 import { fetchFragmentSingle } from "../fetchFragment";
-import { googleVertexApi } from "../google-vertex/client";
 import { checkFrontpage, checkTags, getAutoAppliedTags, getTagBotAccount } from "../languageModels/autoTagCallbacks";
 import { getOpenAI } from "../languageModels/languageModelIntegration";
 import type { AfterCreateCallbackProperties, CreateCallbackProperties, UpdateCallbackProperties } from "../mutationCallbacks";
@@ -118,12 +117,6 @@ const onPublishUtils = {
       void recombeeApi.upsertPost(post, context)
         // eslint-disable-next-line no-console
         .catch(e => console.log('Error when sending published post to recombee', { e }));
-    }
-  
-    if (vertexEnabledSetting.get()) {
-      void googleVertexApi.upsertPost({ post }, context)
-        // eslint-disable-next-line no-console
-        .catch(e => console.log('Error when sending published post to google vertex', { e }));
     }
   },
 
@@ -994,14 +987,7 @@ export async function updateRecombeePost({ newDocument, oldDocument, context }: 
     void recombeeApi.upsertPost(post, context)
     // eslint-disable-next-line no-console
     .catch(e => console.log('Error when sending updated post to recombee', { e }));
-  }
-
-  if (vertexEnabledSetting.get()) {
-    void googleVertexApi.upsertPost({ post }, context)
-      // eslint-disable-next-line no-console
-      .catch(e => console.log('Error when sending updated post to google vertex', { e }));
-  }
-}
+  }}
 
 /* EDIT ASYNC */
 export function sendPostApprovalNotifications(post: Pick<DbPost, '_id' | 'userId' | 'status'>, oldPost: DbPost) {

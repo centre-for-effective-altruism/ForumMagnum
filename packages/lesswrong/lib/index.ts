@@ -7,8 +7,6 @@ import './permissions';
 // ## Voting
 import './voting/voteTypes';
 import './voting/votingSystems';
-import './voting/reactionsAndLikes';
-import './voting/namesAttachedReactions';
 
 //MomentJS configuration
 import '../components/momentjs';
@@ -37,4 +35,3 @@ import './rateLimits/constants';
 import './rateLimits/types';
 
 import './subscribedUsersFeed';
-import './ultraFeed';
