@@ -471,11 +471,6 @@ interface RecombeeRecommendedPost {
   stickied: boolean | null;
 }
 
-interface VertexRecommendedPost {
-  post: Post;
-  attributionId: string | null;
-}
-
 interface PostWithApprovedJargon {
   post: Post;
   jargonTerms: Array<JargonTerm> | null;
@@ -499,10 +494,6 @@ interface RecentlyActiveDialoguesResult {
 
 interface MyDialoguesResult {
   results: Array<Post>;
-}
-
-interface GoogleVertexPostsResult {
-  results: Array<VertexRecommendedPost>;
 }
 
 interface CrossedKarmaThresholdResult {
@@ -6499,14 +6490,12 @@ interface GraphQLTypeMap {
   PostReviewSort: PostReviewSort;
   DigestPlannerPost: DigestPlannerPost;
   RecombeeRecommendedPost: RecombeeRecommendedPost;
-  VertexRecommendedPost: VertexRecommendedPost;
   PostWithApprovedJargon: PostWithApprovedJargon;
   DigestHighlightsResult: DigestHighlightsResult;
   DigestPostsThisWeekResult: DigestPostsThisWeekResult;
   CuratedAndPopularThisWeekResult: CuratedAndPopularThisWeekResult;
   RecentlyActiveDialoguesResult: RecentlyActiveDialoguesResult;
   MyDialoguesResult: MyDialoguesResult;
-  GoogleVertexPostsResult: GoogleVertexPostsResult;
   CrossedKarmaThresholdResult: CrossedKarmaThresholdResult;
   RecombeeLatestPostsResult: RecombeeLatestPostsResult;
   RecombeeHybridPostsResult: RecombeeHybridPostsResult;

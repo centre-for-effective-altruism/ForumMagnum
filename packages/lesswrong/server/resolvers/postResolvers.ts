@@ -8,7 +8,6 @@ import { getLatestRev, getNextVersion, htmlToChangeMetrics } from '../editor/uti
 import { recombeeApi, recombeeRequestHelpers } from '../recombee/client';
 import { RecommendedPost } from '@/lib/recombee/types';
 import { HybridRecombeeConfiguration, RecombeeRecommendationArgs } from '../../lib/collections/users/recommendationSettings';
-import { googleVertexApi } from '../google-vertex/client';
 import { userCanDo, userIsAdmin } from '../../lib/vulcan-users/permissions';
 import { FilterPostsForReview } from '@/components/bookmarks/ReadHistoryTab';
 import gql from "graphql-tag";
@@ -17,11 +16,6 @@ import { convertImportedGoogleDoc } from '../editor/googleDocUtils';
 import { postIsCriticism } from '../languageModels/criticismTipsBot';
 import { createPost } from '../collections/posts/mutations';
 import { createRevision } from '../collections/revisions/mutations';
-
-interface VertexRecommendedPost {
-  post: Partial<DbPost>;
-  attributionId?: string | null;
-}
 
 interface PostWithApprovedJargon {
   post: Partial<DbPost>;
@@ -82,24 +76,6 @@ const {Query: MyDialoguesQuery, typeDefs: MyDialoguesTypeDefs } = createPaginate
     },
   // Caching is not user specific, do not use caching here else you will share users' drafts
   cacheMaxAgeMs: 0, 
-});
-
-const {Query: GoogleVertexPostsQuery, typeDefs: GoogleVertexPostsTypeDefs } = createPaginatedResolver({
-  name: "GoogleVertexPosts",
-  graphQLType: "VertexRecommendedPost",
-  args: { settings: "JSON" },
-  callback: async (
-    context: ResolverContext,
-    limit: number,
-  ): Promise<VertexRecommendedPost[]> => {
-    const { currentUser } = context;
-
-    if (!currentUser) {
-      throw new Error(`You must logged in to use Google Vertex recommendations right now`);
-    }
-
-    return await googleVertexApi.getRecommendations(limit, context);
-  }
 });
 
 const {Query: CrossedKarmaThresholdQuery, typeDefs: CrossedKarmaThresholdTypeDefs } = createPaginatedResolver({
@@ -319,7 +295,6 @@ export const postGqlQueries = {
   ...CuratedAndPopularThisWeekQuery,
   ...RecentlyActiveDialoguesQuery,
   ...MyDialoguesQuery,
-  ...GoogleVertexPostsQuery,
   ...CrossedKarmaThresholdQuery,
   ...RecombeeLatestPostsQuery,
   ...RecombeeHybridPostsQuery,
@@ -529,11 +504,6 @@ export const postGqlTypeDefs = gql`
     stickied: Boolean
   }
 
-  type VertexRecommendedPost {
-    post: Post!
-    attributionId: String
-  }
-
   type PostWithApprovedJargon {
     post: Post!
     jargonTerms: [JargonTerm!]
@@ -543,7 +513,6 @@ export const postGqlTypeDefs = gql`
   ${CuratedAndPopularThisWeekTypeDefs}
   ${RecentlyActiveDialoguesTypeDefs}
   ${MyDialoguesTypeDefs}
-  ${GoogleVertexPostsTypeDefs}
   ${CrossedKarmaThresholdTypeDefs}
   ${RecombeeLatestPostsTypeDefs}
   ${RecombeeHybridPostsTypeDefs}

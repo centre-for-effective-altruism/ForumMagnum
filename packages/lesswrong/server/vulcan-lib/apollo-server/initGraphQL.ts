@@ -46,7 +46,6 @@ import { loginDataGraphQLMutations, loginDataGraphQLTypeDefs } from './authentic
 import { dialogueMessageGqlQueries, dialogueMessageGqlTypeDefs } from '@/server/resolvers/dialogueMessageResolvers';
 import { forumEventGqlMutations, forumEventGqlTypeDefs } from '@/server/resolvers/forumEventResolvers';
 import { ckEditorCallbacksGraphQLMutations, ckEditorCallbacksGraphQLTypeDefs, getLinkSharedPostGraphQLQueries } from '@/server/ckEditor/ckEditorCallbacks';
-import { googleVertexGqlMutations, googleVertexGqlTypeDefs } from '@/server/resolvers/googleVertexResolvers';
 import { migrationsDashboardGraphQLQueries, migrationsDashboardGraphQLTypeDefs } from '@/server/manualMigrations/migrationsDashboardGraphql';
 import { reviewWinnerGraphQLQueries, reviewWinnerGraphQLTypeDefs } from '@/server/resolvers/reviewWinnerResolvers';
 import { importUrlAsDraftPostGqlMutation, importUrlAsDraftPostTypeDefs } from '@/server/resolvers/importUrlAsDraftPost';
@@ -274,7 +273,6 @@ export const typeDefs = gql`
   ${ckEditorCallbacksGraphQLTypeDefs}
   ${migrationsDashboardGraphQLTypeDefs}
   ${reviewWinnerGraphQLTypeDefs}
-  ${googleVertexGqlTypeDefs}
   ${importUrlAsDraftPostTypeDefs}
   ${revisionResolversGraphQLTypeDefs}
   ${moderationGqlTypeDefs}
@@ -569,7 +567,6 @@ export const resolvers = {
     ...conversationGqlMutations,
     ...databaseSettingsGqlMutations,
     ...forumEventGqlMutations,
-    ...googleVertexGqlMutations,
     ...ckEditorCallbacksGraphQLMutations,
     ...importUrlAsDraftPostGqlMutation,
     ...revisionResolversGraphQLMutations,

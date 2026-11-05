@@ -2461,7 +2461,7 @@ interface RecommendationsCachesDefaultFragment { // fragment on RecommendationsC
   readonly legacyData: any,
   readonly userId: string|null,
   readonly postId: string|null,
-  readonly source: "recombee" | "vertex",
+  readonly source: "recombee",
   readonly scenario: string|null,
   readonly attributionId: string|null,
   readonly ttlMs: number|null,

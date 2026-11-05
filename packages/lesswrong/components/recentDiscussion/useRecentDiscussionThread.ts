@@ -25,7 +25,7 @@ export const useRecentDiscussionThread = <T extends ThreadableCommentType>({
     () => {
       setMarkedAsVisitedAt(new Date());
       setExpandAllThreads(true);
-      void recordPostView({post, extraEventProperties: {type: "recentDiscussionClick"}, recommendationOptions: {skip: true}})
+      void recordPostView({post, extraEventProperties: {type: "recentDiscussionClick"}})
     },
     [setMarkedAsVisitedAt, setExpandAllThreads, recordPostView, post],
   );

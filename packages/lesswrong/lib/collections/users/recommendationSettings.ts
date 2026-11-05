@@ -154,12 +154,6 @@ export interface HybridRecombeeConfiguration {
   filterSettings?: FilterSettings,
 }
 
-export interface VertexConfiguration {
-  loadMore?: {
-    prevAttributionId: string,
-  },
-}
-
 
 export const defaultAlgorithmSettings: DefaultRecommendationsAlgorithm = {
   method: "top",

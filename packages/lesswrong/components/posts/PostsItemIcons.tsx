@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { registerComponent } from '../../lib/vulcan-lib/components';
 import classNames from 'classnames';
 import { postGetPageUrl } from '../../lib/collections/posts/helpers';
@@ -6,9 +6,6 @@ import { curatedUrl } from '../recommendations/constants';
 import { Link } from '../../lib/reactRouterWrapper';
 import { isFriendlyUI } from '../../themes/forumTheme';
 import { isAF } from '../../lib/instanceSettings';
-import { useTracking } from '@/lib/analyticsEvents';
-import { useSetIsHiddenMutation } from '../dropdowns/posts/useSetIsHidden';
-import { IsRecommendationContext } from '../dropdowns/posts/PostActions';
 import LWTooltip from "../common/LWTooltip";
 import ForumIcon from "../common/ForumIcon";
 import OmegaIcon from "../icons/OmegaIcon";
@@ -71,12 +68,6 @@ const styles = (theme: ThemeType) => ({
   dialogueIcon: {
     strokeWidth: isFriendlyUI ? "2px" : undefined,
   },
-  recommendationIcon: {
-    color: isFriendlyUI ? theme.palette.grey[600] : theme.palette.icon.dim4,
-    '&:hover': {
-      opacity: 0.5
-    }
-  }
 });
 
 const CuratedIconInner = ({hasColor, classes}: {
@@ -98,42 +89,12 @@ const CuratedIconInner = ({hasColor, classes}: {
 export const CuratedIcon = registerComponent('CuratedIcon', CuratedIconInner, {styles});
 
 
-const RecommendedPostIcon = ({post, hover, classes}: {
+const PostsItemIconsInner = ({post, classes, hideCuratedIcon, hidePersonalIcon}: {
   post: PostsBase,
-  hover?: boolean,
-  classes: ClassesType<typeof styles>,
-}) => {
-  const { captureEvent } = useTracking() 
-  const { setIsHiddenMutation } = useSetIsHiddenMutation();
-
-  const notInterestedClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    void setIsHiddenMutation({postId: post._id, isHidden: true})
-    captureEvent("recommendationNotInterestedClicked", {postId: post._id})
-  }
-
-  return <span className={classes.postIcon}>
-    <LWTooltip title="Hide this recommendation and show fewer like it" placement="right"> 
-      {hover 
-        ? <ForumIcon icon="NotInterested" onClick={notInterestedClick} className={classNames(classes.icon, classes.recommendationIcon)} />
-        : <ForumIcon icon="Sparkle" className={classNames(classes.icon, classes.recommendationIcon)} />
-      }
-    </LWTooltip>
-  </span>
-}
-
-
-const PostsItemIconsInner = ({post, hover, classes, hideCuratedIcon, hidePersonalIcon}: {
-  post: PostsBase,
-  hover?: boolean,
   hideCuratedIcon?: boolean,
   hidePersonalIcon?: boolean
   classes: ClassesType<typeof styles>,
 }) => {
-  const showRecommendationIcon = useContext(IsRecommendationContext)
-
   return <span className={classes.iconSet}>
     {post.curatedDate && !hideCuratedIcon && <CuratedIcon/>}
     
@@ -174,7 +135,6 @@ const PostsItemIconsInner = ({post, hover, classes, hideCuratedIcon, hidePersona
       </LWTooltip>
     </span>}
 
-    {showRecommendationIcon && <RecommendedPostIcon post={post} hover={hover} classes={classes}/>}
 
   </span>
 }

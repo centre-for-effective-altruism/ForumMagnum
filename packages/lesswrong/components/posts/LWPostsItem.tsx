@@ -444,7 +444,7 @@ const LWPostsItem = ({classes, ...props}: PostsList2Props) => {
     className,
   } = usePostsItem(props);
 
-  const { hover, eventHandlers } = useHover();
+  const { eventHandlers } = useHover();
 
   if (isRepeated) {
     return null;
@@ -510,7 +510,6 @@ const LWPostsItem = ({classes, ...props}: PostsList2Props) => {
                     {...(showPersonalIcon ? {showPersonalIcon} : {})}
                     curatedIconLeft={curatedIconLeft}
                     strikethroughTitle={strikethroughTitle}
-                    postItemHovered={hover}
                   />
                 </AnalyticsTracker>
               </span>

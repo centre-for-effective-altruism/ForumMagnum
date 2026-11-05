@@ -22,15 +22,11 @@ import PostAnalyticsDropdownItem from "./PostAnalyticsDropdownItem";
 import ExcludeFromRecommendationsDropdownItem from "./ExcludeFromRecommendationsDropdownItem";
 import ApproveNewUserDropdownItem from "./ApproveNewUserDropdownItem";
 import { PostSubscriptionsDropdownItem } from "./PostSubscriptionsDropdownItem";
-import DislikeRecommendationDropdownItem from "./DislikeRecommendationDropdownItem";
 import HideFrontPageButton from './HideFrontpagePostDropdownItem';
 
 // We use a context here vs. passing in a boolean prop because we'd need to pass
 // through ~4 layers of hierarchy
 export const AllowHidingFrontPagePostsContext = React.createContext<boolean>(false);
-
-// Same as above context provider but for whether a post is being served as a recommendation
-export const IsRecommendationContext = React.createContext<boolean>(false);
 
 const styles = (_theme: ThemeType) => ({
   root: {
@@ -70,7 +66,6 @@ const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
       {includeBookmark && <BookmarkDropdownItem documentId={post._id} collectionName="Posts" />}
       <SetSideItemVisibility />
       <HideFrontPageButton post={post} />
-      <DislikeRecommendationDropdownItem post={post} />
       <ReportPostDropdownItem post={post}/>
       {currentUser && <EditTagsDropdownItem post={post} closeMenu={closeMenu} />}
       <SummarizeDropdownItem post={post} closeMenu={closeMenu} />

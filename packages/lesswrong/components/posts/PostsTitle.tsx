@@ -186,7 +186,6 @@ const PostsTitle = ({
   Wrapper=DefaultWrapper,
   showEventTag,
   linkEventProps,
-  postItemHovered,
   className,
   classes,
 }: {
@@ -204,7 +203,6 @@ const PostsTitle = ({
   Wrapper?: FC<PropsWithChildren<{}>>,
   showEventTag?: boolean,
   linkEventProps?: Record<string, string>,
-  postItemHovered?: boolean,
   className?: string,
   classes: ClassesType<typeof styles>,
 }) => {
@@ -258,7 +256,6 @@ const PostsTitle = ({
             post={post} 
             hideCuratedIcon={curatedIconLeft} 
             hidePersonalIcon={!showPersonalIcon}
-            hover={postItemHovered}
           />
         </InteractionWrapper>
       </span>}

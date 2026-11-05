@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import { useHideRepeatedPosts } from "./HideRepeatedPostsContext";
-import { RecommendationOptions, useRecordPostView } from "../hooks/useRecordPostView";
+import { useRecordPostView } from "../hooks/useRecordPostView";
 import { useCurrentUser } from "../common/withUser";
 import {
   postCanDelete,
@@ -13,8 +13,6 @@ import {
 import qs from "qs";
 import type { Placement as PopperPlacementType } from "popper.js"
 import { AnnualReviewMarketInfo, getMarketInfo } from "../../lib/collections/posts/annualReviewMarkets";
-import { VERTEX_ATTRIBUTION_ID_QUERY_PARAM } from './PostsPage/constants';
-import { vertexEnabledSetting } from "../../lib/publicSettings";
 import type { PostsListViewType } from "../hooks/usePostsListView";
 
 const isSticky = (post: PostsList, terms: PostsViewTerms) =>
@@ -83,7 +81,6 @@ export type PostsItemConfig = {
   viewType?: PostsListViewType,
   /** Whether or not to show interactive voting arrows */
   isVoteable?: boolean,
-  vertexAttributionId?: string,
   /** Whether or not to make new post items have bold post item dates */
   emphasizeIfNew?: boolean,
   className?: string,
@@ -131,7 +128,6 @@ export const usePostsItem = ({
   showKarma = true,
   useCuratedDate = true,
   isVoteable = false,
-  vertexAttributionId,
   emphasizeIfNew = false,
   className,
 }: PostsItemConfig) => {
@@ -143,25 +139,21 @@ export const usePostsItem = ({
 
   const currentUser = useCurrentUser();
 
-  const recommendationEventOptions: RecommendationOptions = useMemo(() => ({
-    vertexOptions: { attributionId: vertexAttributionId },
-  }), [vertexAttributionId]);
-
   const toggleComments = useCallback(
     () => {
-      void recordPostView({ post, extraEventProperties: { type: "toggleComments" }, recommendationOptions: recommendationEventOptions });
+      void recordPostView({ post, extraEventProperties: { type: "toggleComments" } });
       setShowComments(!showComments);
       setReadComments(true);
     },
-    [post, recordPostView, setShowComments, showComments, setReadComments, recommendationEventOptions],
+    [post, recordPostView, setShowComments, showComments, setReadComments],
   );
 
   const toggleDialogueMessages = useCallback(
     () => {
-      void recordPostView({ post, extraEventProperties: { type: "toggleDialogueMessages" }, recommendationOptions: recommendationEventOptions });
+      void recordPostView({ post, extraEventProperties: { type: "toggleDialogueMessages" } });
       setShowDialogueMessages(!showDialogueMessages);
     },
-    [post, recordPostView, setShowDialogueMessages, showDialogueMessages, recommendationEventOptions],
+    [post, recordPostView, setShowDialogueMessages, showDialogueMessages],
   );
 
   const compareVisitedAndCommentedAt = (
@@ -178,13 +170,9 @@ export const usePostsItem = ({
   const hadUnreadComments =  compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentedAt);
   const hasNewPromotedComments =  compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentPromotedAt);
 
-  let postLink = post.draft && !post.debate
+  const postLink = post.draft && !post.debate
     ? `/editPost?${qs.stringify({postId: post._id, eventForm: post.isEvent})}`
     : postGetPageUrl(post, false, sequenceId || chapter?.sequenceId);
-
-  if (vertexAttributionId && vertexEnabledSetting.get()) {
-    postLink = `${postLink}?${VERTEX_ATTRIBUTION_ID_QUERY_PARAM}=${vertexAttributionId}`
-  }
 
   const showDismissButton = Boolean(currentUser && resumeReading);
   const onArchive = toggleDeleteDraft && (() => toggleDeleteDraft(post));
@@ -210,8 +198,6 @@ export const usePostsItem = ({
   };
 
   const annualReviewMarketInfo = getMarketInfo(post)
-
-  const isRecommendation = !!vertexAttributionId;
 
   return {
     post,
@@ -260,7 +246,6 @@ export const usePostsItem = ({
     viewType,
     bookmark,
     isVoteable,
-    isRecommendation,
     emphasizeIfNew,
     className,
   };
