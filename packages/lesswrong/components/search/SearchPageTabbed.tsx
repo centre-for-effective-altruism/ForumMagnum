@@ -463,7 +463,7 @@ const SearchPageTabbed = ({classes}: {
                 As="div"
               >
                 <Link
-                  to={`/keywords?add=${searchState?.query ?? ""}`}
+                  to={`/keywords?add=${encodeURIComponent(searchState?.query ?? "")}`}
                   className={classes.keywordAlerts}
                 >
                   <ForumIcon icon="BellBorder" /> Get notified
