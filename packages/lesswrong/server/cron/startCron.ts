@@ -1,4 +1,5 @@
 import { isAnyTest } from '@/lib/executionEnvironment';
+import { isBotSiteSetting } from '@/lib/instanceSettings';
 import { SyncedCron } from '@/server/vendor/synced-cron/synced-cron-server';
 import { getCommandLineArguments } from '@/server/commandLine';
 import { sleep } from '@/lib/utils/asyncUtils';
@@ -6,7 +7,7 @@ import { allCronJobs } from './allCronJobs';
 import { cronJobsDefined } from './cronUtil';
 
 export function startSyncedCron() {
-  if (isAnyTest || getCommandLineArguments().shellMode) {
+  if (isAnyTest || getCommandLineArguments().shellMode || isBotSiteSetting.get()) {
     return;
   }
 
