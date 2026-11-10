@@ -1,4 +1,4 @@
-import { isEAForum } from '@/lib/instanceSettings';
+import { isBotSiteSetting, isEAForum } from '@/lib/instanceSettings';
 import { DatabaseServerSetting } from '../databaseSettings';
 import type { RenderedEmail } from './renderEmail';
 import nodemailer from 'nodemailer';
@@ -22,6 +22,12 @@ const getMailUrl = () => {
  * API descended from meteor
  */
 export const sendEmailSmtp = async (email: RenderedEmail): Promise<boolean> => {
+  if (isBotSiteSetting.get()) {
+    // eslint-disable-next-line no-console
+    console.error("Refusing to send email from the bot site");
+    return false;
+  }
+
   if (email.user?.deleted) {
     // eslint-disable-next-line no-console
     console.error("Attempting to send an email to a deleted user");
