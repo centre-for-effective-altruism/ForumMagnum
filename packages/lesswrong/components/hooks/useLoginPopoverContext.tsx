@@ -1,29 +1,31 @@
-import React, { FC, ReactNode, createContext, useCallback, useContext, useState, useMemo } from "react";
+import React, { FC, ReactNode, createContext, useContext, useMemo } from "react";
 
 export type LoginAction = "login" | "signup";
 
 type LoginPopoverContext = {
-  loginAction: LoginAction | null,
-  setLoginAction: (action: LoginAction | null) => void,
   onLogin: () => void,
   onSignup: () => void,
 }
 
 const loginPopoverContext = createContext<LoginPopoverContext | null>(null);
 
+export const redirectToLoginPage = (action: LoginAction) => {
+  const params = new URLSearchParams({
+    returnTo: window.location.pathname + window.location.search,
+  });
+  if (action === "signup") {
+    params.set("signup", "true");
+  }
+  window.location.href = `/login?${params}`;
+}
+
 export const LoginPopoverContextProvider: FC<{
   children?: ReactNode,
 }> = ({children}) => {
-  const [loginAction, setLoginAction] = useState<LoginAction | null>(null);
-  const onLogin = useCallback(() => setLoginAction("login"), []);
-  const onSignup = useCallback(() => setLoginAction("signup"), []);
-  
   const providedContext: LoginPopoverContext = useMemo(() => ({
-    loginAction,
-    setLoginAction,
-    onLogin,
-    onSignup,
-  }), [loginAction, setLoginAction, onLogin, onSignup]);
+    onLogin: () => redirectToLoginPage("login"),
+    onSignup: () => redirectToLoginPage("signup"),
+  }), []);
   
   return (
     <loginPopoverContext.Provider value={providedContext}>

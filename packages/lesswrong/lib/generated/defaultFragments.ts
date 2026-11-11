@@ -1597,6 +1597,15 @@ export const UserTagRelsDefaultFragment = `
   }
 `;
 
+export const UserTwoFactorAuthsDefaultFragment = `
+  fragment UserTwoFactorAuthsDefaultFragment on UserTwoFactorAuth {
+    _id
+    schemaVersion
+    createdAt
+    legacyData
+  }
+`;
+
 export const UsersDefaultFragment = `
   fragment UsersDefaultFragment on User {
     _id

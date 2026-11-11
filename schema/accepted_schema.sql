@@ -3311,6 +3311,27 @@ CREATE INDEX IF NOT EXISTS "idx_UserTagRels_schemaVersion" ON "UserTagRels" USIN
 -- Index "idx_UserTagRels_tagId_userId"
 CREATE UNIQUE INDEX IF NOT EXISTS "idx_UserTagRels_tagId_userId" ON "UserTagRels" USING btree ("tagId", "userId");
 
+-- Table "UserTwoFactorAuths"
+CREATE TABLE "UserTwoFactorAuths" (
+  _id VARCHAR(27) PRIMARY KEY,
+  "schemaVersion" DOUBLE PRECISION NOT NULL DEFAULT 1,
+  "createdAt" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  "legacyData" JSONB,
+  "userId" VARCHAR(27) NOT NULL,
+  "encryptedSecret" TEXT NOT NULL,
+  "enabledAt" TIMESTAMPTZ,
+  "lastUsedTimeStep" DOUBLE PRECISION,
+  "recoveryCodeHashes" TEXT[] NOT NULL DEFAULT '{}',
+  "failedAttempts" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "lastFailedAttemptAt" TIMESTAMPTZ
+);
+
+-- Index "idx_UserTwoFactorAuths_schemaVersion"
+CREATE INDEX IF NOT EXISTS "idx_UserTwoFactorAuths_schemaVersion" ON "UserTwoFactorAuths" USING btree ("schemaVersion");
+
+-- Index "idx_UserTwoFactorAuths_userId"
+CREATE UNIQUE INDEX IF NOT EXISTS "idx_UserTwoFactorAuths_userId" ON "UserTwoFactorAuths" USING btree ("userId");
+
 -- Table "Users"
 CREATE TABLE "Users" (
   _id VARCHAR(27) PRIMARY KEY,

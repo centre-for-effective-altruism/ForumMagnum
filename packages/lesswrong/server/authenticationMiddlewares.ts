@@ -213,7 +213,11 @@ const handleAuthenticate = (
     if (err) {
       return next(err);
     }
-    await createAndSetToken(req, res, user);
+    try {
+      await createAndSetToken(req, res, user);
+    } catch (e) {
+      return next(e);
+    }
 
     const returnTo = getReturnTo(req);
     res.statusCode = 302;

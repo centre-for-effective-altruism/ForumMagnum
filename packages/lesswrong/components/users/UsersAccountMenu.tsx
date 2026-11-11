@@ -6,7 +6,6 @@ import { isFriendlyUI } from '../../themes/forumTheme';
 import { blackBarTitle } from '../../lib/publicSettings';
 import { useLoginPopoverContext } from '../hooks/useLoginPopoverContext';
 import EAButton from "../ea-forum/EAButton";
-import EALoginPopover from "../ea-forum/auth/EALoginPopover";
 import LWClickAwayListener from "../common/LWClickAwayListener";
 import LWPopper from "../common/LWPopper";
 import LoginForm from "./LoginForm";
@@ -56,7 +55,6 @@ const EAUsersAccountMenu = ({classes}: {
       >
         Sign up
       </EAButton>
-      <EALoginPopover />
     </div>
   );
 }

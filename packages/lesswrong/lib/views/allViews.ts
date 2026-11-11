@@ -150,6 +150,7 @@ export const allViews = {
   UserMostValuablePosts: UserMostValuablePostsViews,
   UserRateLimits: UserRateLimitsViews,
   UserTagRels: UserTagRelsViews,
+  UserTwoFactorAuths: new CollectionViewSet('UserTwoFactorAuths', {}),
   UserActivities: new CollectionViewSet('UserActivities', {}),
   Votes: VotesViews,
 };
