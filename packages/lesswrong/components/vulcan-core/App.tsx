@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import moment from 'moment';
-import { localeSetting, siteImageSetting } from '../../lib/publicSettings';
+import { localeSetting } from '../../lib/publicSettings';
+import { getSiteImageUrl } from '../../lib/vulcan-lib/utils';
 import { registerComponent } from '../../lib/vulcan-lib/components';
 // eslint-disable-next-line no-restricted-imports
 import { useHistory, useLocation } from 'react-router';
@@ -107,7 +108,7 @@ const App = ({serverRequestStatus}: ExternalProps) => {
     <ServerRequestStatusContext.Provider value={serverRequestStatus||null}>
     <RefetchCurrentUserContext.Provider value={refetchCurrentUser}>
       <MessageContextProvider>
-        <HeadTags image={siteImageSetting.get()} />
+        <HeadTags image={getSiteImageUrl()} />
         <ScrollToTop />
         <Layout currentUser={currentUser}>
           <location.RouteComponent />

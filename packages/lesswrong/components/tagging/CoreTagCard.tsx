@@ -2,7 +2,7 @@ import React from 'react';
 import { registerComponent } from '../../lib/vulcan-lib/components';
 import { Link } from '../../lib/reactRouterWrapper';
 import { tagGetUrl } from '../../lib/collections/tags/helpers';
-import { siteImageSetting } from '@/lib/publicSettings';
+import { getSiteImageUrl } from '@/lib/vulcan-lib/utils';
 import { isFriendlyUI } from '../../themes/forumTheme';
 import CloudinaryImage2 from "../common/CloudinaryImage2";
 import SubscribeButton from "./SubscribeButton";
@@ -69,7 +69,7 @@ const CoreTagCard = ({tag, classes}: {
         {imageId ? (
           <CloudinaryImage2 publicId={imageId} height={85} width={85} className={classes.image} />
         ) : (
-          <img src={siteImageSetting.get()} className={classes.fallbackImage} />
+          <img src={getSiteImageUrl()} className={classes.fallbackImage} />
         )}
       </div>
       <div className={classes.tagInfo}>

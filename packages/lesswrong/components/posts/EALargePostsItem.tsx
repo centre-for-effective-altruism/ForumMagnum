@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { registerComponent } from "../../lib/vulcan-lib/components";
 import { useHover } from "../common/withHover";
 import { postGetPageUrl } from "../../lib/collections/posts/helpers";
-import { siteImageSetting } from '@/lib/publicSettings';
+import { getSiteImageUrl } from '@/lib/vulcan-lib/utils';
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { Link } from "../../lib/reactRouterWrapper";
 import { InteractionWrapper, useClickableCell } from "../common/useClickableCell";
@@ -134,7 +134,7 @@ const EALargePostsItem = ({
 
   let imageUrl = post.socialPreviewData.imageUrl;
   if (!imageUrl && !noImagePlaceholder) {
-    imageUrl = siteImageSetting.get();
+    imageUrl = getSiteImageUrl();
   }
 
   const description = post?.contents?.plaintextDescription;
