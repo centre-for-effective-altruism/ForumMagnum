@@ -49,6 +49,18 @@ export type Atom<T extends DbObject> = string | Arg | Query<T> | Table<T>;
 
 const atomIsArg = <T extends DbObject>(atom: Atom<T>): atom is Arg => atom instanceof Arg;
 
+/**
+ * Quote a name for use as an SQL identifier, such as a column alias. Identifiers
+ * are part of the SQL expression and can't be passed as Args, so anything that
+ * isn't a plain name is rejected.
+ */
+export function postgresIdentifier(name: string): string {
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) {
+    throw new Error(`Invalid SQL identifier: ${name}`);
+  }
+  return `"${name}"`;
+}
+
 class NonScalarArrayAccessError extends Error {
   constructor(public fieldName: string, public path: string[]) {
     super("Non-scalar array access");
