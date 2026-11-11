@@ -86,6 +86,20 @@ const ssrInteractionDisable = isE2E
   : "";
 
 /**
+ * Matches the icons in the new site's root layout. These files are served by
+ * the new site, so they aren't available when running ForumMagnum on its own
+ * in development.
+ */
+const eaForumIconsHeader = [
+  '<link rel="icon" href="/favicon.ico" sizes="48x48"/>',
+  '<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>',
+  '<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32"/>',
+  '<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16"/>',
+  '<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>',
+  '<link rel="manifest" href="/site.webmanifest"/>',
+].join("");
+
+/**
  * If allowed, write the prefetchPrefix to the response so the client can start downloading resources
  */
 const maybePrefetchResources = ({
@@ -436,7 +450,9 @@ export function startWebserver() {
       `<link rel="stylesheet" type="text/css" href="${url}">`
     ).join("");
     
-    const faviconHeader = `<link rel="shortcut icon" href="${faviconUrlSetting.get()}"/>`;
+    const faviconHeader = isEAForum
+      ? eaForumIconsHeader
+      : `<link rel="shortcut icon" href="${faviconUrlSetting.get()}"/>`;
 
     // Inject a tab ID into the page, by injecting a script fragment that puts
     // it into a global variable. If the response is cacheable (same html may be used

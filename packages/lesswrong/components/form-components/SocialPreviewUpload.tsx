@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { siteImageSetting } from '@/lib/publicSettings';
 import { htmlToText } from "html-to-text";
 import { truncate } from "../../lib/editor/ellipsize";
 import { getPostDescription } from "../posts/PostsPage/PostsPage";
@@ -10,7 +9,7 @@ import {
 import { randomId } from "../../lib/random";
 import { ckEditorName } from "../editor/Editor";
 import Input from "@/lib/vendor/@material-ui/core/src/Input";
-import { getSiteUrl, sanitize } from "../../lib/vulcan-lib/utils";
+import { getSiteImageUrl, getSiteUrl, sanitize } from "../../lib/vulcan-lib/utils";
 import type { TypedFieldApi } from '@/components/tanstack-form-components/BaseAppForm';
 import type { EditablePost } from '../../lib/collections/posts/helpers';
 import { defineStyles, useStyles } from '../hooks/useStyles';
@@ -284,7 +283,7 @@ export const SocialPreviewUpload = ({
           label={fallbackImageUrl ? "Change preview image" : "Upload preview image"}
           croppingAspectRatio={croppingAspectRatio}
           // socialPreviewImageUrl falls back to the first image in the post on save
-          placeholderUrl={fallbackImageUrl || siteImageSetting.get()}
+          placeholderUrl={fallbackImageUrl || getSiteImageUrl()}
         />
         <div className={classes.title}>
           {post.title || "Title"}

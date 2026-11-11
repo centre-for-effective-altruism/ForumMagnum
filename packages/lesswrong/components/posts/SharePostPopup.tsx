@@ -7,10 +7,9 @@ import { useTracking } from "../../lib/analyticsEvents";
 import { useMessages } from "../common/withMessages";
 import { forumTitleSetting } from "../../lib/instanceSettings";
 import { getPostDescription } from "./PostsPage/PostsPage";
-import { siteImageSetting } from '@/lib/publicSettings';
 import classNames from "classnames";
 import { registerComponent } from "../../lib/vulcan-lib/components";
-import { getSiteUrl } from "../../lib/vulcan-lib/utils";
+import { getSiteImageUrl, getSiteUrl } from "../../lib/vulcan-lib/utils";
 import LWPopper from "../common/LWPopper";
 import { Typography } from "../common/Typography";
 import ForumIcon from "../common/ForumIcon";
@@ -314,7 +313,7 @@ const SharePostPopup = ({
           </div>
           <div className={classes.sharePost}>Share post</div>
           <div className={classes.contentContainer}>
-            <img className={classes.image} src={post.socialPreviewData.imageUrl || siteImageSetting.get()} />
+            <img className={classes.image} src={post.socialPreviewData.imageUrl || getSiteImageUrl()} />
             <div className={classes.postPreviewTextWrapper}>
               <div className={classes.postTitle}>{post.title}</div>
               <div className={classes.postPreviewText}>{getPostDescription(post)}</div>

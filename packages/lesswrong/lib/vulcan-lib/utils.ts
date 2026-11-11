@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import isFunction from 'lodash/isFunction';
-import { siteUrlSetting } from '../instanceSettings';
-import { DatabasePublicSetting } from '../publicSettings';
+import { isEAForum, siteUrlSetting } from '../instanceSettings';
+import { DatabasePublicSetting, siteImageSetting } from '../publicSettings';
 import sanitizeHtml from 'sanitize-html';
 import { getUrlClass } from '@/server/utils/getUrlClass';
 
@@ -50,6 +50,14 @@ export const getSiteUrl = function (): string {
   }
   return url;
 };
+
+/**
+ * The image used to represent the site on social media. On the EA Forum this
+ * is served by the new site, so it isn't available when running ForumMagnum
+ * on its own in development.
+ */
+export const getSiteImageUrl = (): string =>
+  isEAForum ? `${getSiteUrl()}og-image-1200x630.png` : siteImageSetting.get();
 
 export function urlIsAbsolute(url: string): boolean {
   // Check if the URL starts with a protocol (http:, https:, ftp:, etc.)
