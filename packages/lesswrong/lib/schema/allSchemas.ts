@@ -95,6 +95,7 @@ import { default as UserJobAds } from '../collections/userJobAds/newSchema';
 import { default as UserMostValuablePosts } from '../collections/userMostValuablePosts/newSchema';
 import { default as UserRateLimits } from '../collections/userRateLimits/newSchema';
 import { default as UserTagRels } from '../collections/userTagRels/newSchema';
+import { default as UserTwoFactorAuths } from '../collections/userTwoFactorAuths/schema';
 import { default as UserActivities } from '../collections/useractivities/newSchema';
 import { default as Users } from '../collections/users/newSchema';
 import { default as Votes } from '../collections/votes/newSchema';
@@ -118,7 +119,7 @@ export const allSchemas = {
   PodcastEpisodes, Podcasts, PostEmbeddings, PostRecommendations, PostRelations, PostViewTimes, PostViews, Posts, RSSFeeds, ReadStatuses,
   RecommendationsCaches, Reports, ReviewVotes, ReviewWinnerArts, ReviewWinners, Revisions, Sequences, Sessions, SideCommentCaches, SplashArtCoordinates,
   Spotlights, Subscriptions, SurveyQuestions, SurveyResponses, SurveySchedules, Surveys, TagFlags, TagRels, Tags, Tweets,
-  TypingIndicators, UltraFeedEvents, UserActivities, UserEAGDetails, UserJobAds, UserMostValuablePosts, UserRateLimits, UserTagRels,
+  TypingIndicators, UltraFeedEvents, UserActivities, UserEAGDetails, UserJobAds, UserMostValuablePosts, UserRateLimits, UserTagRels, UserTwoFactorAuths,
   Users, Votes, ...testSchemas,
 } satisfies Record<CollectionNameString, Record<string, CollectionFieldSpecification<CollectionNameString>>>;
 

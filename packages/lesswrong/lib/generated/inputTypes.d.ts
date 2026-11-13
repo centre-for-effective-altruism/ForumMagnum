@@ -7204,6 +7204,7 @@ interface CreateInputsByCollectionName {
   TypingIndicators: never;
   UltraFeedEvents: never;
   UserActivities: never;
+  UserTwoFactorAuths: never;
   Votes: never;
 }
 
@@ -7298,5 +7299,6 @@ interface UpdateInputsByCollectionName {
   TypingIndicators: never;
   UltraFeedEvents: never;
   UserActivities: never;
+  UserTwoFactorAuths: never;
   Votes: never;
 }

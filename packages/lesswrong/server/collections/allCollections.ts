@@ -94,6 +94,7 @@ import { UserJobAds } from './userJobAds/collection';
 import { UserMostValuablePosts } from './userMostValuablePosts/collection';
 import { UserRateLimits } from './userRateLimits/collection';
 import { UserTagRels } from './userTagRels/collection';
+import { UserTwoFactorAuths } from './userTwoFactorAuths/collection';
 import { UserActivities } from './useractivities/collection';
 import { Users } from './users/collection';
 import { Votes } from './votes/collection';
@@ -123,7 +124,7 @@ const allCollections = {
   PodcastEpisodes, Podcasts, PostEmbeddings, PostRecommendations, PostRelations, PostViewTimes, PostViews, Posts, RSSFeeds, ReadStatuses,
   RecommendationsCaches, Reports, ReviewVotes, ReviewWinnerArts, ReviewWinners, Revisions, Sequences, Sessions, SideCommentCaches, SplashArtCoordinates,
   Spotlights, Subscriptions, SurveyQuestions, SurveyResponses, SurveySchedules, Surveys, TagFlags, TagRels, Tags, Tweets,
-  TypingIndicators, UltraFeedEvents, UserActivities, UserEAGDetails, UserJobAds, UserMostValuablePosts, UserRateLimits, UserTagRels, Users, Votes
+  TypingIndicators, UltraFeedEvents, UserActivities, UserEAGDetails, UserJobAds, UserMostValuablePosts, UserRateLimits, UserTagRels, UserTwoFactorAuths, Users, Votes
 } satisfies CollectionsByName;
 
 const collectionsByLowercaseName = Object.fromEntries(

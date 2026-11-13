@@ -11958,6 +11958,13 @@ fragment UserTagRelsDefaultFragment on UserTagRel {
   subforumHideIntroPost
 }
 
+fragment UserTwoFactorAuthsDefaultFragment on UserTwoFactorAuth {
+  _id
+  schemaVersion
+  createdAt
+  legacyData
+}
+
 fragment UserVotes on Vote {
   _id
   userId

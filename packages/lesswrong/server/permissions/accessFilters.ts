@@ -467,6 +467,7 @@ const accessFilters = {
   UserMostValuablePosts: allowAccess,
   UserRateLimits: allowAccess,
   UserTagRels: userTagRelCheckAccess,
+  UserTwoFactorAuths: denyAccess,
   UserActivities: allowAccess,
   Votes: voteCheckAccess,
 } satisfies Record<CollectionNameString, CheckAccessFunction<CollectionNameString>>;

@@ -1662,6 +1662,21 @@ interface DbUserTagRel extends DbObject {
   userId: string
 }
 
+type UserTwoFactorAuthsCollection = CollectionBase<"UserTwoFactorAuths">;
+
+interface DbUserTwoFactorAuth extends DbObject {
+  __collectionName?: "UserTwoFactorAuths"
+  createdAt: Date
+  enabledAt: Date | null
+  encryptedSecret: string
+  failedAttempts: number
+  lastFailedAttemptAt: Date | null
+  lastUsedTimeStep: number | null
+  legacyData: any | null
+  recoveryCodeHashes: Array<string>
+  userId: string
+}
+
 type UsersCollection = CollectionBase<"Users">;
 
 interface DbUser extends DbObject {
@@ -2452,6 +2467,7 @@ interface CollectionsByName {
   UserMostValuablePosts: UserMostValuablePostsCollection
   UserRateLimits: UserRateLimitsCollection
   UserTagRels: UserTagRelsCollection
+  UserTwoFactorAuths: UserTwoFactorAuthsCollection
   Users: UsersCollection
   Votes: VotesCollection
 }
@@ -2546,6 +2562,7 @@ interface ObjectsByCollectionName {
   UserMostValuablePosts: DbUserMostValuablePost
   UserRateLimits: DbUserRateLimit
   UserTagRels: DbUserTagRel
+  UserTwoFactorAuths: DbUserTwoFactorAuth
   Users: DbUser
   Votes: DbVote
 }
@@ -2640,6 +2657,7 @@ interface ObjectsByTypeName {
   UserMostValuablePost: DbUserMostValuablePost
   UserRateLimit: DbUserRateLimit
   UserTagRel: DbUserTagRel
+  UserTwoFactorAuth: DbUserTwoFactorAuth
   User: DbUser
   Vote: DbVote
 }

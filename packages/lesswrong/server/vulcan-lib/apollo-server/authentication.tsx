@@ -5,6 +5,7 @@ import GraphQLLocalStrategy from "./graphQLLocalStrategy";
 import sha1 from 'crypto-js/sha1';
 import { getClientIP } from '@/server/utils/getClientIP';
 import Users from "../../../server/collections/users/collection";
+import UserTwoFactorAuths from "../../../server/collections/userTwoFactorAuths/collection";
 import { hashLoginToken } from "../../loginTokens";
 import { LegacyData } from '../../../server/collections/legacyData/collection';
 import { AuthenticationError } from 'apollo-server'
@@ -115,7 +116,16 @@ function promisifiedAuthenticate(req: ResolverContext['req'], res: ResolverConte
   })
 }
 
+const userHasTwoFactorAuthEnabled = async (userId: string) =>
+  !!(await UserTwoFactorAuths.findOne({userId, enabledAt: {$ne: null}}));
+
+// Two-factor auth is only implemented in the new site, so we must never issue
+// login tokens for users who have it enabled
 export async function createAndSetToken(req: AnyBecauseTodo, res: AnyBecauseTodo, user: DbUser) {
+  if (await userHasTwoFactorAuthEnabled(user._id)) {
+    throw new AuthenticationError("This account uses two-factor authentication, please log in at /login");
+  }
+
   const token = randomBytes(32).toString('hex');
   (res as any).setHeader("Set-Cookie", `loginToken=${token}; Max-Age=315360000; Path=/`);
 
@@ -173,8 +183,12 @@ export const loginDataGraphQLMutations = {
 
         req!.logIn(user, async (err: AnyBecauseTodo) => {
           if (err) throw new AuthenticationError(err)
-          token = await createAndSetToken(req, res, user)
-          resolve(token)
+          try {
+            token = await createAndSetToken(req, res, user)
+            resolve(token)
+          } catch (e) {
+            reject(e)
+          }
         })
       })
     })

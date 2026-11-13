@@ -90,6 +90,7 @@ export const collectionNameToTypeName = {
   UserMostValuablePosts: 'UserMostValuablePost',
   UserRateLimits: 'UserRateLimit',
   UserTagRels: 'UserTagRel',
+  UserTwoFactorAuths: 'UserTwoFactorAuth',
   Users: 'User',
   Votes: 'Vote',
 } as const;
@@ -184,6 +185,7 @@ export const typeNameToCollectionName = {
   UserMostValuablePost: 'UserMostValuablePosts',
   UserRateLimit: 'UserRateLimits',
   UserTagRel: 'UserTagRels',
+  UserTwoFactorAuth: 'UserTwoFactorAuths',
   User: 'Users',
   Vote: 'Votes',
 } as const;
@@ -278,6 +280,7 @@ export const tableNameToCollectionName = {
   usermostvaluableposts: 'UserMostValuablePosts',
   userratelimits: 'UserRateLimits',
   usertagrels: 'UserTagRels',
+  usertwofactorauths: 'UserTwoFactorAuths',
   users: 'Users',
   votes: 'Votes',
   ...((isAnyTest && !isIntegrationTest) ? {
